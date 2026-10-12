@@ -11,29 +11,25 @@
   <!-- 头图 -->
   <view class="hero" style="background:{{gym.typeColor || '#4a5164'}}">
     <view class="hero-name">{{gym.name}}</view>
-    <view class="hero-meta">{{gym.area}}<text wx:if="{{gym.openHours}}"> · {{gym.openHours}}</text><text wx:if="{{gym.distanceText}}"> · {{gym.distanceText}}</text><text wx:if="{{gym.price}}"> · 单次 ¥{{gym.price}}</text></view>
+    <view class="hero-meta">{{gym.area}}<text wx:if="{{gym.distanceText}}"> · {{gym.distanceText}}</text><text wx:if="{{gym.price}}"> · ¥{{gym.price}}</text></view>
     <view class="hero-meta" wx:if="{{gym.comingSoon}}">即将开业</view>
-    <view class="hero-tags">
-      <text class="hero-tag" wx:for="{{gym.tags}}" wx:key="*this">{{item}}</text>
-    </view>
   </view>
 
   <view class="page-pad body">
-    <!-- 本馆分级标准（认证定线员可补充/修正，众包同步全馆） -->
-    <view class="card">
-      <view class="between">
-        <text class="bold">本馆分级</text>
-        <text class="small faint" wx:if="{{!editingGrade}}">{{gradeNote || (gradeSystem.length ? '岩点颜色 = 难度' : '')}}</text>
+    <!-- 本馆分级：一行看完 -->
+    <view class="card gs-card" wx:if="{{gradeSystem.length || isSetter || editingGrade}}">
+      <view class="between" wx:if="{{!editingGrade}}">
+        <text class="small faint">分级</text>
+        <text class="small eg-edit-link" wx:if="{{isSetter}}" bindtap="startGradeEdit">{{gradeSystem.length ? '修正' : '补充'}}</text>
       </view>
       <block wx:if="{{!editingGrade}}">
-        <view class="row wrap gs-row" wx:if="{{gradeSystem.length}}">
+        <scroll-view scroll-x class="gs-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{gradeSystem.length}}">
           <view class="gs-chip" wx:for="{{gradeSystem}}" wx:key="color">
             <view class="hold-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
             <text class="gs-grade">{{item.grade}}</text>
           </view>
-        </view>
-        <view class="small faint" wx:else>暂未收录分级标准，欢迎本馆定线员补充</view>
-        <view class="small eg-edit-link" wx:if="{{isSetter}}" bindtap="startGradeEdit">{{gradeSystem.length ? '修正' : '补充'}}分级标准</view>
+        </scroll-view>
+        <view class="small faint" wx:else>暂未收录分级标准</view>
       </block>
       <block wx:else>
         <view class="row wrap eg-opts">
@@ -48,9 +44,9 @@
       </block>
     </view>
 
-    <!-- 墙面照片（整墙找线，最优先） -->
+    <!-- 墙面：按图找线 -->
     <view class="card" wx:if="{{wallPhotos.length}}">
-      <view class="bold lb-title">墙面 <text class="small faint">按图找线</text></view>
+      <view class="bold lb-title">墙面</view>
       <scroll-view scroll-x class="wp-scroll" enhanced show-scrollbar="{{false}}">
         <view class="wp-item" wx:for="{{wallPhotos}}" wx:key="id" data-id="{{item.id}}" bindtap="goWall">
           <image wx:if="{{item.photo}}" class="wp-thumb" src="{{item.photo}}" mode="aspectFill" />
@@ -65,7 +61,7 @@
     <view class="card notice" wx:if="{{gym.announcement}}">{{gym.announcement}}</view>
 
     <!-- 墙面筛选 -->
-    <scroll-view scroll-x class="walls" enhanced show-scrollbar="{{false}}" wx:if="{{gym.walls.length}}">
+    <scroll-view scroll-x class="walls" enhanced show-scrollbar="{{false}}" wx:if="{{gym.walls.length > 1}}">
       <view class="wall-chip {{wallId === 'all' ? 'on' : ''}}" data-id="all" bindtap="pickWall">全部区域</view>
       <view
         class="wall-chip {{wallId === item.id ? 'on' : ''}}"
@@ -89,9 +85,9 @@
       <view class="f-chip sort" bindtap="toggleSort">{{sort === 'hot' ? '按热度' : '按最新'}}</view>
     </view>
 
-    <!-- 线路列表：点卡片就地展开该线的 Beta 预览 -->
+    <!-- 点卡片进线路；点「n 条Beta」就地预览 -->
     <block wx:for="{{shown}}" wx:key="id">
-      <route-card route="{{item}}" expandable bind:toggle="onRouteToggle" />
+      <route-card route="{{item}}" previewable="{{true}}" open="{{expandedId === item.id}}" bind:preview="onRouteToggle" />
       <view class="rb-panel" wx:if="{{expandedId === item.id}}">
         <view class="rb-loading small faint" wx:if="{{rbLoading}}">加载中…</view>
         <block wx:elif="{{routeBetas[item.id]}}">
@@ -118,8 +114,8 @@
             还没人发这条线的 Beta · 爬过你来发第一条
           </view>
           <view class="rb-actions">
-            <view class="rb-act rb-pub" data-rid="{{item.id}}" bindtap="goPublishRoute">＋ 发这条线的 Beta</view>
-            <view class="rb-act" data-rid="{{item.id}}" bindtap="goRouteDetail">{{routeBetas[item.id].total > 3 ? '全部 ' + routeBetas[item.id].total + ' 条 ›' : '线路详情 ›'}}</view>
+            <view class="rb-act rb-pub" data-rid="{{item.id}}" bindtap="goPublishRoute">发 Beta</view>
+            <view class="rb-act" data-rid="{{item.id}}" bindtap="goRouteWall">看走线 ›</view>
           </view>
         </block>
       </view>

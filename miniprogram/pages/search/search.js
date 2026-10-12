@@ -1,4 +1,4 @@
-// 搜索：线路 / 岩馆 / 岩友 / Beta
+// 搜索：线路 / 岩馆 / Beta
 const api = require('../../utils/api');
 
 Page({
@@ -9,7 +9,7 @@ Page({
     searched: false,
     searching: false,
     searchError: '',
-    tab: 'route', // route | gym | user | beta
+    tab: 'route', // route | gym | beta
     result: { routes: [], gyms: [], users: [], betas: [] }
   },
 
@@ -35,7 +35,6 @@ Page({
       const order = [
         ['route', result.routes.length],
         ['gym', result.gyms.length],
-        ['user', result.users.length],
         ['beta', result.betas.length]
       ];
       const current = order.find((o) => o[0] === tab);
@@ -60,8 +59,5 @@ Page({
 
   goGym(e) {
     wx.navigateTo({ url: '/pages/gym-detail/gym-detail?id=' + e.currentTarget.dataset.id });
-  },
-  goUser(e) {
-    wx.navigateTo({ url: '/pages/user/user?id=' + e.currentTarget.dataset.id });
   }
 });

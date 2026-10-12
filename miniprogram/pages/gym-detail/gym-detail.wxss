@@ -1,5 +1,5 @@
 .hero {
-  padding: 48rpx 32rpx 40rpx;
+  padding: 40rpx 32rpx 36rpx;
   color: #fff;
 }
 .hero-name {
@@ -76,16 +76,20 @@
   font-weight: 700;
 }
 
-.gs-row {
-  margin-top: 20rpx;
+.gs-card {
+  padding: 18rpx 24rpx;
+}
+.gs-scroll {
+  white-space: nowrap;
+  margin-top: 12rpx;
 }
 .gs-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background: #f7f8fa;
   border-radius: 999rpx;
   padding: 8rpx 20rpx;
-  margin: 0 14rpx 14rpx 0;
+  margin-right: 12rpx;
 }
 .gs-grade {
   font-size: 24rpx;
@@ -166,7 +170,6 @@
 /* 分级标准众包编辑 */
 .eg-edit-link {
   color: #e8571f;
-  margin-top: 12rpx;
 }
 .eg-opts {
   margin: 16rpx 0 4rpx;

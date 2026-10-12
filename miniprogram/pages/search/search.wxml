@@ -4,7 +4,7 @@
     <view class="input-wrap">
       <input
         class="input"
-        placeholder="线路名 / 岩馆 / 岩友 / 动作标签"
+        placeholder="线路、岩馆、动作"
         value="{{kw}}"
         focus
         confirm-type="search"
@@ -37,7 +37,6 @@
     <view class="seg">
       <view class="seg-item {{tab === 'route' ? 'on' : ''}}" data-tab="route" bindtap="switchTab">线路 {{result.routes.length}}</view>
       <view class="seg-item {{tab === 'gym' ? 'on' : ''}}" data-tab="gym" bindtap="switchTab">岩馆 {{result.gyms.length}}</view>
-      <view class="seg-item {{tab === 'user' ? 'on' : ''}}" data-tab="user" bindtap="switchTab">岩友 {{result.users.length}}</view>
       <view class="seg-item {{tab === 'beta' ? 'on' : ''}}" data-tab="beta" bindtap="switchTab">Beta {{result.betas.length}}</view>
     </view>
 
@@ -52,20 +51,6 @@
         <view class="small faint">{{item.area}} · {{item.routeCount}} 条在墙</view>
       </view>
       <empty-state wx:if="{{!result.gyms.length}}" title="没有找到相关岩馆" />
-    </block>
-
-    <block wx:if="{{tab === 'user'}}">
-      <view class="card g-item" wx:for="{{result.users}}" wx:key="id" data-id="{{item.id}}" bindtap="goUser">
-        <view class="row">
-          <view class="avatar-emoji" style="background:{{item.color}}">{{item.emoji}}</view>
-          <view class="flex-1 u-info">
-            <view class="bold">{{item.nickname}} <text class="small faint">最高 {{item.maxGrade}}</text></view>
-            <view class="small faint">{{item.intro}}</view>
-          </view>
-          <text class="faint">›</text>
-        </view>
-      </view>
-      <empty-state wx:if="{{!result.users.length}}" title="没有找到相关岩友" />
     </block>
 
     <block wx:if="{{tab === 'beta'}}">

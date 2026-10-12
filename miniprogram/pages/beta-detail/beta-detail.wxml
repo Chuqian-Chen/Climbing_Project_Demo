@@ -8,27 +8,54 @@
 
 <view class="page-pad" wx:if="{{beta}}">
 
-  <!-- 作者卡 -->
-  <view class="card">
+  <!-- 先认线 -->
+  <view class="card route-link" wx:if="{{route}}" bindtap="goRoute">
+    <view class="row">
+      <view class="hold-dot {{route.colorLight ? 'light' : ''}}" style="background:{{route.colorHex}}"></view>
+      <text class="route-name ellipsis">{{route.name}}</text>
+      <view class="grade-badge" style="background:{{route.gradeColor}}">{{route.grade}}</view>
+      <view class="flex-1"></view>
+      <text class="small faint">{{route.gymName}} ›</text>
+    </view>
+    <scroll-view scroll-x class="seq-row" enhanced show-scrollbar="{{false}}" wx:if="{{seqChips.length}}">
+      <block wx:for="{{seqChips}}" wx:key="index">
+        <view class="seq-chip" style="border-color:{{route.colorHex}}">{{item.label}}</view>
+        <text class="seq-arrow" wx:if="{{index < seqChips.length - 1}}">→</text>
+      </block>
+    </scroll-view>
+    <view class="small faint seq-wall" wx:if="{{wallRef && wallRef.photo}}" catchtap="goWall">看墙面走线 ›</view>
+  </view>
+
+  <view class="byline">
     <view class="row">
       <view class="tap" bindtap="goAuthor">
-        <image wx:if="{{beta.author.avatarUrl}}" class="avatar-img" src="{{beta.author.avatarUrl}}" mode="aspectFill" />
-        <view wx:else class="avatar-emoji" style="background:{{beta.author.color}}">{{beta.author.emoji}}</view>
+        <image wx:if="{{beta.author.avatarUrl}}" class="avatar-img by-avatar" src="{{beta.author.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-emoji by-avatar" style="background:{{beta.author.color}}">{{beta.author.emoji}}</view>
       </view>
-      <view class="flex-1 author-info" bindtap="goAuthor">
-        <view class="bold">{{beta.author.nickname}} <text class="setter-badge" wx:if="{{beta.author.isSetter}}">定线员</text></view>
-        <view class="small faint">
-          <text wx:if="{{beta.author.height}}">身高 {{beta.author.height}}cm</text>
-          <text wx:if="{{beta.author.armSpan}}"> · 臂展 {{beta.author.armSpan}}cm</text>
+      <view class="flex-1" bindtap="goAuthor">
+        <text class="small">{{beta.author.nickname}}</text>
+        <text class="small faint">
+          <text wx:if="{{beta.author.height}}"> · {{beta.author.height}}cm</text>
           <text> · {{beta.timeText}}</text>
-        </view>
+        </text>
       </view>
       <view class="follow {{following ? 'on' : ''}}" wx:if="{{social && !beta.isMine}}" bindtap="toggleFollow">
         {{following ? '已关注' : '+ 关注'}}
       </view>
-      <view class="del-beta small edit-beta" wx:if="{{beta.isMine}}" bindtap="editBetaTap">编辑</view>
-      <view class="del-beta small" wx:if="{{beta.isMine}}" bindtap="deleteBetaTap">删除</view>
+      <text class="del-beta small edit-beta" wx:if="{{beta.isMine}}" bindtap="editBetaTap">编辑</text>
+      <text class="del-beta small" wx:if="{{beta.isMine}}" bindtap="deleteBetaTap">删除</text>
     </view>
+  </view>
+
+  <view class="title">{{beta.title}}</view>
+  <view class="caution-banner" wx:if="{{beta.caution}}">
+    <text class="caution-tag">易掉点</text>
+    <text class="caution-text">{{beta.caution}}</text>
+  </view>
+  <view class="row wrap meta-row">
+    <text class="tag on" wx:if="{{beta.heightMatch}}">适合你</text>
+    <text class="tag on" wx:if="{{beta.heightText}}">适合 {{beta.heightText}}</text>
+    <text class="tag" wx:for="{{beta.moveTags}}" wx:key="*this">{{item}}</text>
   </view>
 
   <!-- 媒体区：视频 + 图片统一横滑 -->
@@ -77,28 +104,6 @@
     <view class="small media-hint">演示环境 · 点击了解视频能力</view>
   </view>
 
-  <view class="card route-link" wx:if="{{route}}" bindtap="goRoute">
-    <view class="row">
-      <view class="hold-dot {{route.colorLight ? 'light' : ''}}" style="background:{{route.colorHex}}"></view>
-      <text class="route-name ellipsis">{{route.name}}</text>
-      <view class="grade-badge" style="background:{{route.gradeColor}}">{{route.grade}}</view>
-      <view class="flex-1"></view>
-      <text class="small faint">{{route.gymName}} ›</text>
-    </view>
-  </view>
-
-  <!-- 标题 + 适配 -->
-  <view class="title">{{beta.title}}</view>
-  <view class="caution-banner" wx:if="{{beta.caution}}">
-    <text class="caution-tag">易掉点</text>
-    <text class="caution-text">{{beta.caution}}</text>
-  </view>
-  <view class="row wrap meta-row">
-    <text class="tag on" wx:if="{{beta.heightMatch}}">适合你</text>
-    <text class="tag on" wx:if="{{beta.heightText}}">适合 {{beta.heightText}}</text>
-    <text class="tag" wx:for="{{beta.moveTags}}" wx:key="*this">{{item}}</text>
-  </view>
-
   <!-- 分步拆解 -->
   <view class="card steps">
     <view class="step" wx:for="{{beta.steps}}" wx:key="index">
@@ -110,10 +115,9 @@
     </view>
   </view>
 
-  <!-- 互动行 -->
+  <view class="btn btn-primary ck-main" bindtap="goCheckin">跟练打卡</view>
   <view class="acts">
     <view class="act {{beta.liked ? 'liked' : ''}}" bindtap="toggleLike"><text class="act-heart">{{beta.liked ? '♥' : '♡'}}</text> {{beta.likeCount}}</view>
-    <view class="act" bindtap="goCheckin">跟练打卡</view>
     <button class="act share" open-type="share">分享</button>
   </view>
 

@@ -63,6 +63,9 @@ Page({
           })
         });
       }
+      const hid = this.data.highlightId || this.data.selectedId;
+      const mk = hid ? (res.markers || []).find((m) => m.routeId === hid) : null;
+      const holds = hid ? ((res.holds || {})[hid] || []).filter((h) => !h.f && h.label) : [];
       this.setData({
         gymName: res.gymName,
         wallName: res.wallName,
@@ -72,7 +75,12 @@ Page({
         holds: res.holds || {},
         routeLabels: res.routes.map((r) => r.label),
         isSetter: !!res.isSetter,
-        loadFailed: false
+        loadFailed: false,
+        selectedId: hid || '',
+        selectedName: mk ? (mk.name || '') : '',
+        selectedGrade: mk ? (mk.grade || '') : '',
+        selectedBetaCount: mk ? (mk.betaCount || 0) : 0,
+        selectedSeq: holds.map((h) => h.label).join(' → ')
       }, () => this.refreshSegs());
     }).catch(() => {
       this.setData({ loadFailed: true });
@@ -172,7 +180,7 @@ Page({
   onImgLoad() {
     this.refreshSegs();
   },
-  // 编辑模式点已圈的点 → 操作菜单（删除/起步/手脚），替代隐藏长按手势的主入口
+  // 浏览：岩点圈只作展示（选中后才出现）；编辑：点圆圈弹出改/删
   onRingTap(e) {
     if (!this.data.editMode) return;
     const rid = e.currentTarget.dataset.rid;
@@ -338,7 +346,10 @@ Page({
   /* ---------- 标注 ---------- */
   onImgTap(e) {
     const d = this.data;
-    if (!d.editMode) return;
+    if (!d.editMode) {
+      if (d.selectedId) this.selectRoute(d.selectedId);
+      return;
+    }
     if (d.pendingIdx < 0) {
       wx.showToast({ title: '先在下方选择要标注的线路', icon: 'none' });
       return;
@@ -454,25 +465,39 @@ Page({
 
   onMarkerTap(e) {
     if (this.data.editMode) return;
-    const id = e.currentTarget.dataset.id;
-    // 第一次点：高亮这条线的全部岩点 + 显示 Beta 直达入口；再点同一个：进入线路详情
-    if (this.data.selectedId !== id) {
-      const mk = this.data.markers.find((m) => m.routeId === id) || {};
+    this.selectRoute(e.currentTarget.dataset.id);
+  },
+
+  selectRoute(id) {
+    if (!id) return;
+    if (this.data.selectedId === id) {
       this.setData({
-        selectedId: id,
-        selectedName: mk.name || '',
-        selectedBetaCount: mk.betaCount || 0
+        selectedId: '',
+        selectedName: '',
+        selectedGrade: '',
+        selectedSeq: '',
+        selectedBetaCount: 0
       }, () => this.refreshSegs());
       return;
     }
-    wx.navigateTo({
-      url: '/pages/route-detail/route-detail?id=' + id
-    });
+    const mk = this.data.markers.find((m) => m.routeId === id) || {};
+    const holds = ((this.data.holds || {})[id] || []).filter((h) => !h.f && h.label);
+    this.setData({
+      selectedId: id,
+      selectedName: mk.name || '',
+      selectedGrade: mk.grade || '',
+      selectedBetaCount: mk.betaCount || 0,
+      selectedSeq: holds.map((h) => h.label).join(' → ')
+    }, () => this.refreshSegs());
   },
 
   goSelectedRoute() {
     if (!this.data.selectedId) return;
     wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + this.data.selectedId });
+  },
+  goSelectedCheckin() {
+    if (!this.data.selectedId) return;
+    wx.navigateTo({ url: '/pages/checkin/checkin?routeId=' + this.data.selectedId });
   },
   onMarkerLongPress(e) {
     if (!this.data.editMode) return;

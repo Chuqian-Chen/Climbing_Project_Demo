@@ -1,4 +1,4 @@
-// 线路详情：线路信息 + 难度共识 + Beta 列表 + 打卡动态
+// 线路详情：认线 → 走线 → 学 Beta / 打卡
 const api = require('../../utils/api');
 const cloudSync = require('../../utils/cloud-sync');
 const gradeUtil = require('../../utils/grade');
@@ -8,11 +8,12 @@ Page({
     route: null,
     betas: [],
     shownBetas: [],
-    checkins: [],
-    reminderOn: false,
     onlyMyHeight: false,
     hasHeight: false,
     canEdit: false,
+    showManage: false,
+    seqChips: [],
+    seqHint: '',
     gradeOpts: gradeUtil.GRADE_LIST,
     colorOpts: Object.keys(gradeUtil.HOLD_COLORS).map((k) => gradeUtil.HOLD_COLORS[k].name + '点')
   },
@@ -28,20 +29,20 @@ Page({
   load() {
     if (!this.routeId) return Promise.resolve();
     return api.getRouteDetail(this.routeId).then((res) => {
-      // 真实口径的完整身份：馆 · 墙 · 颜色点 V几
       wx.setNavigationBarTitle({ title: res.route.fullName || res.route.name });
+      const holds = (res.wallRef && res.wallRef.holds) || [];
+      const seqChips = holds.filter((h) => !h.f && h.label);
+      const seqHint = (res.analysis && res.analysis[0]) || '';
       this.setData({
         route: res.route,
         betas: res.betas,
-        checkins: res.checkins,
-        reminderOn: res.reminderOn,
         wallRef: res.wallRef || null,
-        analysis: res.analysis || null,
-        analysisMoves: res.analysisMoves || null,
         hasHeight: !!res.hasHeight,
-        canEdit: !!res.route.isMine
+        canEdit: !!res.route.isMine,
+        seqChips: seqChips,
+        seqHint: seqHint,
+        loadFailed: false
       });
-      // 认证定线员也可修正任何线的难度/名称（服务端二次校验）
       if (!res.route.isMine) {
         api.getMy().then((my) => {
           if (my.profile && my.profile.isSetter) this.setData({ canEdit: true });
@@ -49,7 +50,6 @@ Page({
       }
       this.applyBetaFilter();
     }).catch(() => {
-      // 线路被删/已下架：给明确的兜底页而不是空白
       this.setData({ loadFailed: true });
     });
   },
@@ -60,7 +60,10 @@ Page({
     else wx.switchTab({ url: '/pages/home/home' });
   },
 
-  /* ---------- 线主/定线员：修改难度与名称 ---------- */
+  toggleManage() {
+    this.setData({ showManage: !this.data.showManage });
+  },
+
   onGradeEdit(e) {
     const g = this.data.gradeOpts[Number(e.detail.value)];
     if (!g || g === this.data.route.grade) return;
@@ -84,7 +87,7 @@ Page({
   deleteRouteTap() {
     wx.showModal({
       title: '删除这条线路？',
-      content: '删除后不可恢复。若线上已有其他岩友的 Beta 或打卡，将自动改为「下架」；你自己挂在这条线上的 Beta 和打卡记录会一并移除。',
+      content: '若线上已有其他岩友的 Beta 或打卡，将自动改为「下架」。',
       confirmText: '删除',
       confirmColor: '#e5484d',
       success: (r) => {
@@ -103,7 +106,6 @@ Page({
   applyBetaFilter() {
     const d = this.data;
     let list = d.onlyMyHeight ? d.betas.filter((b) => b.heightMatch) : d.betas;
-    // 默认把身高匹配的排前面（稳定排序，组内保持原热度序）——矮个子第一眼看到矮个子的解法
     if (!d.onlyMyHeight) {
       list = list.filter((b) => b.heightMatch).concat(list.filter((b) => !b.heightMatch));
     }
@@ -115,22 +117,12 @@ Page({
     this.applyBetaFilter();
   },
 
-  /* ---------- 互动 ---------- */
-  vote(e) {
-    const feel = e.currentTarget.dataset.feel;
-    api.voteFeel(this.routeId, feel).then((route) => {
-      this.setData({ route: route });
-    });
-  },
-
   toggleFav() {
     api.toggleFav(this.routeId).then((res) => {
       this.setData({ 'route.faved': res.faved });
-      wx.showToast({ title: res.faved ? '已收藏' : '已取消收藏', icon: 'none' });
     });
   },
 
-  // 众包换线报告：≥2 人报告后线路页出提示
   reportRemoved() {
     if (this.data.route.myReported) {
       wx.showToast({ title: '你已报告过，等其他岩友确认', icon: 'none' });
@@ -142,33 +134,11 @@ Page({
       success: (r) => {
         if (!r.confirm) return;
         api.reportRouteRemoved(this.routeId).then(() => {
-          wx.showToast({ title: '已报告，谢谢维护线路信息', icon: 'none' });
+          wx.showToast({ title: '已报告', icon: 'none' });
           this.load();
         });
       }
     });
-  },
-
-  // 拆线提醒：正式环境使用订阅消息，演示环境记录意向
-  toggleReminder() {
-    const doToggle = () => {
-      api.toggleReminder(this.routeId).then((res) => {
-        this.setData({ reminderOn: res.on });
-        wx.showToast({
-          title: res.on ? '拆线前会提醒你' : '已取消提醒',
-          icon: 'none'
-        });
-      });
-    };
-    if (wx.requestSubscribeMessage) {
-      wx.requestSubscribeMessage({
-        // 正式环境替换为真实的订阅消息模板 ID
-        tmplIds: ['DEMO_TMPL_ROUTE_REMOVE'],
-        complete: doToggle
-      });
-    } else {
-      doToggle();
-    }
   },
 
   goCheckin() {
@@ -179,7 +149,6 @@ Page({
       wx.previewImage({ urls: [this.data.route.photo] });
     }
   },
-  // 为这条线补照片：云存储共享，无云时本地保存
   addRoutePhoto() {
     wx.chooseMedia({
       count: 1,
@@ -220,22 +189,18 @@ Page({
   goPublish() {
     wx.navigateTo({ url: '/pages/publish/publish?routeId=' + this.routeId });
   },
-  goUser(e) {
-    const id = e.currentTarget.dataset.id;
-    if (id && id !== 'me') wx.navigateTo({ url: '/pages/user/user?id=' + id });
-  },
 
   onShareAppMessage() {
     const r = this.data.route || {};
     const w = this.data.wallRef;
     return {
-      title: '「' + r.name + '」' + r.grade + ' · ' + (r.betaCount || 0) + ' 条Beta等你研究',
+      title: r.name + ' ' + r.grade + ' · ' + (r.betaCount || 0) + ' 条Beta',
       path: '/pages/route-detail/route-detail?id=' + this.routeId,
       imageUrl: r.photo || (w && w.photo) || ''
     };
   },
   onShareTimeline() {
     const r = this.data.route || {};
-    return { title: '「' + r.name + '」' + r.grade + ' · 岩友Beta' };
+    return { title: r.name + ' ' + r.grade + ' · 岩友Beta' };
   }
 });

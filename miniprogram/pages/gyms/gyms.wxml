@@ -40,16 +40,12 @@
       <view class="gym-dist" wx:if="{{item.distanceText}}">{{item.distanceText}}</view>
     </view>
     <view class="gym-body">
-      <view class="row wrap" wx:if="{{item.tags.length}}">
-        <text class="tag" wx:for="{{item.tags}}" wx:for-item="t" wx:key="*this">{{t}}</text>
-      </view>
       <block wx:if="{{item.routeCount}}">
         <view class="between gym-stats">
           <text class="small muted">{{item.routeCount}} 条在墙</text>
-          <text class="small muted">本周 {{item.weekCheckins}} 次打卡</text>
-          <text class="small gym-new" wx:if="{{item.newCount}}">新线 {{item.newCount}} 条</text>
+          <text class="small muted" wx:if="{{item.weekCheckins}}">本周 {{item.weekCheckins}} 次打卡</text>
+          <text class="small gym-new" wx:if="{{item.newCount}}">新线 {{item.newCount}}</text>
         </view>
-        <view class="gym-notice" wx:if="{{item.announcement}}">{{item.announcement}}</view>
       </block>
       <view class="small faint" wx:else>线路数据待共建 · 进馆打卡开个荒 →</view>
     </view>

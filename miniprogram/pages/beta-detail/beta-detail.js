@@ -1,4 +1,4 @@
-// Beta 详情：作者 + 分步拆解 + 评论 + 同线路其他 Beta
+// Beta 详情：先认线 / 走线，再学动作，底部跟练打卡
 const api = require('../../utils/api');
 const flags = require('../../utils/flags');
 const cloudSync = require('../../utils/cloud-sync');
@@ -8,6 +8,8 @@ Page({
     social: flags.SOCIAL,
     beta: null,
     route: null,
+    wallRef: null,
+    seqChips: [],
     comments: [],
     others: [],
     following: false,
@@ -29,6 +31,8 @@ Page({
       this.setData({
         beta: res.beta,
         route: res.route,
+        wallRef: res.wallRef || null,
+        seqChips: res.seqChips || [],
         comments: res.comments,
         others: res.others,
         following: res.following,
@@ -127,6 +131,14 @@ Page({
     if (this.data.route) {
       wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + this.data.route.id });
     }
+  },
+  goWall() {
+    const w = this.data.wallRef;
+    const r = this.data.route;
+    if (!w || !r) return;
+    wx.navigateTo({
+      url: '/pages/wall-photo/wall-photo?gymId=' + w.gymId + '&wallId=' + w.wallId + '&highlight=' + r.id
+    });
   },
   goCheckin() {
     if (this.data.route) {

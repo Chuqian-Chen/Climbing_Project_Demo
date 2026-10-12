@@ -7,9 +7,18 @@
     <view class="small faint">线路与已上传的视频/图片不可修改；要换线路请删除后重新发布</view>
   </view>
 
-  <!-- 选线 -->
-  <view class="card" wx:if="{{!editMode}}">
-    <view class="bold sec-title">① 选哪条线</view>
+  <!-- 从线路/墙进来：线已定，不必再选 -->
+  <view class="card" wx:if="{{routeLocked && !editMode}}">
+    <view class="between">
+      <text class="bold">这条线</text>
+      <text class="small faint" bindtap="unlockRoute">换一条</text>
+    </view>
+    <view class="small muted lock-line">{{lockedRouteText}}</view>
+  </view>
+
+  <!-- 选线（Tab 发布 / 主动换线） -->
+  <view class="card" wx:if="{{!editMode && !routeLocked}}">
+    <view class="bold sec-title">选哪条线</view>
     <view class="field">
       <text class="label">岩馆</text>
       <picker mode="multiSelector" range="{{gymPickerRange}}" value="{{gymPickerValue}}" bindchange="onGymChange" bindcolumnchange="onGymColumn">
@@ -42,7 +51,7 @@
   <!-- 素材 -->
   <view class="card" wx:if="{{!editMode}}">
     <view class="between">
-      <text class="bold">② 视频 / 图片（可选）</text>
+      <text class="bold">视频 / 图片（可选）</text>
       <text class="small faint" bindtap="toggleTips">拍摄礼仪 {{showTips ? '▲' : '▼'}}</text>
     </view>
     <view class="tips small muted" wx:if="{{showTips}}">
@@ -64,13 +73,13 @@
 
   <!-- 标题 -->
   <view class="card">
-    <view class="bold sec-title">③ 标题</view>
+    <view class="bold sec-title">标题</view>
     <input class="title-input" placeholder="比如「160cm 小个子友好版」" maxlength="30" value="{{title}}" bindinput="onTitleInput" />
   </view>
 
   <!-- 分步拆解 -->
   <view class="card">
-    <view class="bold steps-title">④ 分步拆解 <text class="small faint title-hint">至少填一步</text></view>
+    <view class="bold steps-title">分步拆解 <text class="small faint title-hint">至少填一步</text></view>
     <view class="step-field" wx:for="{{steps}}" wx:key="phase">
       <view class="step-phase">{{item.phase}}</view>
       <textarea
@@ -92,7 +101,7 @@
       <input class="caution-input" value="{{caution}}" placeholder="选填：最容易掉的地方，一句话提醒岩友" maxlength="40" bindinput="onCautionInput" />
     </view>
 
-    <view class="bold steps-title">⑤ 动作标签 <text class="small faint title-hint">最多 5 个</text></view>
+    <view class="bold steps-title">动作标签 <text class="small faint title-hint">最多 5 个</text></view>
     <view class="row wrap">
       <text
         class="tag {{pickedTags.indexOf(item) >= 0 ? 'on' : ''}}"

@@ -410,23 +410,11 @@ function sortByLikes(a, b) {
 // 首页聚合（loc 可选：有定位时「附近岩馆」按距离排真实岩馆，否则演示馆兜底）
 function getHome(loc) {
   const s = store.get();
-  const todayStr = util.today();
-  const todayCount = (s.checkins || []).filter((k) => k.date === todayStr).length;
   const attemptKs = (s.checkins || []).filter((k) => k.result === 'attempt');
   const lastAttempt = attemptKs.length ? attemptKs[attemptKs.length - 1] : null;
-  // 首页 Beta 流：按热度取 30 条（支持按难度筛选后仍有内容）
   const hotBetas = allBetas(s).slice().sort(sortByLikes).slice(0, 30)
     .map((b) => decorateBeta(b, s));
-  const newRoutes = allRoutes(s)
-    .filter((r) => util.daysSince(r.setDate) <= 7 && r.status === 'active')
-    .sort((a, b) => (a.setDate < b.setDate ? 1 : -1))
-    .slice(0, 6)
-    .map((r) => decorateRoute(r, s));
-  const counts = { bj: 0, sh: 0 };
-  allGymsList().forEach((g) => {
-    if (counts[g.city] != null) counts[g.city] += 1;
-  });
-  // 附近岩馆：有定位时与岩馆页同逻辑（同城过滤 + 距离排序）取前 3
+  // 附近岩馆：有定位时与岩馆页同逻辑（同城过滤 + 距离排序）取前 6
   let nearGyms;
   if (loc && loc.latitude) {
     const cityKey = nearestCityKey(loc);
@@ -435,15 +423,13 @@ function getHome(loc) {
     nearGyms = list.map((g) => decorateGym(g, s, loc))
       .sort((a, b) =>
         (a.distance == null ? 1e9 : a.distance) - (b.distance == null ? 1e9 : b.distance))
-      .slice(0, 3);
+      .slice(0, 6);
   } else {
     nearGyms = mock.GYMS.map((g) => decorateGym(g, s, null));
-    // 生产模式无演示馆：退回全量名录前 3（有内容的馆置顶逻辑与岩馆页一致）
     if (!nearGyms.length) {
-      nearGyms = allGymsList().slice(0, 3).map((g) => decorateGym(g, s, null));
+      nearGyms = allGymsList().slice(0, 6).map((g) => decorateGym(g, s, null));
     }
   }
-  // 到馆场景：人在某馆 2km 内时，该馆的 Beta 置顶（打「本馆」标），其余按热度
   let feedBetas = hotBetas;
   const nearest = nearGyms[0];
   if (nearest && nearest.distance != null && nearest.distance <= 2) {
@@ -455,15 +441,12 @@ function getHome(loc) {
     });
     feedBetas = local.concat(rest);
   }
+  const project = lastAttempt ? findRoute(lastAttempt.routeId) : null;
   return Promise.resolve({
-    profile: s.profile,
     onboarded: !!s.onboarded,
-    todayCount: todayCount,
-    projectRoute: lastAttempt ? decorateRoute(findRoute(lastAttempt.routeId), s) : null,
+    projectRoute: project ? decorateRoute(project, s) : null,
     hotBetas: feedBetas,
-    newRoutes: newRoutes,
-    gyms: nearGyms,
-    gymCounts: counts
+    gyms: nearGyms
   });
 }
 
@@ -519,26 +502,6 @@ function getGymDetail(gymId, loc) {
   if (!gym) return Promise.reject(new Error('gym not found'));
   track.track('view_gym', { gymId: gymId });
   const routes = gymActiveRoutes(gymId, s).map((r) => decorateRoute(r, s));
-  // 周打卡榜：近7天完攀数（云端真实用户用打卡快照显示）
-  const counter = {};
-  allCheckins(s).forEach((k) => {
-    const r = findRoute(k.routeId);
-    if (!r || r.gymId !== gymId) return;
-    if (k.result === 'attempt') return;
-    if (util.daysSince(k.date) > 7 || util.daysSince(k.date) < 0) return;
-    if (!counter[k.userId]) counter[k.userId] = { sends: 0, snap: k.userSnap || null };
-    counter[k.userId].sends += 1;
-  });
-  const leaderboard = Object.keys(counter)
-    .map((uidKey) => {
-      let user = findUser(uidKey, s);
-      if (user.generic && counter[uidKey].snap) {
-        user = Object.assign({ id: uidKey }, counter[uidKey].snap);
-      }
-      return { user: user, sends: counter[uidKey].sends };
-    })
-    .sort((a, b) => b.sends - a.sends)
-    .slice(0, 5);
   // 馆内分级标准（颜色 → 难度）
   const gradeSystem = (gym.gradeSystem || []).map((gs) => {
     const c = gradeUtil.HOLD_COLORS[gs.color] || {};
@@ -561,7 +524,6 @@ function getGymDetail(gymId, loc) {
   return Promise.resolve({
     gym: decorateGym(gym, s, loc),
     routes: routes,
-    leaderboard: leaderboard,
     walls: walls,
     gradeSystem: gradeSystem,
     gradeBy: gym.gradeBy || 'hold',
@@ -581,18 +543,11 @@ function getRouteDetail(routeId) {
     .map((b) => decorateBeta(b, s))
     .sort((a, b) =>
       (Number(b.heightMatch) - Number(a.heightMatch)) || (b.likeCount - a.likeCount));
-  const checkins = allCheckins(s)
-    .filter((k) => k.routeId === routeId)
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
-    .slice(0, 10)
-    .map((k) => decorateCheckin(k, s));
   const todayStr = util.today();
   const wallRef = findRouteWall(route);
   return Promise.resolve({
     route: decorateRoute(route, s),
     betas: betas,
-    checkins: checkins,
-    reminderOn: !!(s.reminders || {})[routeId],
     wallRef: wallRef,
     analysis: analyzeRouteHolds(wallRef && wallRef.holds),
     analysisMoves: buildMoves(wallRef && wallRef.holds),
@@ -636,9 +591,14 @@ function getBetaDetail(betaId) {
     .filter((b) => b.routeId === beta.routeId && b.id !== beta.id)
     .sort(sortByLikes)
     .map((b) => decorateBeta(b, s));
+  const route = findRoute(beta.routeId);
+  const wallRef = findRouteWall(route);
+  const seqChips = ((wallRef && wallRef.holds) || []).filter((h) => !h.f && h.label);
   return Promise.resolve({
     beta: decorateBeta(beta, s),
-    route: decorateRoute(findRoute(beta.routeId), s),
+    route: decorateRoute(route, s),
+    wallRef: wallRef,
+    seqChips: seqChips,
     comments: comments,
     others: others,
     following: !!(s.follows || {})[beta.userId]
@@ -1701,24 +1661,39 @@ function findRouteWall(route) {
   const gym = findGym(route.gymId);
   if (!gym) return null;
   const walls = gymWalls(gym);
+  let fallback = null;
   for (let i = 0; i < walls.length; i++) {
     const doc = getWallDoc(route.gymId, walls[i].id);
     if (!doc || !(doc.photoFileID || doc.photoPath)) continue;
+    const photo = doc.photoFileID || doc.photoPath || '';
     const m = (doc.markers || []).find((mk) => mk.routeId === route.id);
     if (m) {
       return {
         gymId: route.gymId,
         wallId: walls[i].id,
         wallName: walls[i].name,
-        photo: doc.photoFileID || doc.photoPath || '',
+        photo: photo,
         x: m.x,
         y: m.y,
+        hasMarker: true,
         // 这条线的全部岩点圈注（多点标注，含起步组标签）
         holds: labelHolds((doc.holds && doc.holds[route.id]) || [])
       };
     }
+    if (!fallback && walls[i].id === route.wallId) {
+      fallback = {
+        gymId: route.gymId,
+        wallId: walls[i].id,
+        wallName: walls[i].name,
+        photo: photo,
+        x: 0,
+        y: 0,
+        hasMarker: false,
+        holds: []
+      };
+    }
   }
-  return null;
+  return fallback;
 }
 
 /* ---------- 搜索 ---------- */

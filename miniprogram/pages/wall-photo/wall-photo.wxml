@@ -28,7 +28,7 @@
         <view
           wx:for="{{holds[mk.routeId]}}"
           wx:key="index"
-          wx:if="{{editMode ? pendingRouteId === mk.routeId : (!selectedId || selectedId === mk.routeId)}}"
+          wx:if="{{editMode ? pendingRouteId === mk.routeId : selectedId === mk.routeId}}"
           class="hold-ring {{item.f ? 'ft' : ''}} {{(selectedId === mk.routeId || pendingRouteId === mk.routeId) ? 'on' : ''}}"
           style="left:{{item.x}}%;top:{{item.y}}%;border-color:{{mk.colorHex}}"
           data-rid="{{mk.routeId}}"
@@ -53,11 +53,17 @@
     <view class="tip small muted" wx:if="{{editMode}}">
       {{pendingIdx >= 0 ? '按手序点照片给「' + routeLabels[pendingIdx] + '」加点 · 点已圈的圆圈可改/删' : '先在下方选择要标注的线路'}}
     </view>
-    <view class="tip beta-jump" wx:elif="{{selectedId}}" bindtap="goSelectedRoute">
-      <text class="small">「{{selectedName}}」</text>
-      <text class="small beta-jump-link">{{selectedBetaCount ? '有 ' + selectedBetaCount + ' 条 Beta，去学 ›' : '还没有 Beta · 爬完你来发第一条 ›'}}</text>
+    <view class="sel-bar" wx:elif="{{selectedId}}">
+      <view class="sel-head">
+        <text class="bold">{{selectedName}} {{selectedGrade}}</text>
+        <text class="small faint" wx:if="{{selectedSeq}}">{{selectedSeq}}</text>
+      </view>
+      <view class="sel-acts">
+        <view class="btn btn-soft sel-btn" bindtap="goSelectedRoute">详情</view>
+        <view class="btn btn-primary sel-btn" bindtap="goSelectedCheckin">打卡</view>
+      </view>
     </view>
-    <view class="tip small faint" wx:elif="{{markers.length}}">点徽章高亮整条线的岩点，再点进入线路详情</view>
+    <view class="tip small faint" wx:elif="{{markers.length}}">点难度徽章，看这条线怎么走</view>
   </block>
 
   <!-- 空状态 -->
