@@ -1,0 +1,100 @@
+<view class="page-pad tabbar-pad" wx:if="{{!loading || loadError}}">
+
+  <view class="err" wx:if="{{loadError}}">
+    <text>数据加载出错：{{loadError}}</text>
+    <text class="err-retry" bindtap="retry">重试</text>
+  </view>
+
+  <block wx:if="{{!loadError && stats && stats.totalCheckins > 0}}">
+    <!-- 核心统计 -->
+    <view class="card stats">
+      <view class="stat">
+        <view class="stat-num">{{stats.totalSends}}</view>
+        <view class="stat-label">完攀</view>
+      </view>
+      <view class="stat">
+        <view class="stat-num">{{stats.maxGrade}}</view>
+        <view class="stat-label">最高难度</view>
+      </view>
+      <view class="stat">
+        <view class="stat-num">{{stats.monthCount}}</view>
+        <view class="stat-label">本月打卡</view>
+      </view>
+      <view class="stat">
+        <view class="stat-num">{{stats.streak}}<text class="stat-sub">周</text></view>
+        <view class="stat-label">连续打卡</view>
+      </view>
+    </view>
+
+    <!-- 热力图（近10周） -->
+    <view class="card">
+      <view class="bold heat-title">上墙热力 · 近 10 周</view>
+      <view class="heat">
+        <view
+          wx:for="{{heat}}"
+          wx:key="date"
+          class="heat-cell lv{{item.level}} {{item.isToday ? 'today' : ''}}"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 难度金字塔 -->
+    <view class="card" wx:if="{{pyramid.length}}">
+      <view class="bold heat-title">完攀金字塔</view>
+      <view class="pyr-row" wx:for="{{pyramid}}" wx:key="grade">
+        <view class="pyr-grade" style="color:{{item.color}}">{{item.grade}}</view>
+        <view class="pyr-track">
+          <view class="pyr-bar" style="width:{{item.pct}}%;background:{{item.color}}"></view>
+        </view>
+        <view class="pyr-count">{{item.count}}</view>
+      </view>
+    </view>
+
+    <!-- 成就 -->
+    <view class="card">
+      <view class="bold heat-title">成就徽章</view>
+      <view class="badges">
+        <view class="badge {{item.unlocked ? 'on' : ''}}" wx:for="{{badges}}" wx:key="name">
+          <view class="badge-name">{{item.name}}</view>
+          <view class="badge-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 时间线 -->
+    <view class="section-title">打卡记录</view>
+    <block wx:for="{{groups}}" wx:key="date" wx:for-item="group">
+      <view class="tl-date">{{group.dateText}}</view>
+      <view
+        class="card tl-item"
+        wx:for="{{group.list}}"
+        wx:key="id"
+        data-id="{{item.route.id}}"
+        data-kid="{{item.id}}"
+        bindtap="goRoute"
+        bindlongpress="onCheckinLongPress"
+      >
+        <view class="row">
+          <view class="hold-dot {{item.route.colorLight ? 'light' : ''}}" style="background:{{item.route.colorHex}}"></view>
+          <text class="tl-name ellipsis">{{item.route.name}}</text>
+          <view class="grade-badge" style="background:{{item.route.gradeColor}}">{{item.route.grade}}</view>
+          <view class="flex-1"></view>
+          <text class="small faint">{{item.resultText}}{{item.result === 'attempt' ? ' · ' + item.attempts + '次尝试' : (item.attempts > 1 ? ' · ' + item.attempts + '次' : '')}}</text>
+        </view>
+        <view class="small faint tl-gym">{{item.route.gymName}}<text wx:if="{{item.route.wallName}}"> · {{item.route.wallName}}</text></view>
+        <view class="small muted tl-note" wx:if="{{item.note}}">「{{item.note}}」</view>
+      </view>
+    </block>
+  </block>
+
+  <block wx:elif="{{!loadError}}">
+    <empty-state
+      title="还没有打卡记录"
+      desc="完攀或磕线后记得回来打个卡，攒出你的攀岩足迹"
+      btnText="去岩馆看看"
+      bind:action="goGyms"
+    />
+    <view class="seed" wx:if="{{!demoSeeded}}" bindtap="seedDemo">或：载入一批演示打卡，先看看效果 →</view>
+  </block>
+
+</view>

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "岩友主页",
+  "usingComponents": {
+    "beta-card": "/components/beta-card/beta-card",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

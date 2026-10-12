@@ -1,0 +1,27 @@
+<view class="rc card" wx:if="{{route}}" bindtap="onTap" hover-class="rc-hover">
+  <view class="row">
+    <!-- 认线缩略图：线路照片 / 墙面图+点位 -->
+    <view class="rc-thumb-wrap" wx:if="{{route.visual}}">
+      <image class="rc-thumb" src="{{route.visual.src}}" mode="aspectFill" lazy-load />
+      <view
+        wx:if="{{route.visual.wall}}"
+        class="rc-thumb-dot"
+        style="left:{{route.visual.x}}%;top:{{route.visual.y}}%;background:{{route.colorHex}}"
+      ></view>
+    </view>
+    <view class="flex-1 rc-body">
+      <view class="row">
+        <view class="hold-dot {{route.colorLight ? 'light' : ''}}" style="background:{{route.colorHex}}"></view>
+        <view class="rc-name ellipsis">{{route.name}}</view>
+        <view class="badge-new" wx:if="{{route.isNew}}">新线</view>
+        <view class="badge-warn" wx:if="{{route.removingSoon}}">{{route.daysLeft === 0 ? '今日拆线' : route.daysLeft + '天后拆线'}}</view>
+        <view class="flex-1"></view>
+        <view class="grade-badge" style="background:{{route.gradeColor}}">{{route.grade}}</view>
+      </view>
+      <view class="rc-meta faint small">
+        <text wx:if="{{route.wallName}}">{{route.wallName}} · </text>{{route.setterName}} 定线 · {{route.sendsTotal}} 人完攀
+        <text wx:if="{{route.betaCount}}" class="rc-beta"> · {{route.betaCount}} 条Beta</text>
+      </view>
+    </view>
+  </view>
+</view>

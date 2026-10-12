@@ -1,0 +1,47 @@
+<view class="page-pad">
+
+  <view class="card da-warn">
+    <text class="small">以下是管理员/开发操作，会改动云端或本地数据。普通使用不需要进入本页。</text>
+  </view>
+
+  <view class="card set-item" bindtap="initCloud">
+    <view class="between">
+      <view>
+        <view>初始化云数据库</view>
+        <view class="small faint da-hint">首次建库用；已有数据的集合自动跳过</view>
+      </view>
+      <text class="faint">›</text>
+    </view>
+  </view>
+
+  <view class="card set-item" bindtap="reseedCloud">
+    <view class="between">
+      <view>
+        <view>重灌云演示数据</view>
+        <view class="small faint da-hint">演示数据覆盖为最新版；真实用户内容不受影响</view>
+      </view>
+      <text class="faint">›</text>
+    </view>
+  </view>
+
+  <view class="card set-item" bindtap="prodCloud">
+    <view class="between">
+      <view>
+        <view>切换为生产数据</view>
+        <view class="small faint da-hint">上线前执行一次：清演示内容，保留真实数据</view>
+      </view>
+      <text class="faint">›</text>
+    </view>
+  </view>
+
+  <view class="card set-item" bindtap="resetDemo">
+    <view class="between">
+      <view>
+        <view class="danger">重置本地演示数据</view>
+        <view class="small faint da-hint">清空本机档案/打卡/Beta，恢复初始状态</view>
+      </view>
+      <text class="faint">›</text>
+    </view>
+  </view>
+
+</view>

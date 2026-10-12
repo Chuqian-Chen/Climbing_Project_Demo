@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "岩馆详情",
+  "usingComponents": {
+    "route-card": "/components/route-card/route-card",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

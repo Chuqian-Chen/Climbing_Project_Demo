@@ -1,0 +1,25 @@
+<view class="page-pad">
+
+  <view class="card">
+    <view class="p-title">岩馆入驻 · 免费</view>
+    <view class="p-text">「岩友Beta」帮岩友按图找线、记录攀爬。馆方入驻后可以：</view>
+    <view class="p-item">上传整墙照片，KAYA 式圈出每条线的岩点</view>
+    <view class="p-item">认证本馆定线员，新线上墙即刻同步给岩友</view>
+    <view class="p-item">换线时一键下架整墙旧线，信息永远是新的</view>
+    <view class="p-item">看到本馆的打卡热度与难度感受投票</view>
+  </view>
+
+  <view class="card">
+    <view class="p-title">入驻流程</view>
+    <view class="p-item">1. 联系我们开通馆方认证（提供岩馆名称与联系人）</view>
+    <view class="p-item">2. 馆内定线员在「我的」页申请认证，审核即通</view>
+    <view class="p-item">3. 拍墙、圈点、发新线公告，就这么简单</view>
+  </view>
+
+  <view class="card">
+    <view class="p-title">联系方式</view>
+    <view class="p-text">邮箱：chloe.c.chuqian@gmail.com</view>
+    <view class="btn btn-primary p-btn" bindtap="copyContact">复制邮箱</view>
+  </view>
+
+</view>

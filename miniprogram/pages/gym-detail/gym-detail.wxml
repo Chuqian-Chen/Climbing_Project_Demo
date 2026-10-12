@@ -1,0 +1,133 @@
+<view class="page-pad" wx:if="{{loadFailed}}">
+  <view class="card">
+    <view class="bold">这家岩馆不存在</view>
+    <view class="small faint" style="margin-top:12rpx">可能链接已失效，回岩馆列表看看</view>
+    <view class="btn btn-soft" style="margin-top:24rpx" bindtap="goBackHome">返回</view>
+  </view>
+</view>
+
+<view wx:if="{{gym}}">
+
+  <!-- 头图 -->
+  <view class="hero" style="background:{{gym.typeColor || '#4a5164'}}">
+    <view class="hero-name">{{gym.name}}</view>
+    <view class="hero-meta">{{gym.area}}<text wx:if="{{gym.openHours}}"> · {{gym.openHours}}</text><text wx:if="{{gym.distanceText}}"> · {{gym.distanceText}}</text><text wx:if="{{gym.price}}"> · 单次 ¥{{gym.price}}</text></view>
+    <view class="hero-meta" wx:if="{{gym.comingSoon}}">即将开业</view>
+    <view class="hero-tags">
+      <text class="hero-tag" wx:for="{{gym.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="page-pad body">
+    <!-- 本馆分级标准（认证定线员可补充/修正，众包同步全馆） -->
+    <view class="card">
+      <view class="between">
+        <text class="bold">本馆分级</text>
+        <text class="small faint" wx:if="{{!editingGrade}}">{{gradeNote || (gradeSystem.length ? '岩点颜色 = 难度' : '')}}</text>
+      </view>
+      <block wx:if="{{!editingGrade}}">
+        <view class="row wrap gs-row" wx:if="{{gradeSystem.length}}">
+          <view class="gs-chip" wx:for="{{gradeSystem}}" wx:key="color">
+            <view class="hold-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+            <text class="gs-grade">{{item.grade}}</text>
+          </view>
+        </view>
+        <view class="small faint" wx:else>暂未收录分级标准，欢迎本馆定线员补充</view>
+        <view class="small eg-edit-link" wx:if="{{isSetter}}" bindtap="startGradeEdit">{{gradeSystem.length ? '修正' : '补充'}}分级标准</view>
+      </block>
+      <block wx:else>
+        <view class="row wrap eg-opts">
+          <view class="eg-chip {{egByIdx === index ? 'on' : ''}}" wx:for="{{egOpts}}" wx:key="key" data-i="{{index}}" bindtap="egByTap">{{item.label}}</view>
+        </view>
+        <textarea class="eg-ta" value="{{egLines}}" bindinput="egLinesInput" placeholder="每行一条，如：&#10;橙=V0&#10;粉=V1&#10;绿=V2" maxlength="400" />
+        <input class="eg-note" value="{{egNote}}" bindinput="egNoteInput" placeholder="补充说明（选填），如：贴标岩点=起步点" maxlength="50" />
+        <view class="row eg-actions">
+          <view class="btn btn-ghost flex-1" bindtap="cancelGradeEdit">取消</view>
+          <view class="btn btn-primary flex-1" bindtap="saveGradeEdit">保存</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 墙面照片（整墙找线，最优先） -->
+    <view class="card" wx:if="{{wallPhotos.length}}">
+      <view class="bold lb-title">墙面 <text class="small faint">按图找线</text></view>
+      <scroll-view scroll-x class="wp-scroll" enhanced show-scrollbar="{{false}}">
+        <view class="wp-item" wx:for="{{wallPhotos}}" wx:key="id" data-id="{{item.id}}" bindtap="goWall">
+          <image wx:if="{{item.photo}}" class="wp-thumb" src="{{item.photo}}" mode="aspectFill" />
+          <view wx:else class="wp-thumb wp-add">＋</view>
+          <view class="small wp-name ellipsis">{{item.name}}</view>
+          <view class="small faint">{{item.photo ? item.markerCount + ' 条已标注' : '上传墙面照'}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 公告 -->
+    <view class="card notice" wx:if="{{gym.announcement}}">{{gym.announcement}}</view>
+
+    <!-- 墙面筛选 -->
+    <scroll-view scroll-x class="walls" enhanced show-scrollbar="{{false}}" wx:if="{{gym.walls.length}}">
+      <view class="wall-chip {{wallId === 'all' ? 'on' : ''}}" data-id="all" bindtap="pickWall">全部区域</view>
+      <view
+        class="wall-chip {{wallId === item.id ? 'on' : ''}}"
+        wx:for="{{gym.walls}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="pickWall"
+      >{{item.name}} {{item.angle}}</view>
+    </scroll-view>
+
+    <!-- 难度/状态/排序 -->
+    <view class="filters" wx:if="{{routes.length}}">
+      <view
+        class="f-chip {{bandKey === item.key ? 'on' : ''}}"
+        wx:for="{{bands}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="pickBand"
+      >{{item.label}}</view>
+      <view class="f-chip {{onlyNew ? 'on' : ''}}" bindtap="toggleNew">新线</view>
+      <view class="f-chip sort" bindtap="toggleSort">{{sort === 'hot' ? '按热度' : '按最新'}}</view>
+    </view>
+
+    <!-- 线路列表：点卡片就地展开该线的 Beta 预览 -->
+    <block wx:for="{{shown}}" wx:key="id">
+      <route-card route="{{item}}" expandable bind:toggle="onRouteToggle" />
+      <view class="rb-panel" wx:if="{{expandedId === item.id}}">
+        <view class="rb-loading small faint" wx:if="{{rbLoading}}">加载中…</view>
+        <block wx:elif="{{routeBetas[item.id]}}">
+          <view
+            class="rb-item"
+            wx:for="{{routeBetas[item.id].betas}}"
+            wx:for-item="b"
+            wx:key="id"
+            data-bid="{{b.id}}"
+            bindtap="goBeta"
+          >
+            <image wx:if="{{b.author.avatarUrl}}" class="rb-avatar" src="{{b.author.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="rb-avatar rb-avatar-emoji" style="background:{{b.author.color}}">{{b.author.emoji}}</view>
+            <view class="rb-mid">
+              <view class="rb-title">{{b.title}}</view>
+              <view class="rb-sub small faint">
+                {{b.author.nickname}}<text wx:if="{{b.heightText}}"> · {{b.heightText}}</text><text wx:if="{{b.type === 'video'}}"> · 视频</text>
+              </view>
+              <view class="rb-caution small" wx:if="{{b.caution}}">易掉点：{{b.caution}}</view>
+            </view>
+            <view class="rb-likes small faint">♡ {{b.likeCount}}</view>
+          </view>
+          <view class="rb-empty small faint" wx:if="{{!routeBetas[item.id].betas.length}}">
+            还没人发这条线的 Beta · 爬过你来发第一条
+          </view>
+          <view class="rb-actions">
+            <view class="rb-act rb-pub" data-rid="{{item.id}}" bindtap="goPublishRoute">＋ 发这条线的 Beta</view>
+            <view class="rb-act" data-rid="{{item.id}}" bindtap="goRouteDetail">{{routeBetas[item.id].total > 3 ? '全部 ' + routeBetas[item.id].total + ' 条 ›' : '线路详情 ›'}}</view>
+          </view>
+        </block>
+      </view>
+    </block>
+    <empty-state
+      wx:if="{{!shown.length}}"
+      title="{{routes.length ? '没有符合条件的线路' : '这家岩馆的线路待共建'}}"
+      desc="{{routes.length ? '换个筛选条件试试' : '来过这家馆？打卡、发条 Beta，让更多岩友看到它的线'}}"
+    />
+  </view>
+</view>

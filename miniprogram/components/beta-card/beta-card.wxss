@@ -1,0 +1,107 @@
+.bc {
+  margin-bottom: 20rpx;
+}
+.bc-hover {
+  transform: scale(0.985);
+  transition: transform 0.1s;
+}
+.bc-avatar {
+  margin-right: 16rpx;
+}
+.bc-nick {
+  font-weight: 700;
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+.bc-setter {
+  font-size: 20rpx;
+  color: #7a4de8;
+  background: transparent;
+  border: 1rpx solid #cdbcf2;
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
+  margin-right: 8rpx;
+  font-weight: 600;
+}
+.bc-height {
+  font-size: 20rpx;
+  color: #5a6072;
+  background: #f0f2f5;
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
+  margin-right: 8rpx;
+}
+.bc-match {
+  font-size: 20rpx;
+  color: #e8571f;
+  background: #fff1ea;
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
+  font-weight: 600;
+}
+.bc-type {
+  font-size: 22rpx;
+  color: #5a6072;
+}
+.bc-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin: 16rpx 0 8rpx;
+}
+.bc-tags {
+  margin-top: 4rpx;
+}
+.bc-footer {
+  margin-top: 8rpx;
+}
+.bc-dot {
+  width: 22rpx;
+  height: 22rpx;
+}
+.bc-thumb-wrap {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 14rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f0f2f5;
+}
+.bc-thumb {
+  width: 100%;
+  height: 100%;
+}
+.bc-thumb-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 26rpx;
+  height: 26rpx;
+  border-radius: 50%;
+  border: 4rpx solid #ffde59;
+  box-shadow: 0 0 6rpx rgba(0, 0, 0, 0.4);
+}
+.bc-route-col {
+  margin-left: 14rpx;
+  min-width: 0;
+}
+.bc-likes {
+  flex-shrink: 0;
+  margin-left: 12rpx;
+  padding: 8rpx 0 8rpx 12rpx;
+}
+.bc-heart {
+  font-size: 30rpx;
+}
+.bc-liked {
+  color: #e5484d;
+  font-weight: 600;
+}
+.bc-route {
+  margin: 0 10rpx;
+  max-width: 220rpx;
+}
+.bc-grade {
+  min-width: 52rpx;
+  font-size: 20rpx;
+  padding: 0 10rpx;
+}

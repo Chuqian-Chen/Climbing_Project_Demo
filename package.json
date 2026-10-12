@@ -1,0 +1,15 @@
+{
+  "name": "climbing-project-demo",
+  "version": "1.0.0",
+  "description": "岩友Beta — 抱石 Beta 分享与打卡微信小程序 Demo",
+  "scripts": {
+  },
+  "keywords": ["miniprogram", "climbing", "bouldering"],
+  "author": "Chuqian-Chen",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^2.8.3-1"
+  }
+}

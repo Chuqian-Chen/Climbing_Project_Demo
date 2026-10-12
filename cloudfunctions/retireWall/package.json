@@ -1,0 +1,9 @@
+{
+  "name": "retireWall",
+  "version": "1.0.0",
+  "description": "整墙换线批量下架（认证定线员）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

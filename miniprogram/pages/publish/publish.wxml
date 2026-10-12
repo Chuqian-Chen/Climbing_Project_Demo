@@ -1,0 +1,125 @@
+<view class="page-pad pub">
+
+  <!-- 编辑模式：线路已固定 -->
+  <view class="card" wx:if="{{editMode}}">
+    <view class="bold sec-title">编辑 Beta</view>
+    <view class="small muted edit-route-line">{{editRouteText}}</view>
+    <view class="small faint">线路与已上传的视频/图片不可修改；要换线路请删除后重新发布</view>
+  </view>
+
+  <!-- 选线 -->
+  <view class="card" wx:if="{{!editMode}}">
+    <view class="bold sec-title">① 选哪条线</view>
+    <view class="field">
+      <text class="label">岩馆</text>
+      <picker mode="multiSelector" range="{{gymPickerRange}}" value="{{gymPickerValue}}" bindchange="onGymChange" bindcolumnchange="onGymColumn">
+        <view class="pick {{gymId ? 'has' : ''}}">{{gymLabel || '城市 › 区域 › 岩馆'}}</view>
+      </picker>
+    </view>
+    <view class="field" wx:if="{{gymId && hasRoutes}}">
+      <text class="label">线路</text>
+      <picker range="{{routeLabels}}" value="{{routeIdx}}" bindchange="onRouteChange">
+        <view class="pick {{routeIdx >= 0 ? 'has' : ''}}">{{routeIdx >= 0 ? routeLabels[routeIdx] : '选择线路 ›'}}</view>
+      </picker>
+    </view>
+    <view class="pioneer small" wx:if="{{gymId && !hasRoutes}}">这家馆还没有线路数据，你来开第一条：</view>
+    <block wx:if="{{newRouteMode}}">
+      <view class="field">
+        <text class="label">岩点颜色</text>
+        <picker range="{{colorNames}}" value="{{colorIdx}}" bindchange="onColorChange">
+          <view class="pick {{colorIdx >= 0 ? 'has' : ''}}">{{colorIdx >= 0 ? colorNames[colorIdx] + '色' : '选择颜色 ›'}}</view>
+        </picker>
+      </view>
+      <view class="field">
+        <text class="label">难度</text>
+        <picker range="{{grades}}" value="{{gradeIdx}}" bindchange="onGradeChange">
+          <view class="pick {{gradeIdx >= 0 ? 'has' : ''}}">{{gradeIdx >= 0 ? grades[gradeIdx] : '选择难度 ›'}}</view>
+        </picker>
+      </view>
+    </block>
+  </view>
+
+  <!-- 素材 -->
+  <view class="card" wx:if="{{!editMode}}">
+    <view class="between">
+      <text class="bold">② 视频 / 图片（可选）</text>
+      <text class="small faint" bindtap="toggleTips">拍摄礼仪 {{showTips ? '▲' : '▼'}}</text>
+    </view>
+    <view class="tips small muted" wx:if="{{showTips}}">
+      <view>· 拍摄前确认不挡到正在攀爬的岩友</view>
+      <view>· 横屏拍全墙面，能看清起手点和脚点</view>
+      <view>· 避免拍到他人正脸，尊重隐私</view>
+      <view>· 视频建议 60 秒内，直击关键动作</view>
+    </view>
+    <view class="media-grid">
+      <view class="media-item" wx:for="{{media}}" wx:key="index">
+        <image class="media-thumb" src="{{item.thumb}}" mode="aspectFill" />
+        <view class="media-dur" wx:if="{{item.durText}}">{{item.durText}}</view>
+        <view class="media-del" data-index="{{index}}" catchtap="removeMedia">✕</view>
+      </view>
+      <view class="media-add" wx:if="{{media.length < 9}}" bindtap="chooseMedia">＋</view>
+    </view>
+    <view class="small faint">可选。不传素材也可以发纯图文 Beta</view>
+  </view>
+
+  <!-- 标题 -->
+  <view class="card">
+    <view class="bold sec-title">③ 标题</view>
+    <input class="title-input" placeholder="比如「160cm 小个子友好版」" maxlength="30" value="{{title}}" bindinput="onTitleInput" />
+  </view>
+
+  <!-- 分步拆解 -->
+  <view class="card">
+    <view class="bold steps-title">④ 分步拆解 <text class="small faint title-hint">至少填一步</text></view>
+    <view class="step-field" wx:for="{{steps}}" wx:key="phase">
+      <view class="step-phase">{{item.phase}}</view>
+      <textarea
+        class="step-input"
+        placeholder="{{index === 0 ? '起手点在哪、身体怎么摆…' : index === 1 ? '关键动作、发力顺序、容易掉的点…' : '出顶动作、注意事项…'}}"
+        value="{{item.text}}"
+        maxlength="120"
+        auto-height
+        data-index="{{index}}"
+        bindinput="onStepInput"
+      />
+    </view>
+  </view>
+
+  <!-- 标签 + 适配 -->
+  <view class="card">
+    <view class="caution-row">
+      <text class="caution-label">易掉点</text>
+      <input class="caution-input" value="{{caution}}" placeholder="选填：最容易掉的地方，一句话提醒岩友" maxlength="40" bindinput="onCautionInput" />
+    </view>
+
+    <view class="bold steps-title">⑤ 动作标签 <text class="small faint title-hint">最多 5 个</text></view>
+    <view class="row wrap">
+      <text
+        class="tag {{pickedTags.indexOf(item) >= 0 ? 'on' : ''}}"
+        wx:for="{{shownTags}}"
+        wx:key="*this"
+        data-tag="{{item}}"
+        bindtap="toggleTag"
+      >{{item}}</text>
+      <text class="tag tag-more" bindtap="toggleTagsExpand">{{tagsExpanded ? '收起 ▲' : '更多 ▼'}}</text>
+    </view>
+    <view class="divider"></view>
+    <view class="field">
+      <text class="label">适合身高</text>
+      <picker range="{{heightRanges}}" value="{{heightIdx}}" bindchange="onHeightChange">
+        <view class="pick has">{{heightRanges[heightIdx]}}{{heightIdx > 0 ? 'cm' : ''}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">可见范围</text>
+      <view class="row">
+        <view class="vis {{isPublic ? 'on' : ''}}" data-v="1" bindtap="setPublic">公开</view>
+        <view class="vis {{!isPublic ? 'on' : ''}}" data-v="0" bindtap="setPublic">仅自己</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="btn {{canSubmit ? 'btn-primary' : 'btn-disabled'}} submit" bindtap="submit">{{editMode ? '保存修改' : '发布 Beta'}}</view>
+  <view class="small faint safety">发布即表示同意内容规范：内容真实、尊重他人、注意安全</view>
+
+</view>

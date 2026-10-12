@@ -1,0 +1,153 @@
+<view class="page-pad" wx:if="{{loadFailed}}">
+  <view class="card">
+    <view class="bold">这条 Beta 不存在或已删除</view>
+    <view class="small faint" style="margin-top:12rpx">可能作者已撤回，换一条看看</view>
+    <view class="btn btn-soft" style="margin-top:24rpx" bindtap="goBackHome">返回</view>
+  </view>
+</view>
+
+<view class="page-pad" wx:if="{{beta}}">
+
+  <!-- 作者卡 -->
+  <view class="card">
+    <view class="row">
+      <view class="tap" bindtap="goAuthor">
+        <image wx:if="{{beta.author.avatarUrl}}" class="avatar-img" src="{{beta.author.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-emoji" style="background:{{beta.author.color}}">{{beta.author.emoji}}</view>
+      </view>
+      <view class="flex-1 author-info" bindtap="goAuthor">
+        <view class="bold">{{beta.author.nickname}} <text class="setter-badge" wx:if="{{beta.author.isSetter}}">定线员</text></view>
+        <view class="small faint">
+          <text wx:if="{{beta.author.height}}">身高 {{beta.author.height}}cm</text>
+          <text wx:if="{{beta.author.armSpan}}"> · 臂展 {{beta.author.armSpan}}cm</text>
+          <text> · {{beta.timeText}}</text>
+        </view>
+      </view>
+      <view class="follow {{following ? 'on' : ''}}" wx:if="{{social && !beta.isMine}}" bindtap="toggleFollow">
+        {{following ? '已关注' : '+ 关注'}}
+      </view>
+      <view class="del-beta small edit-beta" wx:if="{{beta.isMine}}" bindtap="editBetaTap">编辑</view>
+      <view class="del-beta small" wx:if="{{beta.isMine}}" bindtap="deleteBetaTap">删除</view>
+    </view>
+  </view>
+
+  <!-- 媒体区：视频 + 图片统一横滑 -->
+  <scroll-view
+    wx:if="{{beta.videoFileID || (beta.imageFileIDs && beta.imageFileIDs.length)}}"
+    scroll-x
+    class="media-strip"
+    enhanced
+    show-scrollbar="{{false}}"
+  >
+    <view class="ms-video-wrap" wx:if="{{beta.videoFileID}}">
+      <video
+        id="beta-video"
+        class="ms-video"
+        src="{{beta.videoFileID}}"
+        controls
+        object-fit="contain"
+      ></video>
+      <!-- 未播放前的封面遮罩：避免视频黑屏首帧 -->
+      <view class="ms-cover" wx:if="{{!videoStarted}}" bindtap="startVideo">
+        <image
+          wx:if="{{beta.imageFileIDs.length || beta.routeVisual}}"
+          class="ms-cover-img"
+          src="{{beta.imageFileIDs.length ? beta.imageFileIDs[0] : beta.routeVisual.src}}"
+          mode="aspectFill"
+        />
+        <view class="ms-cover-play">▶</view>
+        <view class="ms-cover-dur" wx:if="{{beta.videoDur}}">{{beta.videoDur}}</view>
+      </view>
+    </view>
+    <image
+      wx:for="{{beta.imageFileIDs}}"
+      wx:key="*this"
+      class="ms-img"
+      src="{{item}}"
+      mode="aspectFill"
+      data-src="{{item}}"
+      bindtap="previewImg"
+    />
+  </scroll-view>
+
+  <!-- 演示视频占位 -->
+  <view class="card media" wx:if="{{beta.type === 'video' && !beta.videoFileID}}" bindtap="playVideo">
+    <view class="media-play">▶</view>
+    <view class="media-dur">{{beta.videoDur}}</view>
+    <view class="small media-hint">演示环境 · 点击了解视频能力</view>
+  </view>
+
+  <view class="card route-link" wx:if="{{route}}" bindtap="goRoute">
+    <view class="row">
+      <view class="hold-dot {{route.colorLight ? 'light' : ''}}" style="background:{{route.colorHex}}"></view>
+      <text class="route-name ellipsis">{{route.name}}</text>
+      <view class="grade-badge" style="background:{{route.gradeColor}}">{{route.grade}}</view>
+      <view class="flex-1"></view>
+      <text class="small faint">{{route.gymName}} ›</text>
+    </view>
+  </view>
+
+  <!-- 标题 + 适配 -->
+  <view class="title">{{beta.title}}</view>
+  <view class="caution-banner" wx:if="{{beta.caution}}">
+    <text class="caution-tag">易掉点</text>
+    <text class="caution-text">{{beta.caution}}</text>
+  </view>
+  <view class="row wrap meta-row">
+    <text class="tag on" wx:if="{{beta.heightMatch}}">适合你</text>
+    <text class="tag on" wx:if="{{beta.heightText}}">适合 {{beta.heightText}}</text>
+    <text class="tag" wx:for="{{beta.moveTags}}" wx:key="*this">{{item}}</text>
+  </view>
+
+  <!-- 分步拆解 -->
+  <view class="card steps">
+    <view class="step" wx:for="{{beta.steps}}" wx:key="index">
+      <view class="step-head">
+        <view class="step-no">{{index + 1}}</view>
+        <text class="step-phase">{{item.phase}}</text>
+      </view>
+      <view class="step-text">{{item.text}}</view>
+    </view>
+  </view>
+
+  <!-- 互动行 -->
+  <view class="acts">
+    <view class="act {{beta.liked ? 'liked' : ''}}" bindtap="toggleLike"><text class="act-heart">{{beta.liked ? '♥' : '♡'}}</text> {{beta.likeCount}}</view>
+    <view class="act" bindtap="goCheckin">跟练打卡</view>
+    <button class="act share" open-type="share">分享</button>
+  </view>
+
+  <!-- 评论 -->
+  <view class="section-title">评论 ({{comments.length}})</view>
+  <view class="card cm" wx:for="{{comments}}" wx:key="id">
+    <view class="row">
+      <view class="avatar-emoji cm-avatar" style="background:{{item.user.color}}">{{item.user.emoji}}</view>
+      <view class="flex-1">
+        <view class="between">
+          <text class="bold small">{{item.user.nickname}}</text>
+          <view class="row">
+            <text class="small cm-del" wx:if="{{item.isMine}}" data-cid="{{item.id}}" catchtap="deleteCommentTap">删除</text>
+            <text class="small faint">{{item.dateText}}</text>
+          </view>
+        </view>
+        <view class="cm-text">{{item.text}}</view>
+      </view>
+    </view>
+  </view>
+  <view class="card cm-input-wrap">
+    <input
+      class="cm-input"
+      placeholder="说点什么…（比如你的完攀心得）"
+      value="{{commentText}}"
+      confirm-type="send"
+      bindinput="onCommentInput"
+      bindconfirm="sendComment"
+    />
+    <view class="cm-send {{commentText ? 'on' : ''}}" bindtap="sendComment">发送</view>
+  </view>
+
+  <!-- 同线路其他 Beta -->
+  <view class="section-title" wx:if="{{others.length}}">这条线的其他 Beta</view>
+  <beta-card wx:for="{{others}}" wx:key="id" beta="{{item}}" showRoute="{{false}}" />
+
+</view>

@@ -1,0 +1,94 @@
+<view class="page-pad" wx:if="{{status !== 'loading'}}">
+
+  <!-- 已认证：定线员工作台 -->
+  <block wx:if="{{status === 'approved'}}">
+    <view class="card sc-id-card">
+      <view class="sc-id-title">认证定线员</view>
+      <view class="sc-id-nick">{{profile.nickname || '岩友'}}</view>
+      <view class="sc-id-gym" wx:if="{{gymName}}">{{gymName}}</view>
+    </view>
+
+    <view class="section-title">工作台</view>
+    <view class="card set-item" bindtap="goMyGym">
+      <view class="between">
+        <view>
+          <view>墙面与线路管理</view>
+          <view class="small faint sc-hint">上传墙照、圈点标注新线、整墙换线下架</view>
+        </view>
+        <text class="faint">›</text>
+      </view>
+    </view>
+    <view class="card set-item" bindtap="goMyGym">
+      <view class="between">
+        <view>
+          <view>分级标准修正</view>
+          <view class="small faint sc-hint">在岩馆页修正贴标颜色与难度对应关系</view>
+        </view>
+        <text class="faint">›</text>
+      </view>
+    </view>
+    <view class="card set-item" bindtap="goPartner">
+      <view class="between">
+        <view>
+          <view>馆方合作说明</view>
+          <view class="small faint sc-hint">给店家看的入驻介绍</view>
+        </view>
+        <text class="faint">›</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 审核中 -->
+  <block wx:elif="{{status === 'pending'}}">
+    <view class="card sc-pending">
+      <view class="sc-pending-title">申请审核中</view>
+      <view class="small muted sc-pending-desc">
+        已收到你的定线员注册申请{{gymName ? '（' + gymName + '）' : ''}}。审核通过后自动生效，无需其他操作。
+      </view>
+    </view>
+  </block>
+
+  <!-- 未认证：注册申请表 -->
+  <block wx:else>
+    <view class="card sc-rejected" wx:if="{{rejected}}">
+      <text class="small">上次申请未通过审核，可修改信息后重新提交</text>
+    </view>
+    <view class="card sc-intro">
+      <view class="bold">定线员注册</view>
+      <view class="small muted sc-intro-desc">
+        认证定线员可以：上传本馆墙面照片并圈点标注线路、换线时一键下架整墙旧线、修正本馆的贴标分级标准。普通岩友无需注册，打开即用。
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="edit-row">
+        <text class="edit-label">姓名</text>
+        <input class="edit-input" value="{{form.realName}}" placeholder="真实姓名或馆内称呼" maxlength="20" bindinput="onNameInput" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">常驻岩馆</text>
+        <picker range="{{gymNames}}" value="{{gymIndex}}" bindchange="onGymChange">
+          <view class="sc-picker {{gymIndex < 0 ? 'faint' : ''}}">{{gymIndex >= 0 ? gymNames[gymIndex] : '点击选择 ›'}}</view>
+        </picker>
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">定线年限</text>
+        <picker range="{{yearsOpts}}" value="{{yearsIndex}}" bindchange="onYearsChange">
+          <view class="sc-picker {{yearsIndex < 0 ? 'faint' : ''}}">{{yearsIndex >= 0 ? yearsOpts[yearsIndex] : '点击选择 ›'}}</view>
+        </picker>
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">联系方式</text>
+        <input class="edit-input" value="{{form.contact}}" placeholder="微信号或手机号，仅审核用" maxlength="40" bindinput="onContactInput" />
+      </view>
+      <view class="edit-row sc-note-row">
+        <text class="edit-label">补充说明</text>
+        <textarea class="sc-note" value="{{form.note}}" placeholder="选填：定线经历、代表线路等" maxlength="200" auto-height bindinput="onNoteInput" />
+      </view>
+    </view>
+
+    <view class="btn {{submitting ? 'btn-disabled' : 'btn-primary'}} sc-submit" bindtap="submit">提交注册申请</view>
+    <view class="small faint sc-foot">提交即代表同意平台对墙面内容的社区规范；审核结果将在本页展示</view>
+  </block>
+
+</view>

@@ -1,0 +1,19 @@
+node_modules/
+miniprogram_npm/
+package-lock.json
+yarn.lock
+
+# 微信开发者工具本机配置
+project.private.config.json
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+.cursor/
+*.swp
+
+# 本地实验脚本
+scratchpad/

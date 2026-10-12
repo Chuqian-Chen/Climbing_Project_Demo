@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/gyms/gyms",
+    "pages/logbook/logbook",
+    "pages/profile/profile",
+    "pages/gym-detail/gym-detail",
+    "pages/route-detail/route-detail",
+    "pages/beta-detail/beta-detail",
+    "pages/publish/publish",
+    "pages/checkin/checkin",
+    "pages/search/search",
+    "pages/user/user",
+    "pages/wall-photo/wall-photo",
+    "pages/partner/partner",
+    "pages/setter-center/setter-center",
+    "pages/data-admin/data-admin"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "岩友Beta",
+    "backgroundColor": "#f5f6f8",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#9aa1b2",
+    "selectedColor": "#ff6b35",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "首页" },
+      { "pagePath": "pages/gyms/gyms", "text": "岩馆" },
+      { "pagePath": "pages/logbook/logbook", "text": "足迹" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于计算你与各攀岩馆的距离，推荐附近岩馆"
+    }
+  },
+  "requiredPrivateInfos": ["getLocation"],
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "搜索",
+  "usingComponents": {
+    "route-card": "/components/route-card/route-card",
+    "beta-card": "/components/beta-card/beta-card",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

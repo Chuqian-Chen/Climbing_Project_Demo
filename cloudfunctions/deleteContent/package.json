@@ -1,0 +1,9 @@
+{
+  "name": "deleteContent",
+  "version": "1.0.0",
+  "description": "删除自己的 Beta / 线路（有他人内容的线路自动转下架）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

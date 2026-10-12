@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Beta 详情",
+  "usingComponents": {
+    "beta-card": "/components/beta-card/beta-card"
+  }
+}

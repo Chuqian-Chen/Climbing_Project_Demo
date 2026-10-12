@@ -1,0 +1,125 @@
+<view class="page-pad tabbar-pad" wx:if="{{loadError && !profile}}">
+  <view class="card">
+    <view class="bold">档案加载失败</view>
+    <view class="small faint">{{loadError}}</view>
+  </view>
+</view>
+
+<view class="page-pad tabbar-pad" wx:if="{{profile}}">
+
+  <!-- 档案卡 -->
+  <view class="card head">
+    <block wx:if="{{!editing}}">
+      <view class="row">
+        <image wx:if="{{profile.avatarUrl}}" class="avatar-img head-avatar" src="{{profile.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-emoji head-avatar" style="background:#fff1ea">{{profile.emoji}}</view>
+        <view class="flex-1">
+          <view class="head-nick">{{profile.nickname || '未设置昵称'}} <text class="head-setter" wx:if="{{profile.isSetter}}">定线员</text></view>
+          <view class="small faint">
+            {{profile.height ? '身高 ' + profile.height + 'cm' : '身高未填写'}}
+            <text wx:if="{{profile.armSpan}}"> · 臂展 {{profile.armSpan}}cm</text>
+          </view>
+          <view class="small muted head-intro" wx:if="{{profile.intro}}">{{profile.intro}}</view>
+        </view>
+        <view class="edit-btn" bindtap="startEdit">编辑</view>
+      </view>
+      <view class="tip" wx:if="{{!profile.height}}">
+        填写身高臂展后，浏览线路时会为你标出「适合你」的 Beta
+      </view>
+      <view class="row gym-row">
+        <text class="small muted">主场岩馆：</text>
+        <picker range="{{gymNames}}" value="{{gymIndex}}" bindchange="onGymChange">
+          <text class="small gym-pick">{{gymIndex >= 0 ? gymNames[gymIndex] : '点击选择 ›'}}</text>
+        </picker>
+      </view>
+    </block>
+
+    <!-- 编辑态：微信头像昵称能力 -->
+    <block wx:else>
+      <view class="edit-row">
+        <text class="edit-label">头像</text>
+        <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <image wx:if="{{editForm.avatarUrl}}" class="avatar-img" src="{{editForm.avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="avatar-emoji" style="background:#fff1ea">{{profile.emoji}}</view>
+          <text class="small faint avatar-hint">点击使用微信头像</text>
+        </button>
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">昵称</text>
+        <input class="edit-input" type="nickname" value="{{editForm.nickname}}" placeholder="输入或选择微信昵称" bindinput="onNickInput" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">身高</text>
+        <input class="edit-input" type="number" value="{{editForm.height}}" placeholder="cm，用于匹配 Beta" bindinput="onHeightInput" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">臂展</text>
+        <input class="edit-input" type="number" value="{{editForm.armSpan}}" placeholder="cm，选填" bindinput="onSpanInput" />
+      </view>
+      <view class="edit-row">
+        <text class="edit-label">签名</text>
+        <input class="edit-input" value="{{editForm.intro}}" placeholder="一句话介绍你的攀岩风格" maxlength="30" bindinput="onIntroInput" />
+      </view>
+      <view class="row edit-actions">
+        <view class="btn btn-ghost flex-1 cancel" bindtap="cancelEdit">取消</view>
+        <view class="btn btn-primary flex-1" bindtap="saveEdit">保存</view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 数据入口 -->
+  <view class="card counts" bindtap="goLogbook">
+    <view class="between">
+      <text class="bold">我的足迹</text>
+      <text class="small faint">{{checkinCount}} 条打卡 ›</text>
+    </view>
+  </view>
+
+  <!-- 我的内容 -->
+  <view class="seg">
+    <view class="seg-item {{tab === 'beta' ? 'on' : ''}}" data-tab="beta" bindtap="switchContentTab">我的Beta ({{myBetas.length}})</view>
+    <view class="seg-item {{tab === 'fav' ? 'on' : ''}}" data-tab="fav" bindtap="switchContentTab">收藏 ({{favRoutes.length}})</view>
+    <view class="seg-item {{tab === 'follow' ? 'on' : ''}}" wx:if="{{social}}" data-tab="follow" bindtap="switchContentTab">关注 ({{following.length}})</view>
+  </view>
+
+  <block wx:if="{{tab === 'beta'}}">
+    <beta-card wx:for="{{myBetas}}" wx:key="id" beta="{{item}}" />
+    <empty-state wx:if="{{!myBetas.length}}" title="还没发过 Beta" desc="你的第一条 Beta 可能正是别人磕了三周的答案" btnText="去发布" bind:action="goPublish" />
+  </block>
+  <block wx:if="{{tab === 'fav'}}">
+    <route-card wx:for="{{favRoutes}}" wx:key="id" route="{{item}}" />
+    <empty-state wx:if="{{!favRoutes.length}}" title="还没收藏线路" desc="在线路页点收藏，方便下次直奔目标" />
+  </block>
+  <block wx:if="{{tab === 'follow'}}">
+    <view class="card follow-item" wx:for="{{following}}" wx:key="id" data-id="{{item.id}}" bindtap="goUser">
+      <view class="row">
+        <view class="avatar-emoji" style="background:{{item.color}}">{{item.emoji}}</view>
+        <view class="flex-1 follow-info">
+          <view class="bold">{{item.nickname}}</view>
+          <view class="small faint">{{item.intro}}</view>
+        </view>
+        <text class="faint">›</text>
+      </view>
+    </view>
+    <empty-state wx:if="{{!following.length}}" title="还没关注岩友" desc="在 Beta 页关注你欣赏的攀爬者" />
+  </block>
+
+  <!-- 设置 -->
+  <view class="section-title">设置</view>
+  <view class="card set-item" bindtap="goSetterCenter">
+    <view class="between">
+      <text>{{profile.isSetter ? '定线员工作台' : '定线员中心'}}</text>
+      <text class="faint">{{setterStatus === 'pending' ? '审核中' : '›'}}</text>
+    </view>
+  </view>
+  <view class="card set-item" bindtap="goPartner">
+    <view class="between"><text>馆方合作</text><text class="faint">›</text></view>
+  </view>
+  <view class="card set-item" bindtap="showAbout">
+    <view class="between"><text>关于与安全声明</text><text class="faint">›</text></view>
+  </view>
+  <view class="card set-item" bindtap="goDataAdmin">
+    <view class="between"><text class="faint">数据管理（管理员）</text><text class="faint">›</text></view>
+  </view>
+
+</view>

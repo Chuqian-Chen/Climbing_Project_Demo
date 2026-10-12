@@ -1,0 +1,77 @@
+<view class="page-pad">
+
+  <view class="bar">
+    <view class="input-wrap">
+      <input
+        class="input"
+        placeholder="线路名 / 岩馆 / 岩友 / 动作标签"
+        value="{{kw}}"
+        focus
+        confirm-type="search"
+        bindinput="onInput"
+        bindconfirm="doSearch"
+      />
+    </view>
+    <view class="go" bindtap="doSearch">搜索</view>
+  </view>
+
+  <!-- 未搜索：历史 + 热门 -->
+  <block wx:if="{{!searched}}">
+    <view class="between" wx:if="{{history.length}}">
+      <view class="bold">最近搜索</view>
+      <text class="small faint" bindtap="clearHistory">清空</text>
+    </view>
+    <view class="row wrap kw-wrap" wx:if="{{history.length}}">
+      <text class="tag" wx:for="{{history}}" wx:key="*this" data-kw="{{item}}" bindtap="doSearch">{{item}}</text>
+    </view>
+    <view class="bold hot-title">大家在搜</view>
+    <view class="row wrap kw-wrap">
+      <text class="tag on" wx:for="{{hotTags}}" wx:key="*this" data-kw="{{item}}" bindtap="doSearch">{{item}}</text>
+    </view>
+  </block>
+
+  <!-- 结果 -->
+  <block wx:else>
+    <view class="small faint" wx:if="{{searching}}">搜索中…</view>
+    <view class="small" wx:if="{{searchError}}" style="color:#e5484d;margin-bottom:16rpx">{{searchError}}</view>
+    <view class="seg">
+      <view class="seg-item {{tab === 'route' ? 'on' : ''}}" data-tab="route" bindtap="switchTab">线路 {{result.routes.length}}</view>
+      <view class="seg-item {{tab === 'gym' ? 'on' : ''}}" data-tab="gym" bindtap="switchTab">岩馆 {{result.gyms.length}}</view>
+      <view class="seg-item {{tab === 'user' ? 'on' : ''}}" data-tab="user" bindtap="switchTab">岩友 {{result.users.length}}</view>
+      <view class="seg-item {{tab === 'beta' ? 'on' : ''}}" data-tab="beta" bindtap="switchTab">Beta {{result.betas.length}}</view>
+    </view>
+
+    <block wx:if="{{tab === 'route'}}">
+      <route-card wx:for="{{result.routes}}" wx:key="id" route="{{item}}" />
+      <empty-state wx:if="{{!result.routes.length}}" title="没有找到相关线路" />
+    </block>
+
+    <block wx:if="{{tab === 'gym'}}">
+      <view class="card g-item" wx:for="{{result.gyms}}" wx:key="id" data-id="{{item.id}}" bindtap="goGym">
+        <view class="bold">{{item.name}}</view>
+        <view class="small faint">{{item.area}} · {{item.routeCount}} 条在墙</view>
+      </view>
+      <empty-state wx:if="{{!result.gyms.length}}" title="没有找到相关岩馆" />
+    </block>
+
+    <block wx:if="{{tab === 'user'}}">
+      <view class="card g-item" wx:for="{{result.users}}" wx:key="id" data-id="{{item.id}}" bindtap="goUser">
+        <view class="row">
+          <view class="avatar-emoji" style="background:{{item.color}}">{{item.emoji}}</view>
+          <view class="flex-1 u-info">
+            <view class="bold">{{item.nickname}} <text class="small faint">最高 {{item.maxGrade}}</text></view>
+            <view class="small faint">{{item.intro}}</view>
+          </view>
+          <text class="faint">›</text>
+        </view>
+      </view>
+      <empty-state wx:if="{{!result.users.length}}" title="没有找到相关岩友" />
+    </block>
+
+    <block wx:if="{{tab === 'beta'}}">
+      <beta-card wx:for="{{result.betas}}" wx:key="id" beta="{{item}}" />
+      <empty-state wx:if="{{!result.betas.length}}" title="没有找到相关 Beta" />
+    </block>
+  </block>
+
+</view>

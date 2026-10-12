@@ -1,0 +1,35 @@
+<view class="page-pad" wx:if="{{loadFailed}}">
+  <view class="card">
+    <view class="bold">找不到这位岩友</view>
+    <view class="btn btn-soft" style="margin-top:24rpx" bindtap="goBackHome">返回</view>
+  </view>
+</view>
+
+<view class="page-pad" wx:if="{{user}}">
+
+  <view class="card">
+    <view class="row">
+      <view class="avatar-emoji u-avatar" style="background:{{user.color}}">{{user.emoji}}</view>
+      <view class="flex-1 u-main">
+        <view class="u-nick">{{user.nickname}} <text class="u-setter" wx:if="{{user.isSetter}}">定线员</text></view>
+        <view class="small faint">
+          <text wx:if="{{user.height}}">身高 {{user.height}}cm</text>
+          <text wx:if="{{user.armSpan}}"> · 臂展 {{user.armSpan}}cm</text>
+          <text wx:if="{{user.maxGrade}}"> · 最高 {{user.maxGrade}}</text>
+        </view>
+        <view class="small muted u-intro" wx:if="{{user.intro}}">{{user.intro}}</view>
+      </view>
+      <view class="follow {{following ? 'on' : ''}}" wx:if="{{social}}" bindtap="toggleFollow">{{following ? '已关注' : '+ 关注'}}</view>
+    </view>
+    <view class="u-stats" wx:if="{{stats}}">
+      <view class="u-stat"><text class="bold">{{stats.betaCount}}</text><text class="small faint"> Beta</text></view>
+      <view class="u-stat"><text class="bold">{{stats.sendCount}}</text><text class="small faint"> 完攀</text></view>
+      <view class="u-stat" wx:if="{{homeGymName}}"><text class="small faint">主场：{{homeGymName}}</text></view>
+    </view>
+  </view>
+
+  <view class="section-title">TA 的 Beta</view>
+  <beta-card wx:for="{{betas}}" wx:key="id" beta="{{item}}" />
+  <empty-state wx:if="{{!betas.length}}" title="TA 还没有发布 Beta" />
+
+</view>

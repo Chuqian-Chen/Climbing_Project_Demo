@@ -1,0 +1,15 @@
+.da-warn {
+  background: #fff7e6;
+  color: #8a6a2f;
+  padding: 18rpx 24rpx;
+}
+.set-item {
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+.da-hint {
+  margin-top: 4rpx;
+}
+.danger {
+  color: #e5484d;
+}

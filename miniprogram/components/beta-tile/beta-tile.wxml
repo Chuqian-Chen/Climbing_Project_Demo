@@ -1,0 +1,49 @@
+<view class="bt" wx:if="{{beta}}" bindtap="onTap" hover-class="bt-hover">
+
+  <!-- 封面：Beta 自己的图 > 认线图（墙面照+点位） -->
+  <view class="bt-cover" wx:if="{{beta.imageFileIDs.length || beta.routeVisual}}">
+    <image
+      class="bt-img"
+      src="{{beta.imageFileIDs.length ? beta.imageFileIDs[0] : beta.routeVisual.src}}"
+      mode="widthFix"
+      lazy-load
+    />
+    <view
+      wx:if="{{!beta.imageFileIDs.length && beta.routeVisual.wall}}"
+      class="bt-cover-dot"
+      style="left:{{beta.routeVisual.x}}%;top:{{beta.routeVisual.y}}%;background:{{beta.routeColorHex}}"
+    ></view>
+    <view class="bt-dur" wx:if="{{beta.type === 'video' && beta.videoDur}}">{{beta.videoDur}}</view>
+    <view class="bt-fit" wx:if="{{beta.heightMatch}}">适合你</view>
+    <view class="bt-corner" wx:if="{{beta.routeGrade}}" style="background:{{beta.routeGradeColor}}">{{beta.routeGrade}}</view>
+  </view>
+
+  <!-- 无图兜底封面：线路色淡底 + 大号难度 -->
+  <view class="bt-cover bt-cover-fb" wx:elif="{{beta.routeGrade}}" style="background:{{beta.routeColorHex}}1f">
+    <view class="bt-fb-grade" style="color:{{beta.routeGradeColor}}">{{beta.routeGrade}}</view>
+    <view class="bt-fb-name">{{beta.routeName}}</view>
+    <view class="bt-dur" wx:if="{{beta.type === 'video' && beta.videoDur}}">{{beta.videoDur}}</view>
+    <view class="bt-fit" wx:if="{{beta.heightMatch}}">适合你</view>
+  </view>
+
+  <view class="bt-body">
+    <view class="bt-title">{{beta.title}}</view>
+    <view class="bt-caution" wx:if="{{beta.caution}}">易掉点：{{beta.caution}}</view>
+    <view class="bt-route" wx:if="{{beta.routeName && (beta.imageFileIDs.length || beta.routeVisual)}}">
+      <view class="hold-dot bt-dot {{beta.routeColorLight ? 'light' : ''}}" style="background:{{beta.routeColorHex}}"></view>
+      <text class="bt-route-name">{{beta.routeName}}</text>
+      <text class="bt-grade" style="color:{{beta.routeGradeColor}}">{{beta.routeGrade}}</text>
+    </view>
+    <view class="bt-foot">
+      <image wx:if="{{beta.author.avatarUrl}}" class="bt-avatar" src="{{beta.author.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="bt-avatar bt-avatar-emoji" style="background:{{beta.author.color}}">{{beta.author.emoji}}</view>
+      <text class="bt-nick">{{beta.author.nickname}}</text>
+      <text class="bt-local" wx:if="{{beta.isLocalGym}}">本馆</text>
+      <view class="flex-1"></view>
+      <view class="bt-like" catchtap="onLike">
+        <text class="{{beta.liked ? 'bt-liked' : ''}}">{{beta.liked ? '♥' : '♡'}}</text> {{beta.likeCount}}
+      </view>
+    </view>
+  </view>
+
+</view>

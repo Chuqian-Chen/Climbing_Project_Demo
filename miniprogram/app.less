@@ -1,0 +1,235 @@
+/* ============================================
+   岩友Beta 全局设计系统
+   （文件为 .less 以兼容模板编译配置，内容为标准 CSS）
+   ============================================ */
+
+page {
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --ink: #1b1e28;
+  --ink-2: #5a6072;
+  --ink-3: #9aa1b2;
+  --line: #eceef2;
+  --brand: #ff6b35;
+  --brand-deep: #e8571f;
+  --brand-soft: #fff1ea;
+  --green: #30a46c;
+  --blue: #0090ff;
+  --amber: #ffb224;
+  --red: #e5484d;
+  --purple: #8e4ec6;
+  --radius: 24rpx;
+
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 28rpx;
+  line-height: 1.55;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+/* ---------- 布局 ---------- */
+.page-pad {
+  padding: 24rpx;
+}
+/* Tab 页底部为自定义 TabBar 预留空间 */
+.tabbar-pad {
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
+}
+.row {
+  display: flex;
+  align-items: center;
+}
+.between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.flex-1 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(27, 30, 40, 0.04);
+}
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin: 32rpx 0 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-more {
+  font-size: 24rpx;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+/* ---------- 文本 ---------- */
+.muted {
+  color: var(--ink-2);
+}
+.faint {
+  color: var(--ink-3);
+}
+.small {
+  font-size: 24rpx;
+}
+.bold {
+  font-weight: 700;
+}
+.ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 徽章 / 标签 ---------- */
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64rpx;
+  padding: 2rpx 14rpx;
+  border-radius: 12rpx;
+  color: #ffffff;
+  font-size: 24rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+}
+.hold-dot {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.hold-dot.light {
+  border: 2rpx solid #d5d8de;
+}
+.tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+  background: #f0f2f5;
+  color: var(--ink-2);
+  font-size: 22rpx;
+  margin: 0 12rpx 12rpx 0;
+}
+.tag.on {
+  background: var(--brand-soft);
+  color: var(--brand-deep);
+  font-weight: 600;
+}
+.badge-new {
+  display: inline-block;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  background: var(--brand);
+  color: #fff;
+  font-size: 20rpx;
+  font-weight: 700;
+}
+.badge-warn {
+  display: inline-block;
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+  background: #fff3f3;
+  color: var(--red);
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  padding: 20rpx 0;
+  box-sizing: border-box;
+}
+.btn::after {
+  border: none;
+}
+.btn-primary {
+  background: var(--brand);
+  color: #ffffff;
+}
+.btn-primary:active {
+  opacity: 0.85;
+}
+.btn-ghost {
+  background: #ffffff;
+  color: var(--ink);
+  border: 2rpx solid var(--line);
+}
+.btn-soft {
+  background: var(--brand-soft);
+  color: var(--brand-deep);
+}
+.btn-disabled {
+  background: #e4e6ea;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+/* ---------- 头像 ---------- */
+.avatar-emoji {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+.avatar-img {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ---------- 其他 ---------- */
+.divider {
+  height: 2rpx;
+  background: var(--line);
+  margin: 20rpx 0;
+}
+.fade-in {
+  animation: fadeIn 0.3s ease both;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 模板遗留样式（保留避免影响未引用的示例页） */
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+}

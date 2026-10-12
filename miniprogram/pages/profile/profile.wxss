@@ -1,0 +1,125 @@
+.head-avatar {
+  width: 108rpx;
+  height: 108rpx;
+  font-size: 56rpx;
+  margin-right: 20rpx;
+}
+.head-nick {
+  font-size: 34rpx;
+  font-weight: 800;
+}
+.head-setter {
+  font-size: 20rpx;
+  color: #7a4de8;
+  background: transparent;
+  border: 1rpx solid #cdbcf2;
+  border-radius: 8rpx;
+  padding: 4rpx 12rpx;
+  font-weight: 600;
+  vertical-align: middle;
+}
+.head-intro {
+  margin-top: 4rpx;
+}
+.edit-btn {
+  font-size: 24rpx;
+  color: #e8571f;
+  background: #fff1ea;
+  padding: 8rpx 24rpx;
+  border-radius: 999rpx;
+}
+.tip {
+  margin-top: 20rpx;
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  padding: 14rpx 18rpx;
+  font-size: 22rpx;
+  color: #5a6072;
+}
+.gym-row {
+  margin-top: 16rpx;
+}
+.gym-pick {
+  color: #e8571f;
+  font-weight: 600;
+}
+
+/* 编辑态 */
+.edit-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f2f5;
+}
+.edit-label {
+  width: 120rpx;
+  font-size: 26rpx;
+  color: #5a6072;
+}
+.edit-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+.avatar-btn {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  border: none;
+}
+.avatar-btn::after {
+  border: none;
+}
+.avatar-hint {
+  margin-left: 16rpx;
+}
+.edit-actions {
+  margin-top: 24rpx;
+  gap: 20rpx;
+}
+.cancel {
+  margin-right: 20rpx;
+}
+
+.counts {
+  padding: 28rpx 24rpx;
+}
+
+.seg {
+  display: flex;
+  background: #ffffff;
+  border-radius: 999rpx;
+  padding: 8rpx;
+  margin-bottom: 24rpx;
+}
+.seg-item {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  color: #5a6072;
+  padding: 12rpx 0;
+  border-radius: 999rpx;
+}
+.seg-item.on {
+  background: #1b1e28;
+  color: #fff;
+  font-weight: 700;
+}
+
+.follow-item {
+  padding: 20rpx 24rpx;
+  margin-bottom: 16rpx;
+}
+.follow-info {
+  margin-left: 16rpx;
+}
+
+.set-item {
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+.danger {
+  color: #e5484d;
+}

@@ -1,0 +1,53 @@
+<view class="bc card" wx:if="{{beta}}" bindtap="onTap" hover-class="bc-hover">
+  <!-- 作者行 -->
+  <view class="row">
+    <image wx:if="{{beta.author.avatarUrl}}" class="avatar-img bc-avatar" src="{{beta.author.avatarUrl}}" mode="aspectFill" />
+    <view wx:else class="avatar-emoji bc-avatar" style="background:{{beta.author.color}}">{{beta.author.emoji}}</view>
+    <view class="flex-1">
+      <view class="row">
+        <text class="bc-nick">{{beta.author.nickname}}</text>
+        <text class="bc-setter" wx:if="{{beta.author.isSetter}}">定线员</text>
+        <text class="bc-height" wx:if="{{beta.heightText}}">{{beta.heightText}}</text>
+        <text class="bc-match" wx:if="{{beta.heightMatch}}">适合你</text>
+      </view>
+      <view class="faint small">{{beta.timeText}}<text wx:if="{{showRoute && beta.gymName}}"> · {{beta.gymName}}</text></view>
+    </view>
+    <view class="bc-type">{{beta.type === 'video' ? '视频 ' + beta.videoDur : '图文'}}</view>
+  </view>
+
+  <!-- 标题 -->
+  <view class="bc-title">{{beta.title}}</view>
+
+  <!-- 线路信息 + 互动（动作标签收进详情页，卡片保持干净） -->
+  <view class="between bc-footer">
+    <view class="row flex-1" wx:if="{{showRoute}}">
+      <!-- 封面缩略：Beta 实拍图 > 认线图（墙面图+点位） -->
+      <view class="bc-thumb-wrap" wx:if="{{beta.imageFileIDs.length || beta.routeVisual}}">
+        <image class="bc-thumb" src="{{beta.imageFileIDs.length ? beta.imageFileIDs[0] : beta.routeVisual.src}}" mode="aspectFill" lazy-load />
+        <view
+          wx:if="{{!beta.imageFileIDs.length && beta.routeVisual.wall}}"
+          class="bc-thumb-dot"
+          style="left:{{beta.routeVisual.x}}%;top:{{beta.routeVisual.y}}%;background:{{beta.routeColorHex}}"
+        ></view>
+      </view>
+      <view wx:else class="hold-dot bc-dot {{beta.routeColorLight ? 'light' : ''}}" style="background:{{beta.routeColorHex}}"></view>
+      <view class="bc-route-col">
+        <view class="row">
+          <text class="small muted ellipsis bc-route">{{beta.routeName}}</text>
+          <view class="grade-badge bc-grade" style="background:{{beta.routeGradeColor}}">{{beta.routeGrade}}</view>
+        </view>
+        <text class="small faint" wx:if="{{beta.gymName}}">{{beta.gymName}}</text>
+      </view>
+    </view>
+    <!-- 线路页里（showRoute=false）线路信息冗余，但封面依旧露脸 -->
+    <view class="row flex-1" wx:elif="{{beta.imageFileIDs.length || beta.routeVisual}}">
+      <view class="bc-thumb-wrap">
+        <image class="bc-thumb" src="{{beta.imageFileIDs.length ? beta.imageFileIDs[0] : beta.routeVisual.src}}" mode="aspectFill" lazy-load />
+      </view>
+    </view>
+    <view wx:else></view>
+    <view class="faint small bc-likes" catchtap="onLike">
+      <text class="bc-heart {{beta.liked ? 'bc-liked' : ''}}">{{beta.liked ? '♥' : '♡'}}</text> {{beta.likeCount}} · 评论 {{beta.commentCount}}
+    </view>
+  </view>
+</view>

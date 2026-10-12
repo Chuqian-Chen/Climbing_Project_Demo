@@ -1,0 +1,9 @@
+{
+  "name": "saveGymMeta",
+  "version": "1.0.0",
+  "description": "众包写入岩馆分级标准",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

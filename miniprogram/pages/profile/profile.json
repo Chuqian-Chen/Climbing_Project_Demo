@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的",
+  "usingComponents": {
+    "beta-card": "/components/beta-card/beta-card",
+    "route-card": "/components/route-card/route-card",
+    "empty-state": "/components/empty-state/empty-state"
+  }
+}

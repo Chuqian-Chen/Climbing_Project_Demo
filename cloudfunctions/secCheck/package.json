@@ -1,0 +1,9 @@
+{
+  "name": "secCheck",
+  "version": "1.0.0",
+  "description": "UGC 内容安全检测（msgSecCheck + imgSecCheck）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

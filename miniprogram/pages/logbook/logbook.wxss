@@ -1,0 +1,142 @@
+.err {
+  background: #fff3f3;
+  color: #b23b3b;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.err-retry {
+  color: #e8571f;
+  font-weight: 700;
+  padding-left: 20rpx;
+}
+.stats {
+  display: flex;
+}
+.stat {
+  flex: 1;
+  text-align: center;
+}
+.stat-num {
+  font-size: 44rpx;
+  font-weight: 800;
+}
+.stat-sub {
+  font-size: 22rpx;
+  font-weight: 400;
+}
+.stat-label {
+  font-size: 22rpx;
+  color: #9aa1b2;
+  margin-top: 4rpx;
+}
+
+.heat-title {
+  margin-bottom: 20rpx;
+}
+.heat {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 8rpx;
+}
+.heat-cell {
+  height: 36rpx;
+  border-radius: 6rpx;
+  background: #eef0f3;
+}
+.heat-cell.lv1 { background: #ffd0b8; }
+.heat-cell.lv2 { background: #ff9a66; }
+.heat-cell.lv3 { background: #ff6b35; }
+.heat-cell.today { outline: 3rpx solid #1b1e28; outline-offset: -3rpx; }
+
+.pyr-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14rpx;
+}
+.pyr-grade {
+  width: 80rpx;
+  font-weight: 800;
+  font-size: 26rpx;
+}
+.pyr-track {
+  flex: 1;
+  background: #f0f2f5;
+  border-radius: 999rpx;
+  height: 28rpx;
+  overflow: hidden;
+}
+.pyr-bar {
+  height: 100%;
+  border-radius: 999rpx;
+  min-width: 28rpx;
+}
+.pyr-count {
+  width: 60rpx;
+  text-align: right;
+  font-size: 24rpx;
+  color: #5a6072;
+}
+
+.badges {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+}
+.badge {
+  text-align: center;
+  padding: 16rpx 4rpx;
+  border-radius: 16rpx;
+  background: #f7f8fa;
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+.badge.on {
+  filter: none;
+  opacity: 1;
+  background: #fff7f2;
+}
+.badge-name {
+  font-size: 22rpx;
+  font-weight: 700;
+  margin-top: 6rpx;
+}
+.badge-desc {
+  font-size: 18rpx;
+  color: #9aa1b2;
+  margin-top: 2rpx;
+}
+
+.tl-date {
+  font-size: 24rpx;
+  color: #9aa1b2;
+  margin: 20rpx 0 12rpx;
+}
+.tl-item {
+  margin-bottom: 16rpx;
+  padding: 20rpx 24rpx;
+}
+.tl-name {
+  font-weight: 700;
+  margin: 0 12rpx;
+  max-width: 240rpx;
+}
+.tl-gym {
+  margin-top: 6rpx;
+  padding-left: 66rpx;
+}
+.tl-note {
+  margin-top: 8rpx;
+  padding-left: 66rpx;
+}
+
+.seed {
+  text-align: center;
+  color: #e8571f;
+  font-size: 24rpx;
+  margin-top: 8rpx;
+}

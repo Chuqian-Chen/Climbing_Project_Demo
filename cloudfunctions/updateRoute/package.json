@@ -1,0 +1,9 @@
+{
+  "name": "updateRoute",
+  "version": "1.0.0",
+  "description": "修改线路难度/名称（线主或认证定线员）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

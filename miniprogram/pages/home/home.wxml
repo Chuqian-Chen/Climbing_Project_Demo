@@ -1,0 +1,63 @@
+<view class="page-pad tabbar-pad">
+
+  <!-- 搜索入口 -->
+  <view class="search-bar" bindtap="goSearch">
+    <text class="faint">搜线路 / 岩馆 / 岩友 / 动作标签</text>
+  </view>
+
+  <!-- 错误兜底 -->
+  <view class="load-err" wx:if="{{loadError}}">
+    <text>数据加载出错：{{loadError}}</text>
+    <text class="load-err-retry" bindtap="retry">重试</text>
+  </view>
+
+  <!-- 首次引导：一行轻提示 -->
+  <view class="onboard-slim" wx:if="{{!onboarded}}">
+    <text class="onboard-slim-text" bindtap="goProfile">填写身高臂展，帮你标出「适合你」的 Beta ›</text>
+    <text class="onboard-close" bindtap="dismissOnboard">✕</text>
+  </view>
+
+  <!-- 继续磕线 -->
+  <view class="slim small" wx:if="{{projectRoute}}" bindtap="goProject">
+    <text class="muted">继续磕线：</text>
+    <text class="bold">{{projectRoute.name}} {{projectRoute.grade}}</text>
+    <text class="faint"> ›</text>
+  </view>
+
+  <!-- 附近岩馆：紧凑一行 -->
+  <view class="gym-row-head">
+    <text class="section-label">附近岩馆</text>
+    <text class="section-more" bindtap="goGyms">全部 ›</text>
+  </view>
+  <scroll-view scroll-x class="gymchips" enhanced show-scrollbar="{{false}}">
+    <view class="gymchip" wx:for="{{gyms}}" wx:key="id" data-id="{{item.id}}" bindtap="goGym">
+      <text class="gymchip-name">{{item.name}}</text>
+      <text class="gymchip-meta" wx:if="{{item.distanceText}}">{{item.distanceText}}</text>
+      <text class="gymchip-meta gymchip-count" wx:if="{{item.routeCount}}">{{item.routeCount}} 条</text>
+    </view>
+  </scroll-view>
+
+  <!-- 大家的 Beta：双列瀑布流 -->
+  <view class="gym-row-head feed-head">
+    <text class="section-label">大家的 Beta</text>
+  </view>
+  <scroll-view scroll-x class="band-row" enhanced show-scrollbar="{{false}}">
+    <view
+      wx:for="{{gradeBands}}"
+      wx:key="key"
+      class="band-chip {{bandKey === item.key ? 'on' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="pickBand"
+    >{{item.label}}</view>
+  </scroll-view>
+  <view class="band-empty small faint" wx:if="{{bandEmpty}}">这个难度档还没有 Beta · 换个档看看，或去发第一条</view>
+  <view class="feed">
+    <view class="feed-col">
+      <beta-tile wx:for="{{betaColL}}" wx:key="id" beta="{{item}}" />
+    </view>
+    <view class="feed-col">
+      <beta-tile wx:for="{{betaColR}}" wx:key="id" beta="{{item}}" />
+    </view>
+  </view>
+
+</view>

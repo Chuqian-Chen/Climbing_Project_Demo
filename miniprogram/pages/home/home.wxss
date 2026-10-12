@@ -1,0 +1,136 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 999rpx;
+  padding: 18rpx 28rpx;
+  margin-bottom: 20rpx;
+}
+.load-err {
+  background: #fff3f3;
+  color: #b23b3b;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.load-err-retry {
+  color: #e8571f;
+  font-weight: 700;
+  padding-left: 20rpx;
+}
+
+/* 首次引导：一行轻提示 */
+.onboard-slim {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff7f2;
+  border-radius: 12rpx;
+  padding: 14rpx 22rpx;
+  margin-bottom: 16rpx;
+}
+.onboard-slim-text {
+  font-size: 24rpx;
+  color: #c05621;
+  flex: 1;
+}
+.onboard-close {
+  color: #c9855f;
+  padding: 0 8rpx;
+}
+
+.slim {
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 16rpx 22rpx;
+  margin-bottom: 16rpx;
+}
+
+/* 区块标题行 */
+.gym-row-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8rpx 4rpx 14rpx;
+}
+.feed-head {
+  margin-top: 24rpx;
+}
+.section-label {
+  font-size: 32rpx;
+  font-weight: 800;
+}
+.section-more {
+  font-size: 24rpx;
+  color: #9aa1b2;
+}
+
+/* 附近岩馆：紧凑 chips */
+.gymchips {
+  white-space: nowrap;
+  margin: 0 -24rpx;
+  padding: 0 24rpx;
+}
+.gymchip {
+  display: inline-flex;
+  align-items: baseline;
+  background: #ffffff;
+  border-radius: 999rpx;
+  padding: 12rpx 24rpx;
+  margin-right: 14rpx;
+}
+.gymchip-name {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.gymchip-meta {
+  font-size: 20rpx;
+  color: #9aa1b2;
+  margin-left: 10rpx;
+}
+.gymchip-count {
+  color: #ff6b35;
+  font-weight: 600;
+}
+
+/* 难度筛选档 */
+.band-row {
+  white-space: nowrap;
+  margin: 0 -24rpx 16rpx;
+  padding: 0 24rpx;
+}
+.band-chip {
+  display: inline-block;
+  padding: 10rpx 30rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #5a6072;
+  font-size: 24rpx;
+  margin-right: 14rpx;
+}
+.band-chip.on {
+  background: #1b1e28;
+  color: #fff;
+  font-weight: 700;
+}
+.band-empty {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+/* Beta 双列瀑布流 */
+.feed {
+  display: flex;
+  align-items: flex-start;
+}
+.feed-col {
+  flex: 1;
+  min-width: 0;
+}
+.feed-col:first-child {
+  margin-right: 16rpx;
+}

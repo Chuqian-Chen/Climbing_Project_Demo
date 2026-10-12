@@ -1,0 +1,94 @@
+/* 定线员中心 */
+
+/* 表单行（与我的页编辑态保持一致的观感） */
+.edit-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f2f5;
+}
+.edit-label {
+  width: 140rpx;
+  font-size: 26rpx;
+  color: #5a6072;
+}
+.edit-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+.set-item {
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+}
+
+/* 认证名牌：深色卡片 */
+.sc-id-card {
+  background: linear-gradient(135deg, #2b2f3a, #40465a);
+  color: #fff;
+  padding: 36rpx 32rpx;
+}
+.sc-id-title {
+  font-size: 22rpx;
+  color: #cdbcf2;
+  letter-spacing: 2rpx;
+}
+.sc-id-nick {
+  font-size: 44rpx;
+  font-weight: 800;
+  margin-top: 10rpx;
+}
+.sc-id-gym {
+  font-size: 24rpx;
+  color: #9aa1b2;
+  margin-top: 6rpx;
+}
+
+.sc-hint {
+  margin-top: 4rpx;
+}
+
+.sc-pending {
+  padding: 48rpx 32rpx;
+  text-align: center;
+}
+.sc-pending-title {
+  font-size: 36rpx;
+  font-weight: 800;
+}
+.sc-pending-desc {
+  margin-top: 12rpx;
+  line-height: 1.6;
+}
+
+.sc-rejected {
+  background: #fff7f2;
+  color: #b45309;
+  padding: 20rpx 24rpx;
+}
+
+.sc-intro-desc {
+  margin-top: 8rpx;
+  line-height: 1.7;
+}
+
+.sc-picker {
+  padding: 12rpx 0;
+}
+.sc-note-row {
+  align-items: flex-start;
+}
+.sc-note {
+  flex: 1;
+  min-height: 80rpx;
+  padding: 12rpx 0;
+  font-size: 28rpx;
+}
+.sc-submit {
+  margin-top: 24rpx;
+}
+.sc-foot {
+  text-align: center;
+  margin-top: 16rpx;
+  padding: 0 24rpx;
+  line-height: 1.6;
+}

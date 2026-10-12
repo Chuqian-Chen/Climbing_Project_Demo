@@ -1,0 +1,18 @@
+.p-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+}
+.p-text {
+  font-size: 26rpx;
+  color: #5a6072;
+  margin-bottom: 12rpx;
+}
+.p-item {
+  font-size: 26rpx;
+  color: #5a6072;
+  line-height: 1.9;
+}
+.p-btn {
+  margin-top: 16rpx;
+}

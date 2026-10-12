@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "岩友Beta",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "beta-tile": "/components/beta-tile/beta-tile"
+  }
+}

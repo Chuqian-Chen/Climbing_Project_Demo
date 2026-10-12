@@ -1,0 +1,131 @@
+.err {
+  background: #fff3f3;
+  color: #b23b3b;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.err-retry {
+  color: #e8571f;
+  font-weight: 700;
+  padding-left: 20rpx;
+}
+.city-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.city-chip {
+  padding: 10rpx 36rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #5a6072;
+  font-size: 26rpx;
+  margin-right: 16rpx;
+}
+.city-chip.on {
+  background: #1b1e28;
+  color: #fff;
+  font-weight: 700;
+}
+.count {
+  margin-bottom: 16rpx;
+}
+.kw-bar {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 999rpx;
+  padding: 12rpx 28rpx;
+  margin-bottom: 20rpx;
+}
+.kw-input {
+  flex: 1;
+  font-size: 26rpx;
+}
+.kw-bar .count {
+  margin: 0 0 0 16rpx;
+  flex-shrink: 0;
+}
+.gym-demo {
+  font-size: 18rpx;
+  color: #8a90a3;
+  background: #f2f3f7;
+  padding: 2rpx 12rpx;
+  border-radius: 999rpx;
+  flex-shrink: 0;
+  margin-right: 88rpx; /* 让位给右上角距离标签 */
+}
+.loc-tip {
+  background: #fff7e6;
+  color: #8a6a2f;
+  border-radius: 16rpx;
+  padding: 16rpx 24rpx;
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+}
+.loc-link {
+  color: #e8571f;
+  font-weight: 700;
+  margin-left: 8rpx;
+}
+.gym-card {
+  padding: 0;
+  overflow: hidden;
+}
+.gym-hover {
+  transform: scale(0.985);
+  transition: transform 0.1s;
+}
+.gym-head {
+  padding: 28rpx 28rpx 0;
+  position: relative;
+}
+.gym-name {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #1b1e28;
+}
+.gym-area {
+  font-size: 22rpx;
+  color: #9aa1b2;
+  margin-top: 6rpx;
+}
+.gym-dist {
+  position: absolute;
+  right: 28rpx;
+  top: 28rpx;
+  font-size: 22rpx;
+  color: #5a6072;
+  background: #f2f3f7;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+}
+.gym-body {
+  padding: 14rpx 28rpx 24rpx;
+}
+.gym-stats {
+  margin-top: 4rpx;
+}
+.gym-new {
+  color: #e8571f;
+  font-weight: 600;
+}
+.gym-notice {
+  margin-top: 16rpx;
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  padding: 12rpx 16rpx;
+  font-size: 22rpx;
+  color: #5a6072;
+}
+
+/* 即将开业标 */
+.gym-soon {
+  color: #2f7a58;
+  background: #e8f5ee;
+}

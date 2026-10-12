@@ -1,0 +1,178 @@
+.pub {
+  padding-bottom: 60rpx;
+}
+.field {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 0;
+}
+.label {
+  width: 140rpx;
+  font-size: 26rpx;
+  color: #5a6072;
+  flex-shrink: 0;
+}
+.pick {
+  font-size: 28rpx;
+  color: #9aa1b2;
+  padding: 8rpx 0;
+}
+.pick.has {
+  color: #1b1e28;
+  font-weight: 600;
+}
+
+.sec-title {
+  margin-bottom: 12rpx;
+}
+.title-hint {
+  margin-left: 12rpx;
+  font-weight: 400;
+}
+.tag-more {
+  background: transparent;
+  color: #e8571f;
+  border: 2rpx dashed #ffd9c4;
+}
+.pioneer {
+  color: #30a46c;
+  font-weight: 600;
+  margin: 8rpx 0 4rpx;
+}
+.nr-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+.tips {
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-top: 14rpx;
+  white-space: pre-line;
+}
+
+.media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 20rpx 0 8rpx;
+}
+.media-item {
+  position: relative;
+  width: 196rpx;
+  height: 196rpx;
+  margin: 0 14rpx 14rpx 0;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+.media-thumb {
+  width: 100%;
+  height: 100%;
+}
+.media-dur {
+  position: absolute;
+  left: 8rpx;
+  bottom: 8rpx;
+  font-size: 20rpx;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2rpx 10rpx;
+  border-radius: 8rpx;
+}
+.media-del {
+  position: absolute;
+  right: 8rpx;
+  top: 8rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.media-add {
+  width: 196rpx;
+  height: 196rpx;
+  border-radius: 16rpx;
+  border: 2rpx dashed #d5d8de;
+  color: #9aa1b2;
+  font-size: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14rpx;
+}
+
+.title-input {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.edit-route-line {
+  font-weight: 700;
+  margin: 8rpx 0 6rpx;
+}
+.caution-row {
+  display: flex;
+  align-items: center;
+  background: #fff3f3;
+  border-radius: 12rpx;
+  padding: 14rpx 20rpx;
+  margin-top: 20rpx;
+}
+.caution-label {
+  color: #e5484d;
+  font-size: 24rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 16rpx;
+}
+.caution-input {
+  flex: 1;
+  font-size: 26rpx;
+}
+.steps-title {
+  margin-bottom: 16rpx;
+}
+.step-field {
+  margin-bottom: 20rpx;
+}
+.step-phase {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #e8571f;
+  margin-bottom: 8rpx;
+}
+.step-input {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f7f8fa;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
+  min-height: 80rpx;
+}
+
+.vis {
+  padding: 8rpx 28rpx;
+  border-radius: 999rpx;
+  background: #f0f2f5;
+  color: #5a6072;
+  font-size: 24rpx;
+  margin-right: 16rpx;
+}
+.vis.on {
+  background: #fff1ea;
+  color: #e8571f;
+  font-weight: 700;
+}
+
+.submit {
+  margin-top: 8rpx;
+}
+.safety {
+  text-align: center;
+  margin-top: 20rpx;
+}

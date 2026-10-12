@@ -1,0 +1,9 @@
+{
+  "name": "updateBeta",
+  "version": "1.0.0",
+  "description": "作者编辑自己的 Beta（白名单字段）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
