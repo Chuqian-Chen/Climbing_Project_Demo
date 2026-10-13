@@ -28,7 +28,7 @@
 
     <!-- 热力图（近10周） -->
     <view class="card">
-      <view class="bold heat-title">上墙热力 · 近 10 周</view>
+      <view class="bold heat-title">近 10 周</view>
       <view class="heat">
         <view
           wx:for="{{heat}}"
@@ -91,11 +91,11 @@
   <block wx:elif="{{!loadError}}">
     <empty-state
       title="还没有打卡记录"
-      desc="完攀或磕线后记得回来打个卡，攒出你的攀岩足迹"
+      desc="打卡后会显示在这里"
       btnText="去岩馆看看"
       bind:action="goGyms"
     />
-    <view class="seed" wx:if="{{!demoSeeded}}" bindtap="seedDemo">或：载入一批演示打卡，先看看效果 →</view>
+    <view class="seed" wx:if="{{!demoSeeded}}" bindtap="seedDemo">载入演示打卡</view>
   </block>
 
 </view>

@@ -1,4 +1,4 @@
-// Beta 详情：先认线 / 走线，再学动作，底部跟练打卡
+// Beta 详情：先认线 / 走线，底部打卡
 const api = require('../../utils/api');
 const flags = require('../../utils/flags');
 const cloudSync = require('../../utils/cloud-sync');

@@ -13,7 +13,6 @@ Page({
     canEdit: false,
     showManage: false,
     seqChips: [],
-    seqHint: '',
     gradeOpts: gradeUtil.GRADE_LIST,
     colorOpts: Object.keys(gradeUtil.HOLD_COLORS).map((k) => gradeUtil.HOLD_COLORS[k].name + '点')
   },
@@ -32,7 +31,6 @@ Page({
       wx.setNavigationBarTitle({ title: res.route.fullName || res.route.name });
       const holds = (res.wallRef && res.wallRef.holds) || [];
       const seqChips = holds.filter((h) => !h.f && h.label);
-      const seqHint = (res.analysis && res.analysis[0]) || '';
       this.setData({
         route: res.route,
         betas: res.betas,
@@ -40,7 +38,6 @@ Page({
         hasHeight: !!res.hasHeight,
         canEdit: !!res.route.isMine,
         seqChips: seqChips,
-        seqHint: seqHint,
         loadFailed: false
       });
       if (!res.route.isMine) {
@@ -194,7 +191,7 @@ Page({
     const r = this.data.route || {};
     const w = this.data.wallRef;
     return {
-      title: r.name + ' ' + r.grade + ' · ' + (r.betaCount || 0) + ' 条Beta',
+      title: r.name + ' ' + r.grade + ' · ' + (r.betaCount || 0) + ' Beta',
       path: '/pages/route-detail/route-detail?id=' + this.routeId,
       imageUrl: r.photo || (w && w.photo) || ''
     };

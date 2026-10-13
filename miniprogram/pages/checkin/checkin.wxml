@@ -1,7 +1,7 @@
 <view class="page-pad" wx:if="{{loadFailed}}">
   <view class="card ck-missing">
-    <view class="bold">这条线路不存在或已下架</view>
-    <view class="small muted ck-missing-desc">可能已换线拆除，去墙上看看新线吧</view>
+    <view class="bold">线路不存在或已下架</view>
+    <view class="small muted ck-missing-desc">可能已换线</view>
     <view class="btn btn-soft ck-missing-btn" bindtap="goBack">返回</view>
   </view>
 </view>
@@ -26,19 +26,16 @@
   <block wx:if="{{!done}}">
     <!-- 完攀方式 -->
     <view class="card">
-      <view class="bold f-title">这把爬得怎么样？</view>
+      <view class="bold f-title">结果</view>
       <view class="res-row">
         <view class="res {{result === 'flash' ? 'on flash' : ''}}" data-r="flash" bindtap="setResult">
           <view class="res-name">闪送</view>
-          <view class="res-desc">第一把就过</view>
         </view>
         <view class="res {{result === 'top' ? 'on top' : ''}}" data-r="top" bindtap="setResult">
           <view class="res-name">完攀</view>
-          <view class="res-desc">磕了几把过了</view>
         </view>
         <view class="res {{result === 'attempt' ? 'on att' : ''}}" data-r="attempt" bindtap="setResult">
           <view class="res-name">磕线中</view>
-          <view class="res-desc">还在努力</view>
         </view>
       </view>
     </view>
@@ -57,7 +54,7 @@
 
     <!-- 难度感受 -->
     <view class="card">
-      <view class="bold f-title">定级感受 <text class="small faint">选填，帮大家校准难度</text></view>
+      <view class="bold f-title">定级感受 <text class="small faint">选填</text></view>
       <view class="row">
         <view class="feel-chip {{feel === 'soft' ? 'on' : ''}}" data-f="soft" bindtap="setFeel">偏软</view>
         <view class="feel-chip {{feel === 'fair' ? 'on' : ''}}" data-f="fair" bindtap="setFeel">准确</view>
@@ -69,7 +66,7 @@
     <view class="card">
       <textarea
         class="note"
-        placeholder="记点什么…（比如：终于治好了我的挂脚跟恐惧症）"
+        placeholder="备注（选填）"
         maxlength="60"
         value="{{note}}"
         auto-height
@@ -83,26 +80,26 @@
   <!-- 打卡成功 -->
   <block wx:else>
     <view class="card done fade-in">
-      <view class="done-title">打卡成功！</view>
+      <view class="done-title">已打卡</view>
       <view class="small muted">今天第 {{doneInfo.todayCount}} 条 · {{doneInfo.checkin.resultText}}「{{route.name}}」{{route.grade}}</view>
       <view class="new-badge" wx:if="{{doneInfo.newBadges && doneInfo.newBadges.length}}">
         解锁成就：{{doneInfo.newBadges[0].name}}
       </view>
 
       <block wx:if="{{!posterPath}}">
-        <view class="btn btn-primary done-btn" bindtap="genPoster">生成打卡海报</view>
+        <view class="btn btn-primary done-btn" bindtap="genPoster">生成海报</view>
       </block>
       <block wx:else>
         <image class="poster-img" src="{{posterPath}}" mode="widthFix" bindtap="previewPoster" />
         <view class="row poster-acts">
           <view class="btn btn-soft flex-1 poster-save" bindtap="savePoster">存相册</view>
-          <button class="btn btn-primary flex-1 poster-share" open-type="share">分享给岩友</button>
+          <button class="btn btn-primary flex-1 poster-share" open-type="share">分享</button>
         </view>
       </block>
 
       <view class="row done-links">
         <view class="done-link" bindtap="backToRoute">返回线路</view>
-        <view class="done-link" bindtap="goLogbook">查看足迹 ›</view>
+        <view class="done-link" bindtap="goLogbook">足迹 ›</view>
       </view>
     </view>
   </block>

@@ -4,7 +4,7 @@
     <view class="input-wrap">
       <input
         class="input"
-        placeholder="线路、岩馆、动作"
+        placeholder="线路、岩馆、Beta"
         value="{{kw}}"
         focus
         confirm-type="search"
@@ -48,7 +48,7 @@
     <block wx:if="{{tab === 'gym'}}">
       <view class="card g-item" wx:for="{{result.gyms}}" wx:key="id" data-id="{{item.id}}" bindtap="goGym">
         <view class="bold">{{item.name}}</view>
-        <view class="small faint">{{item.area}} · {{item.routeCount}} 条在墙</view>
+        <view class="small faint">{{item.area}} · {{item.routeCount}} 条</view>
       </view>
       <empty-state wx:if="{{!result.gyms.length}}" title="没有找到相关岩馆" />
     </block>

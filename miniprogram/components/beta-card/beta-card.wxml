@@ -7,8 +7,8 @@
       <view class="row">
         <text class="bc-nick">{{beta.author.nickname}}</text>
         <text class="bc-setter" wx:if="{{beta.author.isSetter}}">定线员</text>
-        <text class="bc-height" wx:if="{{beta.heightText}}">{{beta.heightText}}</text>
         <text class="bc-match" wx:if="{{beta.heightMatch}}">适合你</text>
+        <text class="bc-height" wx:elif="{{beta.heightText}}">{{beta.heightText}}</text>
       </view>
       <view class="faint small">{{beta.timeText}}<text wx:if="{{showRoute && beta.gymName}}"> · {{beta.gymName}}</text></view>
     </view>

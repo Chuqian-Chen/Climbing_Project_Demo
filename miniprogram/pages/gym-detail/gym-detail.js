@@ -164,7 +164,7 @@ Page({
       gradeNote: d.egNote.trim()
     }).then(() => {
       this.setData({ editingGrade: false });
-      wx.showToast({ title: '已保存，全馆岩友可见', icon: 'none' });
+      wx.showToast({ title: '已保存', icon: 'none' });
       this.load();
     }).catch((e) => {
       wx.showToast({

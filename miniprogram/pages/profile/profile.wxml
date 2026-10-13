@@ -24,7 +24,7 @@
         <view class="edit-btn" bindtap="startEdit">编辑</view>
       </view>
       <view class="tip" wx:if="{{!profile.height}}">
-        填写身高臂展后，浏览线路时会为你标出「适合你」的 Beta
+        填身高臂展，便于匹配 Beta
       </view>
       <view class="row gym-row">
         <text class="small muted">主场岩馆：</text>
@@ -84,11 +84,11 @@
 
   <block wx:if="{{tab === 'beta'}}">
     <beta-card wx:for="{{myBetas}}" wx:key="id" beta="{{item}}" />
-    <empty-state wx:if="{{!myBetas.length}}" title="还没发过 Beta" desc="你的第一条 Beta 可能正是别人磕了三周的答案" btnText="去发布" bind:action="goPublish" />
+    <empty-state wx:if="{{!myBetas.length}}" title="还没发过 Beta" desc="去线路页发布即可" btnText="去发布" bind:action="goPublish" />
   </block>
   <block wx:if="{{tab === 'fav'}}">
     <route-card wx:for="{{favRoutes}}" wx:key="id" route="{{item}}" />
-    <empty-state wx:if="{{!favRoutes.length}}" title="还没收藏线路" desc="在线路页点收藏，方便下次直奔目标" />
+    <empty-state wx:if="{{!favRoutes.length}}" title="还没收藏线路" desc="在线路页点星收藏" />
   </block>
   <block wx:if="{{tab === 'follow'}}">
     <view class="card follow-item" wx:for="{{following}}" wx:key="id" data-id="{{item.id}}" bindtap="goUser">

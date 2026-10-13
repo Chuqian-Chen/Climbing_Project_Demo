@@ -212,8 +212,8 @@ Page({
 
     // 尝试次数
     const tryText = k.result === 'flash'
-      ? '一把过，手感火热'
-      : (k.result === 'top' ? k.attempts + ' 次尝试后完攀' : '已尝试 ' + k.attempts + ' 次，下次就送');
+      ? '闪送'
+      : (k.result === 'top' ? k.attempts + ' 次完攀' : '尝试 ' + k.attempts + ' 次');
     ctx.fillText(tryText, 24, 232);
 
     // 日期
@@ -226,12 +226,6 @@ Page({
     ctx.lineTo(W - 24, 290);
     ctx.stroke();
 
-    // 引言
-    ctx.fillStyle = '#c8ccd6';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('每一次脱落，都是在测量', 24, 330);
-    ctx.fillText('自己与顶点的距离。', 24, 350);
-
     // 小程序码占位
     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
     this.roundRect(ctx, W - 88, H - 100, 64, 64, 10);
@@ -239,7 +233,7 @@ Page({
     ctx.fillStyle = '#9aa1b2';
     ctx.font = '9px sans-serif';
     ctx.fillText('小程序码', W - 80, H - 64);
-    ctx.fillText('长按识别 · 一起磕线', 24, H - 60);
+    ctx.fillText('岩友Beta', 24, H - 60);
   },
 
   roundRect(ctx, x, y, w, h, r) {
@@ -256,7 +250,7 @@ Page({
     if (!this.data.posterPath) return;
     wx.saveImageToPhotosAlbum({
       filePath: this.data.posterPath,
-      success: () => wx.showToast({ title: '已保存，去朋友圈晒吧', icon: 'success' }),
+      success: () => wx.showToast({ title: '已保存到相册', icon: 'success' }),
       fail: (err) => {
         if (err.errMsg && err.errMsg.indexOf('auth') >= 0) {
           wx.showModal({

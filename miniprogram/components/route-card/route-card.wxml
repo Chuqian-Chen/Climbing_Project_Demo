@@ -20,8 +20,8 @@
       <view class="row rc-meta">
         <text class="faint small ellipsis">{{route.wallName || ''}}{{route.sendsTotal ? (route.wallName ? ' · ' : '') + route.sendsTotal + ' 人完攀' : ''}}</text>
         <view class="flex-1"></view>
-        <view class="rc-beta {{open ? 'on' : ''}}" wx:if="{{previewable}}" catchtap="onPreview">{{open ? '收起' : ((route.betaCount || 0) + ' 条Beta')}}</view>
-        <text class="faint small" wx:elif="{{route.betaCount}}">{{route.betaCount}} 条Beta</text>
+        <view class="rc-beta {{open ? 'on' : ''}}" wx:if="{{previewable}}" catchtap="onPreview">{{open ? '收起' : ((route.betaCount || 0) + ' Beta')}}</view>
+        <text class="faint small" wx:elif="{{route.betaCount}}">{{route.betaCount}} Beta</text>
       </view>
     </view>
   </view>

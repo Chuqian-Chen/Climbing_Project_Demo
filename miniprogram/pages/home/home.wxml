@@ -1,7 +1,7 @@
 <view class="page-pad tabbar-pad">
 
   <view class="search-bar" bindtap="goSearch">
-    <text class="faint">搜线路、岩馆、动作</text>
+    <text class="faint">搜线路或岩馆</text>
   </view>
 
   <view class="load-err" wx:if="{{loadError}}">
@@ -10,7 +10,7 @@
   </view>
 
   <view class="onboard-slim" wx:if="{{!onboarded}}">
-    <text class="onboard-slim-text" bindtap="goProfile">填写身高臂展，帮你标出「适合你」的 Beta ›</text>
+    <text class="onboard-slim-text" bindtap="goProfile">填身高臂展，标出适合你的 Beta ›</text>
     <text class="onboard-close" bindtap="dismissOnboard">✕</text>
   </view>
 
@@ -57,9 +57,9 @@
     </view>
   </view>
 
-  <!-- 次要：学动作 -->
+  <!-- 次要：热门 Beta -->
   <view class="gym-row-head feed-head">
-    <text class="section-label">学动作</text>
+    <text class="section-label">热门 Beta</text>
   </view>
   <scroll-view scroll-x class="band-row" enhanced show-scrollbar="{{false}}">
     <view
@@ -70,7 +70,7 @@
       bindtap="pickBand"
     >{{item.label}}</view>
   </scroll-view>
-  <view class="band-empty small faint" wx:if="{{bandEmpty}}">这个难度档还没有 Beta · 换个档看看</view>
+  <view class="band-empty small faint" wx:if="{{bandEmpty}}">这档暂无 Beta</view>
   <view class="feed">
     <view class="feed-col">
       <beta-tile wx:for="{{betaColL}}" wx:key="id" beta="{{item}}" />

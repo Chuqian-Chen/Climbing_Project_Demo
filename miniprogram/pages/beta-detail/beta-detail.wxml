@@ -23,7 +23,7 @@
         <text class="seq-arrow" wx:if="{{index < seqChips.length - 1}}">→</text>
       </block>
     </scroll-view>
-    <view class="small faint seq-wall" wx:if="{{wallRef && wallRef.photo}}" catchtap="goWall">看墙面走线 ›</view>
+    <view class="small faint seq-wall" wx:if="{{wallRef && wallRef.photo}}" catchtap="goWall">走线 ›</view>
   </view>
 
   <view class="byline">
@@ -54,7 +54,7 @@
   </view>
   <view class="row wrap meta-row">
     <text class="tag on" wx:if="{{beta.heightMatch}}">适合你</text>
-    <text class="tag on" wx:if="{{beta.heightText}}">适合 {{beta.heightText}}</text>
+    <text class="tag on" wx:elif="{{beta.heightText}}">适合 {{beta.heightText}}</text>
     <text class="tag" wx:for="{{beta.moveTags}}" wx:key="*this">{{item}}</text>
   </view>
 
@@ -101,7 +101,7 @@
   <view class="card media" wx:if="{{beta.type === 'video' && !beta.videoFileID}}" bindtap="playVideo">
     <view class="media-play">▶</view>
     <view class="media-dur">{{beta.videoDur}}</view>
-    <view class="small media-hint">演示环境 · 点击了解视频能力</view>
+    <view class="small media-hint">暂无视频</view>
   </view>
 
   <!-- 分步拆解 -->
@@ -115,7 +115,7 @@
     </view>
   </view>
 
-  <view class="btn btn-primary ck-main" bindtap="goCheckin">跟练打卡</view>
+  <view class="btn btn-primary ck-main" bindtap="goCheckin">打卡</view>
   <view class="acts">
     <view class="act {{beta.liked ? 'liked' : ''}}" bindtap="toggleLike"><text class="act-heart">{{beta.liked ? '♥' : '♡'}}</text> {{beta.likeCount}}</view>
     <button class="act share" open-type="share">分享</button>
@@ -141,7 +141,7 @@
   <view class="card cm-input-wrap">
     <input
       class="cm-input"
-      placeholder="说点什么…（比如你的完攀心得）"
+      placeholder="说点什么…"
       value="{{commentText}}"
       confirm-type="send"
       bindinput="onCommentInput"
@@ -151,7 +151,7 @@
   </view>
 
   <!-- 同线路其他 Beta -->
-  <view class="section-title" wx:if="{{others.length}}">这条线的其他 Beta</view>
+  <view class="section-title" wx:if="{{others.length}}">其他 Beta</view>
   <beta-card wx:for="{{others}}" wx:key="id" beta="{{item}}" showRoute="{{false}}" />
 
 </view>
