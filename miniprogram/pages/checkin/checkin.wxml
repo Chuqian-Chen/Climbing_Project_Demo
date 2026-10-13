@@ -16,7 +16,7 @@
         <view class="row">
           <view class="hold-dot {{route.colorLight ? 'light' : ''}}" style="background:{{route.colorHex}}"></view>
           <text class="r-name ellipsis">{{route.name}}</text>
-          <view class="grade-badge" style="background:{{route.gradeColor}}">{{route.grade}}</view>
+          <view class="grade-badge" wx:if="{{route.grade}}" style="background:{{route.gradeColor}}">{{route.grade}}</view>
         </view>
         <view class="small faint ck-gym">{{route.gymName}}<text wx:if="{{route.wallName}}"> · {{route.wallName}}</text></view>
       </view>

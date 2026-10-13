@@ -214,6 +214,15 @@ Page({
       url: '/pages/wall-photo/wall-photo?gymId=' + this.gymId + '&wallId=' + e.currentTarget.dataset.id
     });
   },
+  goShootWall() {
+    const wall = (this.data.wallPhotos || [])[0];
+    wx.navigateTo({
+      url: '/pages/wall-photo/wall-photo?gymId=' + this.gymId + '&wallId=' + ((wall && wall.id) || 'w-main')
+    });
+  },
+  goGymCheckin() {
+    wx.navigateTo({ url: '/pages/checkin/checkin?gymId=' + this.gymId });
+  },
   goBackHome() {
     const pages = getCurrentPages();
     if (pages.length > 1) wx.navigateBack();

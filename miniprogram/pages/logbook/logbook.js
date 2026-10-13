@@ -58,7 +58,9 @@ Page({
 
   goRoute(e) {
     const id = e.currentTarget.dataset.id;
+    const gid = e.currentTarget.dataset.gid;
     if (id) wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + id });
+    else if (gid) wx.navigateTo({ url: '/pages/gym-detail/gym-detail?id=' + gid });
   },
 
   // 长按打卡条目 → 删除（手滑打错卡的撤销通道；统计随之修正）

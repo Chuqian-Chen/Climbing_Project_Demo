@@ -26,9 +26,24 @@ function myOpenid() {
   }
 }
 
+// 按业务 id upsert 到云数据库（未开通云/失败时静默跳过）
+function cloudSet(coll, id, doc) {
+  if (typeof wx === 'undefined' || !wx.cloud || !id) return;
+  try {
+    const body = Object.assign({ mtime: Date.now() }, doc);
+    delete body._id;
+    wx.cloud.database().collection(coll).doc(String(id)).set({ data: body }).catch(() => {});
+  } catch (e) { /* ignore */ }
+}
+
 // 把文档写入云数据库（未开通云/失败时静默跳过，本地体验不受影响）
 // mtime：增量同步（fetchAll since）依赖的修改时间戳
 function cloudAdd(coll, doc) {
+  const id = doc && (doc.id || doc._id);
+  if (id) {
+    cloudSet(coll, id, doc);
+    return;
+  }
   if (typeof wx === 'undefined' || !wx.cloud) return;
   try {
     wx.cloud.database().collection(coll)
@@ -383,21 +398,28 @@ function matchHeight(heightFit, state) {
 function decorateCheckin(k, state) {
   const s = state || store.get();
   const meta = RESULT_META[k.result] || RESULT_META.attempt;
-  const route = decorateRoute(findRoute(k.routeId), s);
+  const route = k.routeId ? decorateRoute(findRoute(k.routeId), s) : null;
+  const gym = (!route && k.gymId) ? findGym(k.gymId) : null;
   let user = findUser(k.userId, s);
   if (user.generic && k.userSnap) {
     user = Object.assign({ id: k.userId }, k.userSnap);
   }
+  const routeView = route ? {
+    id: route.id, name: route.name, grade: route.grade,
+    gradeColor: route.gradeColor, colorHex: route.colorHex,
+    colorLight: route.colorLight, gymName: route.gymName, wallName: route.wallName
+  } : (gym ? {
+    id: '', name: gym.name + ' · 到馆', grade: '',
+    gradeColor: gym.typeColor || '#4a5164', colorHex: gym.typeColor || '#4a5164',
+    colorLight: false, gymName: gym.name, wallName: ''
+  } : null);
   return Object.assign({}, k, {
     user: user,
     isMine: isMineId(k.userId),
     resultText: meta.text,
     dateText: util.relativeDate(k.date),
-    route: route ? {
-      id: route.id, name: route.name, grade: route.grade,
-      gradeColor: route.gradeColor, colorHex: route.colorHex,
-      colorLight: route.colorLight, gymName: route.gymName, wallName: route.wallName
-    } : null
+    gymId: k.gymId || (route && route.gymId) || '',
+    route: routeView
   });
 }
 
@@ -421,8 +443,11 @@ function getHome(loc) {
     let list = allGymsList();
     if (cityKey) list = list.filter((g) => g.city === cityKey);
     nearGyms = list.map((g) => decorateGym(g, s, loc))
-      .sort((a, b) =>
-        (a.distance == null ? 1e9 : a.distance) - (b.distance == null ? 1e9 : b.distance))
+      .sort((a, b) => {
+        const rank = gymListRank(a) - gymListRank(b);
+        if (rank) return rank;
+        return (a.distance == null ? 1e9 : a.distance) - (b.distance == null ? 1e9 : b.distance);
+      })
       .slice(0, 6);
   } else {
     nearGyms = mock.GYMS.map((g) => decorateGym(g, s, null));
@@ -481,18 +506,25 @@ function decorateGym(gym, state, loc) {
   });
 }
 
+function gymListRank(g) {
+  if (g.unlisted) return 2;
+  if (g.comingSoon) return 1;
+  return 0;
+}
+
 function getGyms(loc, cityKey) {
   const s = store.get();
   let list = allGymsList();
   if (cityKey) list = list.filter((g) => g.city === cityKey);
   const decorated = list.map((g) => decorateGym(g, s, loc));
-  if (loc) {
-    decorated.sort((a, b) =>
-      (a.distance == null ? 1e9 : a.distance) - (b.distance == null ? 1e9 : b.distance));
-  } else {
-    // 无定位时演示岩馆置顶（有线路内容），其余保持名录顺序
-    decorated.sort((a, b) => (b.isDemo ? 1 : 0) - (a.isDemo ? 1 : 0));
-  }
+  decorated.sort((a, b) => {
+    const rank = gymListRank(a) - gymListRank(b);
+    if (rank) return rank;
+    if (loc) {
+      return (a.distance == null ? 1e9 : a.distance) - (b.distance == null ? 1e9 : b.distance);
+    }
+    return (b.isDemo ? 1 : 0) - (a.isDemo ? 1 : 0);
+  });
   return Promise.resolve(decorated);
 }
 
@@ -619,7 +651,15 @@ function toggleLike(betaId) {
     if (st.likes[betaId]) delete st.likes[betaId];
     else st.likes[betaId] = true;
   });
-  return Promise.resolve({ liked: !!s.likes[betaId] });
+  const liked = !!s.likes[betaId];
+  const oid = myOpenid() || 'me';
+  cloudSet('likes', oid + '_' + betaId, {
+    id: oid + '_' + betaId,
+    userId: oid,
+    betaId: betaId,
+    on: liked
+  });
+  return Promise.resolve({ liked: liked });
 }
 
 function toggleFav(routeId) {
@@ -627,7 +667,15 @@ function toggleFav(routeId) {
     if (st.favs[routeId]) delete st.favs[routeId];
     else st.favs[routeId] = true;
   });
-  return Promise.resolve({ faved: !!s.favs[routeId] });
+  const faved = !!s.favs[routeId];
+  const oid = myOpenid() || 'me';
+  cloudSet('favs', oid + '_' + routeId, {
+    id: oid + '_' + routeId,
+    userId: oid,
+    routeId: routeId,
+    on: faved
+  });
+  return Promise.resolve({ faved: faved });
 }
 
 function toggleFollow(userId) {
@@ -772,13 +820,18 @@ function addCheckin(data) {
 }
 
 function doAddCheckin(data) {
-  // 打卡前的已解锁成就（用于对比解锁提示）
+  const route = data.routeId ? findRoute(data.routeId) : null;
+  const gymId = data.gymId || (route && route.gymId) || '';
+  if (!data.routeId && !gymId) {
+    return Promise.reject(new Error('缺少线路或岩馆'));
+  }
   const beforeBadges = buildLogbook(store.get()).badges
     .filter((b) => b.unlocked).map((b) => b.name);
   const checkin = {
     id: util.uid('k'),
     userId: 'me',
-    routeId: data.routeId,
+    routeId: data.routeId || '',
+    gymId: gymId,
     result: data.result,
     attempts: data.attempts || 1,
     note: data.note || '',
@@ -786,7 +839,7 @@ function doAddCheckin(data) {
   };
   store.update((st) => {
     st.checkins.push(checkin);
-    if (data.feel) st.feels[data.routeId] = data.feel;
+    if (data.feel && data.routeId) st.feels[data.routeId] = data.feel;
   });
   cloudAdd('checkins', Object.assign({}, checkin, {
     userId: myOpenid() || 'me',
@@ -797,9 +850,10 @@ function doAddCheckin(data) {
   const newBadges = buildLogbook(s).badges.filter(
     (b) => b.unlocked && beforeBadges.indexOf(b.name) < 0
   );
+  const decorated = decorateCheckin(checkin, s);
   return Promise.resolve({
-    checkin: decorateCheckin(checkin, s),
-    route: decorateRoute(findRoute(data.routeId), s),
+    checkin: decorated,
+    route: decorated.route,
     todayCount: todayCount,
     newBadges: newBadges
   });

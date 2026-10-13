@@ -120,10 +120,18 @@
         </block>
       </view>
     </block>
+    <view class="card cold-card" wx:if="{{!routes.length}}">
+      <view class="bold">这家馆还没有线路</view>
+      <view class="small muted cold-desc">来过？拍一面墙，或先记一笔到馆打卡</view>
+      <view class="row cold-acts">
+        <view class="btn btn-soft flex-1" bindtap="goShootWall">拍墙圈点</view>
+        <view class="btn btn-primary flex-1" bindtap="goGymCheckin">到馆打卡</view>
+      </view>
+    </view>
     <empty-state
-      wx:if="{{!shown.length}}"
-      title="{{routes.length ? '没有符合条件的线路' : '这家岩馆的线路待共建'}}"
-      desc="{{routes.length ? '换个筛选条件试试' : '来过这家馆？打卡、发条 Beta，让更多岩友看到它的线'}}"
+      wx:if="{{routes.length && !shown.length}}"
+      title="没有符合条件的线路"
+      desc="换个筛选条件试试"
     />
   </view>
 </view>

@@ -1,10 +1,10 @@
-// 云函数：deleteContent — 删除自己发布的内容
-// { type:'beta', id }  作者本人可删；连带删除该 Beta 的评论
+// 云函数：deleteContent — 删除自己发布的内容（软删，保证增量同步能看到消失）
+// { type:'beta', id }  作者本人可删；连带软删该 Beta 的评论
 // { type:'comment', id } 评论作者本人可删
 // { type:'checkin', id } 打卡本人可删
 // { type:'route', id } 线主或认证定线员可删；
-//   线上有他人的 Beta/打卡 → 不硬删，转 status='removed'（下架），返回 mode:'retired'
-//   只有自己的内容 → 硬删线路 + 自己挂在线上的 Beta（及其评论）+ 自己的打卡，返回 mode:'deleted'
+//   线上有他人的 Beta/打卡 → 不删，转 status='removed'（下架），返回 mode:'retired'
+//   只有自己的内容 → 软删线路 + 自己挂在线上的 Beta（及其评论）+ 自己的打卡
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
@@ -22,10 +22,19 @@ async function findByBizId(coll, id) {
   return (r.data && r.data[0]) || null;
 }
 
-async function deleteBetaDoc(beta) {
-  await db.collection('betas').doc(beta._id).remove();
+async function softDelete(coll, _id) {
+  await db.collection(coll).doc(_id).update({
+    data: { deleted: true, mtime: Date.now() }
+  });
+}
+
+async function softDeleteBeta(beta) {
+  await softDelete('betas', beta._id);
   try {
-    await db.collection('comments').where({ betaId: beta.id }).remove();
+    const comments = await db.collection('comments').where({ betaId: beta.id }).get();
+    for (const c of (comments.data || [])) {
+      await softDelete('comments', c._id);
+    }
   } catch (e) { /* 评论清理失败不阻断 */ }
 }
 
@@ -40,7 +49,7 @@ exports.main = async (event) => {
       const c = await findByBizId('comments', id);
       if (!c) return { ok: false, error: 'comment not found' };
       if (c.userId !== OPENID) return { ok: false, error: '只能删除自己的评论' };
-      await db.collection('comments').doc(c._id).remove();
+      await softDelete('comments', c._id);
       return { ok: true, mode: 'deleted' };
     }
 
@@ -48,7 +57,7 @@ exports.main = async (event) => {
       const k = await findByBizId('checkins', id);
       if (!k) return { ok: false, error: 'checkin not found' };
       if (k.userId !== OPENID) return { ok: false, error: '只能删除自己的打卡' };
-      await db.collection('checkins').doc(k._id).remove();
+      await softDelete('checkins', k._id);
       return { ok: true, mode: 'deleted' };
     }
 
@@ -56,7 +65,7 @@ exports.main = async (event) => {
       const beta = await findByBizId('betas', id);
       if (!beta) return { ok: false, error: 'beta not found' };
       if (beta.userId !== OPENID) return { ok: false, error: '只能删除自己发布的 Beta' };
-      await deleteBetaDoc(beta);
+      await softDeleteBeta(beta);
       return { ok: true, mode: 'deleted' };
     }
 
@@ -66,7 +75,6 @@ exports.main = async (event) => {
       const allowed = route.setterId === OPENID || await isApprovedSetter(OPENID);
       if (!allowed) return { ok: false, error: '只有线主或认证定线员可以删除' };
 
-      // 他人内容检查：有别人的 Beta 或打卡 → 只下架，不硬删
       const othersBeta = await db.collection('betas')
         .where({ routeId: id, userId: _.neq(OPENID) }).count();
       const othersCheckin = await db.collection('checkins')
@@ -78,15 +86,18 @@ exports.main = async (event) => {
         return { ok: true, mode: 'retired', othersBeta: othersBeta.total, othersCheckin: othersCheckin.total };
       }
 
-      // 硬删：线路 + 自己的 Beta（连评论）+ 自己的打卡
-      await db.collection('routes').doc(route._id).remove();
+      await softDelete('routes', route._id);
       const myBetas = await db.collection('betas')
         .where({ routeId: id, userId: OPENID }).get();
       for (const b of (myBetas.data || [])) {
-        await deleteBetaDoc(b);
+        if (!b.deleted) await softDeleteBeta(b);
       }
       try {
-        await db.collection('checkins').where({ routeId: id, userId: OPENID }).remove();
+        const myCheckins = await db.collection('checkins')
+          .where({ routeId: id, userId: OPENID }).get();
+        for (const k of (myCheckins.data || [])) {
+          if (!k.deleted) await softDelete('checkins', k._id);
+        }
       } catch (e) { /* ignore */ }
       return { ok: true, mode: 'deleted', betasRemoved: (myBetas.data || []).length };
     }

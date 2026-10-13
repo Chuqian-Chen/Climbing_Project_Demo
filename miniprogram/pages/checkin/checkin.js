@@ -15,16 +15,38 @@ Page({
   },
 
   onLoad(options) {
-    this.routeId = options.routeId;
-    if (!this.routeId) {
-      wx.showToast({ title: '缺少线路参数', icon: 'none' });
+    this.routeId = options.routeId || '';
+    this.gymId = options.gymId || '';
+    if (!this.routeId && !this.gymId) {
+      wx.showToast({ title: '缺少线路或岩馆', icon: 'none' });
       return;
     }
-    api.getRouteDetail(this.routeId).then((res) => {
-      this.myTodayCount = res.myTodayCount || 0;
-      this.setData({ route: res.route });
+    if (this.routeId) {
+      api.getRouteDetail(this.routeId).then((res) => {
+        this.myTodayCount = res.myTodayCount || 0;
+        this.setData({ route: res.route, gymOnly: false });
+      }).catch(() => {
+        this.setData({ loadFailed: true });
+      });
+      return;
+    }
+    api.getGymDetail(this.gymId).then((res) => {
+      const g = res.gym;
+      this.myTodayCount = 0;
+      this.setData({
+        gymOnly: true,
+        route: {
+          name: g.name + ' · 到馆',
+          gymName: g.name,
+          wallName: '',
+          grade: '',
+          gradeColor: g.typeColor || '#4a5164',
+          colorHex: g.typeColor || '#4a5164',
+          colorLight: false,
+          photo: ''
+        }
+      });
     }).catch(() => {
-      // 线路被下架/重灌后不存在：给出明确提示而不是白屏
       this.setData({ loadFailed: true });
     });
   },
@@ -83,6 +105,7 @@ Page({
     const d = this.data;
     api.addCheckin({
       routeId: this.routeId,
+      gymId: this.gymId,
       result: d.result,
       attempts: d.attempts,
       feel: d.feel,
@@ -164,29 +187,28 @@ Page({
     ctx.fillText(k.resultText, 24, 96);
 
     // 线路名
-    let name = route.name;
+    let name = (route && route.name) || '到馆';
     if (name.length > 10) name = name.slice(0, 10) + '…';
     ctx.font = 'bold 22px sans-serif';
     ctx.fillText('「' + name + '」', 24, 140);
 
-    // 难度徽章
-    ctx.fillStyle = route.gradeColor;
-    this.roundRect(ctx, 24, 156, 52, 26, 8);
-    ctx.fill();
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 15px sans-serif';
-    ctx.fillText(route.grade, 34, 175);
+    if (route && route.grade) {
+      ctx.fillStyle = route.gradeColor;
+      this.roundRect(ctx, 24, 156, 52, 26, 8);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText(route.grade, 34, 175);
 
-    // 岩点颜色圆
-    ctx.fillStyle = route.colorHex;
-    ctx.beginPath();
-    ctx.arc(100, 169, 11, 0, Math.PI * 2);
-    ctx.fill();
+      ctx.fillStyle = route.colorHex;
+      ctx.beginPath();
+      ctx.arc(100, 169, 11, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-    // 岩馆信息
     ctx.fillStyle = '#9aa1b2';
     ctx.font = '12px sans-serif';
-    ctx.fillText(route.gymName + ' · ' + route.wallName, 24, 210);
+    ctx.fillText((route && route.gymName ? route.gymName : '') + (route && route.wallName ? ' · ' + route.wallName : ''), 24, 210);
 
     // 尝试次数
     const tryText = k.result === 'flash'

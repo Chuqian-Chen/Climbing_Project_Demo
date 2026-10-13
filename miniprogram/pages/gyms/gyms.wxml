@@ -35,6 +35,7 @@
         <view class="gym-name flex-1">{{item.name}}</view>
         <view class="gym-demo" wx:if="{{item.isDemo}}">演示数据</view>
         <view class="gym-demo gym-soon" wx:if="{{item.comingSoon}}">即将开业</view>
+        <view class="gym-demo" wx:if="{{item.unlisted}}">待核实</view>
       </view>
       <view class="gym-area">{{item.area}}<text wx:if="{{item.price}}"> · ¥{{item.price}}</text></view>
       <view class="gym-dist" wx:if="{{item.distanceText}}">{{item.distanceText}}</view>

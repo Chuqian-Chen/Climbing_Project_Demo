@@ -70,6 +70,7 @@
         wx:for="{{group.list}}"
         wx:key="id"
         data-id="{{item.route.id}}"
+        data-gid="{{item.gymId}}"
         data-kid="{{item.id}}"
         bindtap="goRoute"
         bindlongpress="onCheckinLongPress"
@@ -77,7 +78,7 @@
         <view class="row">
           <view class="hold-dot {{item.route.colorLight ? 'light' : ''}}" style="background:{{item.route.colorHex}}"></view>
           <text class="tl-name ellipsis">{{item.route.name}}</text>
-          <view class="grade-badge" style="background:{{item.route.gradeColor}}">{{item.route.grade}}</view>
+          <view class="grade-badge" wx:if="{{item.route.grade}}" style="background:{{item.route.gradeColor}}">{{item.route.grade}}</view>
           <view class="flex-1"></view>
           <text class="small faint">{{item.resultText}}{{item.result === 'attempt' ? ' · ' + item.attempts + '次尝试' : (item.attempts > 1 ? ' · ' + item.attempts + '次' : '')}}</text>
         </view>
