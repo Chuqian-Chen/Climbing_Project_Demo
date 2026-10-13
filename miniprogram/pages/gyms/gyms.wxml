@@ -49,6 +49,7 @@
         </view>
       </block>
       <view class="small faint" wx:else>线路数据待共建 · 进馆打卡开个荒 →</view>
+      <view class="gym-map" wx:if="{{item.lat}}" catchtap="openMap" data-id="{{item.id}}">打开地图 ›</view>
     </view>
   </view>
 

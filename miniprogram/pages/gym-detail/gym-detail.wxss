@@ -216,6 +216,30 @@
   padding: 8rpx 24rpx 18rpx;
   border-top: 1rpx solid #f0f2f5;
 }
+.loc-card {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 24rpx;
+}
+.loc-text {
+  flex: 1;
+  min-width: 0;
+}
+.loc-addr {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1b1e28;
+}
+.loc-btn {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #fff;
+  background: #2f7a58;
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+}
 .cold-card {
   padding: 32rpx 28rpx;
   text-align: center;

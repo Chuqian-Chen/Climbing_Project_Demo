@@ -1,6 +1,7 @@
 // 岩馆列表：城市切换 + 定位排序 + 名录岩馆
 const api = require('../../utils/api');
 const cloudSync = require('../../utils/cloud-sync');
+const util = require('../../utils/helpers');
 
 Page({
   data: {
@@ -66,7 +67,7 @@ Page({
     const kw = this.data.kw.trim().toLowerCase();
     const list = kw
       ? this.data.gyms.filter((g) =>
-          (g.name + g.district + (g.area || '')).toLowerCase().indexOf(kw) >= 0)
+          (g.name + g.district + (g.area || '') + (g.address || '')).toLowerCase().indexOf(kw) >= 0)
       : this.data.gyms;
     this.setData({ shown: list });
   },
@@ -105,6 +106,12 @@ Page({
 
   goGym(e) {
     wx.navigateTo({ url: '/pages/gym-detail/gym-detail?id=' + e.currentTarget.dataset.id });
+  },
+
+  openMap(e) {
+    const id = e.currentTarget.dataset.id;
+    const gym = (this.data.shown || []).find((g) => g.id === id);
+    util.openGymMap(gym);
   },
 
   onShareAppMessage() {

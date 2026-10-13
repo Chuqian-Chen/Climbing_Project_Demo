@@ -1,6 +1,7 @@
 // 岩馆详情：墙面 + 线路列表（点卡进详情，点 Beta 芯片就地预览）
 const api = require('../../utils/api');
 const gradeUtil = require('../../utils/grade');
+const util = require('../../utils/helpers');
 
 // 分级编辑输入解析："橙=V0" / "orange V0" / "橙色：V0" 每行一条
 function parseGradeLines(text) {
@@ -222,6 +223,9 @@ Page({
   },
   goGymCheckin() {
     wx.navigateTo({ url: '/pages/checkin/checkin?gymId=' + this.gymId });
+  },
+  openMap() {
+    util.openGymMap(this.data.gym);
   },
   goBackHome() {
     const pages = getCurrentPages();

@@ -105,6 +105,12 @@
   padding: 4rpx 16rpx;
   border-radius: 999rpx;
 }
+.gym-map {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: #2f7a58;
+  font-weight: 600;
+}
 .gym-body {
   padding: 14rpx 28rpx 24rpx;
 }

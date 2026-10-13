@@ -173,6 +173,7 @@ function normalizeDirGym(d) {
     isDirectory: true,
     name: d.name,
     area: d.near || '',
+    address: d.address || '',
     lat: d.lat,
     lng: d.lng,
     gradient: TYPE_GRADIENTS[d.type || ''] || TYPE_GRADIENTS[''],
@@ -1763,7 +1764,9 @@ function search(kw) {
     return has(r.name) || has(r.grade) || has(c.name) || has((c.name || '') + '点') ||
       (r.tags || []).some(has);
   }).map((r) => decorateRoute(r, s));
-  const gyms = allGymsList().filter((g) => has(g.name) || has(g.area) || (g.tags || []).some(has))
+  const gyms = allGymsList().filter((g) =>
+    has(g.name) || has(g.area) || has(g.address) || has(g.district) || (g.tags || []).some(has)
+  )
     .map((g) => decorateGym(g, s, null));
   const users = mock.USERS.filter((u) => has(u.nickname) || has(u.intro));
   const betas = allBetas(s).filter((b) => has(b.title) || (b.moveTags || []).some(has))

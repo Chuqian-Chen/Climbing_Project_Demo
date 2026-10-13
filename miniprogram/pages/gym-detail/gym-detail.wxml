@@ -16,6 +16,15 @@
   </view>
 
   <view class="page-pad body">
+    <!-- 位置：打开系统地图导航 -->
+    <view class="card loc-card" wx:if="{{gym.lat || gym.address}}" bindtap="openMap">
+      <view class="loc-text">
+        <view class="loc-addr">{{gym.address || gym.area || gym.district}}</view>
+        <view class="small faint" wx:if="{{gym.address && gym.area}}">{{gym.area}}<text wx:if="{{gym.distanceText}}"> · {{gym.distanceText}}</text></view>
+      </view>
+      <view class="loc-btn" wx:if="{{gym.lat}}">地图</view>
+    </view>
+
     <!-- 本馆分级：一行看完 -->
     <view class="card gs-card" wx:if="{{gradeSystem.length || isSetter || editingGrade}}">
       <view class="between" wx:if="{{!editingGrade}}">

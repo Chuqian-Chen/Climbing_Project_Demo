@@ -30,4 +30,4 @@
 
 ## 改演示数据后
 
-`miniprogram/utils/mock-data.js` 与 `gym-directory.js` 改完后，复制到本目录 `initDb/` 再重新部署 `initDb`。
+`miniprogram/utils/mock-data.js` 与 `gym-directory.js` 改完后，复制到本目录 `initDb/` 再重新部署 `initDb`。名录更新后需再跑一次「生产灌库」才会把新地址/坐标写进云数据库。

@@ -17,6 +17,7 @@ function normalizeGym(g) {
   if (!g.isDirectory) return g;
   return Object.assign({}, g, {
     area: g.area || g.near || '',
+    address: g.address || '',
     gradient: g.gradient || TYPE_GRADIENTS[g.type || ''] || TYPE_GRADIENTS[''],
     tags: g.tags || (g.type ? [g.type + '馆'] : []),
     openHours: g.openHours || '',
