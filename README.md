@@ -6,6 +6,14 @@
 
 > 产品口径：打卡记录工具，个人记录可公开。不是大众点评，也不是约伴社区。
 
+## 演示视频
+
+[`docs/demo/yanyou-beta-demo.mp4`](docs/demo/yanyou-beta-demo.mp4)（约 110 秒，1080p）：首页 Beta 流 → Beta 详情 → 打卡与海报 → 足迹 → 岩馆名录 → TA山墙面圈点与 AI 预判 → 发布 Beta。
+
+[![演示视频封面](docs/demo/yanyou-beta-demo-cover.jpg)](docs/demo/yanyou-beta-demo.mp4)
+
+画面由仓库源码在浏览器中渲染后自动录制，改完页面可重新生成：`cd tools/demo-video && npm i && npm run record`（见 [tools/demo-video](tools/demo-video/README.md)）。
+
 ## 快速开始
 
 1. 用[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)导入本仓库根目录

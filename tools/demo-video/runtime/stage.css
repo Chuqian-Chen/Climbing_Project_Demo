@@ -1,0 +1,177 @@
+/* 录屏舞台：1600×900 画布，左手机右字幕 */
+:root {
+  --brand: #ff6b35;
+  --ink: #f4f5f8;
+  --ink-2: #b4bac8;
+  --ink-3: #7c8396;
+  --bg-1: #121419;
+  --bg-2: #1c1f28;
+}
+html, body { margin: 0; height: 100%; background: var(--bg-1); }
+body { overflow: hidden; font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "WenQuanYi Zen Hei", sans-serif; }
+
+#stage {
+  position: relative;
+  width: 1600px;
+  height: 900px;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 700px at 78% 110%, rgba(255, 107, 53, 0.10), transparent 60%),
+    linear-gradient(160deg, var(--bg-2), var(--bg-1) 60%);
+  color: var(--ink);
+}
+#stage .glow {
+  position: absolute;
+  left: 160px;
+  top: 90px;
+  width: 600px;
+  height: 720px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 107, 53, 0.22), rgba(255, 107, 53, 0) 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+#phone {
+  position: absolute;
+  left: 258px;
+  top: 30px;
+  width: 375px;
+  height: 812px;
+  padding: 14px;
+  border-radius: 64px;
+  background: linear-gradient(145deg, #2b2e36, #0c0d10 40%, #1a1c22);
+  box-shadow:
+    0 0 0 2px #3a3d47,
+    0 40px 80px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px #000;
+}
+#phone #mp-screen { border-radius: 50px; }
+#mp-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 122px;
+  height: 35px;
+  margin-left: -61px;
+  border-radius: 20px;
+  background: #000;
+  z-index: 3100;
+  pointer-events: none;
+}
+#mp-statusbar { padding: 0 30px 0 44px; }
+
+/* ---------- 字幕面板 ---------- */
+#panel {
+  position: absolute;
+  left: 780px;
+  top: 0;
+  width: 720px;
+  height: 900px;
+}
+.brand { position: absolute; top: 76px; left: 0; display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--brand); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-weight: 900; font-size: 22px;
+}
+.brand-name { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.brand-sub { font-size: 15px; color: var(--ink-3); padding-left: 12px; border-left: 1px solid #3a3f4c; }
+
+#chapter { position: absolute; top: 236px; left: 0; right: 0; }
+#chapter > * { transition: opacity 0.45s ease, transform 0.45s ease; }
+#chapter.swap > * { opacity: 0; transform: translateY(14px); }
+.ch-no { font-size: 20px; font-weight: 700; color: var(--brand); letter-spacing: 3px; margin-bottom: 14px; }
+.ch-title { font-size: 54px; font-weight: 900; line-height: 1.2; letter-spacing: 1px; }
+.ch-desc { font-size: 24px; line-height: 1.6; color: var(--ink-2); margin-top: 18px; max-width: 640px; }
+.ch-bullets { list-style: none; padding: 0; margin: 40px 0 0; }
+.ch-bullets li {
+  position: relative;
+  font-size: 22px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding-left: 40px;
+  margin-bottom: 18px;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.ch-bullets li.on { opacity: 1; transform: none; }
+.ch-bullets li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 9px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 3px solid var(--brand);
+  box-sizing: border-box;
+}
+.ch-bullets li.on::before { background: var(--brand); }
+.ch-bullets li em { font-style: normal; color: #ffb38f; }
+
+#progress { position: absolute; left: 0; right: 40px; bottom: 74px; display: flex; gap: 10px; }
+#progress .seg { flex: 1; }
+#progress .bar { height: 4px; border-radius: 2px; background: #2c303b; overflow: hidden; }
+#progress .bar i { display: block; height: 100%; width: 0; background: var(--brand); transition: width 0.5s ease; }
+#progress .seg.done .bar i { width: 100%; }
+#progress .seg.on .bar i { width: 100%; }
+#progress .lbl { font-size: 14px; color: var(--ink-3); margin-top: 10px; white-space: nowrap; transition: color 0.3s; }
+#progress .seg.on .lbl { color: var(--ink); font-weight: 700; }
+
+/* ---------- 触点 ---------- */
+#touch-layer { position: absolute; inset: 0; pointer-events: none; z-index: 9000; }
+.touch {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 6px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: scale(1.35);
+  transition: opacity 0.18s ease, transform 0.18s ease, left 0.35s cubic-bezier(0.3, 0.7, 0.2, 1), top 0.35s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+.touch.on { opacity: 1; transform: scale(1); }
+.touch.press { transform: scale(0.82); background: rgba(255, 255, 255, 0.75); }
+.ripple {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 107, 53, 0.9);
+  animation: ripple 0.55s ease-out forwards;
+}
+@keyframes ripple { from { transform: scale(0.6); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
+
+/* ---------- 片头片尾 ---------- */
+#cover {
+  position: absolute;
+  inset: 0;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(900px 600px at 50% 60%, rgba(255, 107, 53, 0.18), transparent 70%),
+    linear-gradient(160deg, var(--bg-2), var(--bg-1));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+#cover.show { opacity: 1; }
+.cover-inner { text-align: center; transform: translateY(10px); transition: transform 0.9s ease; }
+#cover.show .cover-inner { transform: none; }
+.cover-logo {
+  width: 96px; height: 96px; margin: 0 auto 30px; border-radius: 28px; background: var(--brand); color: #fff;
+  font-size: 54px; font-weight: 900; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 20px 50px rgba(255, 107, 53, 0.35);
+}
+.cover-title { font-size: 76px; font-weight: 900; letter-spacing: 4px; }
+.cover-tag { font-size: 28px; color: var(--ink-2); margin-top: 18px; }
+.cover-meta { font-size: 18px; color: var(--ink-3); margin-top: 40px; letter-spacing: 1px; }
+.cover-points { display: flex; gap: 18px; justify-content: center; margin-top: 44px; }
+.cover-points span { font-size: 20px; padding: 10px 22px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); }

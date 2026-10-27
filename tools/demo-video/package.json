@@ -1,0 +1,13 @@
+{
+  "name": "yanyou-beta-demo-video",
+  "private": true,
+  "description": "把小程序源码渲染进浏览器并自动录制演示视频",
+  "scripts": {
+    "record": "node record.js",
+    "serve": "node serve.js",
+    "shots": "node shot.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0"
+  }
+}
