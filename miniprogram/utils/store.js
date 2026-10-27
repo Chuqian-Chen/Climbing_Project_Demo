@@ -27,6 +27,7 @@ const DEFAULTS = {
   gymMeta: {},       // gymId -> {gradeBy, gradeSystem, gradeNote}（众包分级标准，本地覆盖层）
   routeReports: {},  // routeId -> true（我报告过"已换线"）
   retiredWalls: {},  // gymId_wallId -> true（本地整墙换线覆盖层，演示模式也能下架 mock 线）
+  aiBeta: {},        // routeId -> {tips, moves, model, sig, date}（视觉模型线路分析缓存，圈注变了即作废）
   searchHistory: []
 };
 

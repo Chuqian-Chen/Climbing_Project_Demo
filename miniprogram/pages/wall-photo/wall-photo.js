@@ -377,15 +377,23 @@ Page({
     const existing = (this.data.holds[route.id] || []).length;
     const doRun = () => {
       wx.showLoading({ title: 'AI 识别中…' });
-      this.runDetect(route.color)
-        .then((holds) => {
+      // 云端墙照：云函数（同一份算法 + 视觉模型剔除胶带 / 海报、标起步点）；否则本地 canvas 算法
+      const local = () => this.runDetect(route.color).then((holds) => ({ holds: holds, llm: false }));
+      api.aiDetectHolds(this.data.photo, route.color)
+        .catch(local)
+        .then((res) => {
+          const holds = res.holds || [];
           if (!holds.length) throw new Error('未识别到该颜色的岩点');
           return api.setWallHolds(this.gymId, this.wallId, route.id, holds)
-            .then(() => holds.length);
+            .then(() => res);
         })
-        .then((n) => {
+        .then((res) => {
           wx.hideLoading();
-          wx.showToast({ title: '圈出 ' + n + ' 个候选点，长按可删/标起步', icon: 'none' });
+          const n = res.holds.length;
+          wx.showToast({
+            title: res.llm ? 'AI 圈出 ' + n + ' 个岩点，长按可微调' : '圈出 ' + n + ' 个候选点，长按可删/标起步',
+            icon: 'none'
+          });
           this.load();
         })
         .catch((e) => {
@@ -417,7 +425,7 @@ Page({
               return;
             }
             const canvas = res[0].node;
-            const DW = 360;
+            const DW = 540; // 与云函数 aiAnnotate、tools/hold-detect 回归测试同一取样宽度
             const DH = Math.round(DW * info.height / info.width);
             canvas.width = DW;
             canvas.height = DH;

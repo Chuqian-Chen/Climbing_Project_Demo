@@ -83,16 +83,27 @@
   </view>
   <view class="small faint report-link" bindtap="reportRemoved">{{route.myReported ? '已报告换线，等待更多岩友确认' : '这条线拆了？报告已换线'}}</view>
 
-  <!-- AI 路线预判（基于岩点几何的规则引擎） -->
-  <view class="card ai" wx:if="{{analysis}}">
+  <!-- AI 路线预判：视觉模型看图分析（有缓存直接展示）> 岩点几何规则 -->
+  <view class="card ai" wx:if="{{aiBeta || analysis}}">
     <view class="between">
       <text class="bold">AI 路线预判</text>
-      <text class="small faint">实验性 · 仅供参考</text>
+      <text class="small faint">{{aiBeta ? '看图分析 · ' + aiBeta.date : '规则预判 · 仅供参考'}}</text>
     </view>
-    <view class="ai-tip small" wx:for="{{analysis}}" wx:key="index">· {{item}}</view>
-    <block wx:if="{{analysisMoves && analysisMoves.length}}">
-      <view class="ai-sub small bold">逐手拆解（按标注手序）</view>
-      <view class="ai-tip small" wx:for="{{analysisMoves}}" wx:key="index">{{item}}</view>
+    <block wx:if="{{aiBeta}}">
+      <view class="ai-tip small" wx:for="{{aiBeta.tips}}" wx:key="index">· {{item}}</view>
+      <block wx:if="{{aiBeta.moves.length}}">
+        <view class="ai-sub small bold">逐手拆解</view>
+        <view class="ai-tip small" wx:for="{{aiBeta.moves}}" wx:key="index">{{item}}</view>
+      </block>
+      <view class="ai-again small" bindtap="runAiBeta">{{aiBetaLoading ? '分析中…' : '重新分析'}}</view>
+    </block>
+    <block wx:else>
+      <view class="ai-tip small" wx:for="{{analysis}}" wx:key="index">· {{item}}</view>
+      <block wx:if="{{analysisMoves && analysisMoves.length}}">
+        <view class="ai-sub small bold">逐手拆解（按标注手序）</view>
+        <view class="ai-tip small" wx:for="{{analysisMoves}}" wx:key="index">{{item}}</view>
+      </block>
+      <view class="btn btn-soft ai-deep" wx:if="{{aiBetaAvailable}}" bindtap="runAiBeta">{{aiBetaLoading ? 'AI 正在看图分析…' : '让 AI 看图深度分析'}}</view>
     </block>
   </view>
 

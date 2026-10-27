@@ -1,190 +1,156 @@
-// 云函数：aiAnnotate — AI 自动圈点 v1（云端色块算法出候选）
-// 输入 { fileID, color } → 输出 { ok, holds: [{x,y}] }（坐标为照片百分比，自下而上排序）
-// v2 插槽：配置环境变量 VISION_API_KEY 后，可在 refineWithLLM 中接多模态大模型
-// 复刻本地验证过的 HSV 检测（scratchpad/detect-color.js），参数一致
+// 云函数：aiAnnotate — 岩点识别 + AI 路线分析
+//
+// mode = 'holds'（默认）：{ fileID, color } → { ok, holds: [{x,y,s?}], llm, note }
+//   1. hold-detect（与小程序端同一份算法）在 540 宽缩略图上出候选点
+//   2. 配置了视觉模型时：候选点画成编号标记 + 10% 网格，交给模型判定哪些是真岩点、哪些是起步点、有没有漏掉的
+//   3. 模型失败或未配置 → 直接返回算法候选
+//
+// mode = 'beta'：{ fileID, holds: [{x,y,s?,t?}], color, grade } → { ok, tips: [], moves: [] }
+//   把线路岩点按手序编号画在墙照上，请模型给出攀爬建议（需配置视觉模型；未配置返回 ok:false，客户端用规则预判兜底）
+//
+// hold-detect.js 是 miniprogram/utils/hold-detect.js 的副本：改算法后在 tools/hold-detect 运行 `npm run sync`
 const cloud = require('wx-server-sdk');
 const Jimp = require('jimp');
+const detector = require('./hold-detect');
+const { drawMarks } = require('./marks');
+const llm = require('./llm');
+
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
-const COLOR_DEFS = {
-  yellow: { h: [40, 72], s: 0.45, v: 0.26, xMax: 0.95, yMax: 0.9 },
-  orange: { h: [14, 38], s: 0.50, v: 0.35, xMax: 0.95, yMax: 0.9 },
-  pink: { h: [312, 352], s: 0.30, v: 0.30, xMax: 0.95, yMax: 0.9 },
-  green: { h: [95, 168], s: 0.30, v: 0.18, xMax: 0.95, yMax: 0.9 },
-  purple: { h: [262, 312], s: 0.22, v: 0.14, xMax: 0.95, yMax: 0.9 },
-  blue: { h: [195, 245], s: 0.35, v: 0.25, xMax: 0.95, yMax: 0.9 },
-  red: { h: [352, 372], s: 0.45, v: 0.30, xMax: 0.95, yMax: 0.9 },
-  black: { h: [0, 360], s: 0, v: 0, dark: true, xMax: 0.95, yMax: 0.9 },
-  white: { h: [0, 360], s: 0, v: 0, light: true, xMax: 0.95, yMax: 0.9 }
-};
+const COLOR_NAMES = { red: '红', orange: '橙', yellow: '黄', green: '绿', blue: '蓝', purple: '紫', pink: '粉', black: '黑', white: '白' };
+const MAX_ADD = 8;
 
-function rgb2hsv(r, g, b) {
-  r /= 255; g /= 255; b /= 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
-  let h = 0;
-  if (d !== 0) {
-    if (max === r) h = 60 * (((g - b) / d) % 6);
-    else if (max === g) h = 60 * ((b - r) / d + 2);
-    else h = 60 * ((r - g) / d + 4);
-  }
-  if (h < 0) h += 360;
-  return { h: h, s: max === 0 ? 0 : d / max, v: max };
+async function loadImage(fileID) {
+  const res = await cloud.downloadFile({ fileID: fileID });
+  return res.fileContent;
 }
 
-function match(def, hsv) {
-  if (def.dark) return hsv.v < 0.16 && hsv.s < 0.5;
-  if (def.light) return hsv.v > 0.85 && hsv.s < 0.08;
-  const h2 = hsv.h < 20 ? hsv.h + 360 : hsv.h; // red 跨 0 度
-  return ((hsv.h >= def.h[0] && hsv.h <= def.h[1]) || (h2 >= def.h[0] && h2 <= def.h[1])) &&
-    hsv.s >= def.s && hsv.v >= def.v;
+async function candidates(buf, color) {
+  const img = await Jimp.read(buf);
+  img.resize(540, Jimp.AUTO);
+  const imageData = { width: img.bitmap.width, height: img.bitmap.height, data: img.bitmap.data };
+  return detector.detect(imageData, color);
+}
+
+function clampPct(v) {
+  const n = Number(v);
+  if (!isFinite(n)) return null;
+  return Math.max(0, Math.min(100, Math.round(n * 10) / 10));
+}
+
+// 模型回复 → 最终岩点。只接受合法编号与 0~100 内的坐标；补点数量有上限，防止模型「编」出一整面墙
+function mergeReview(cands, review) {
+  const byId = {};
+  cands.forEach((c) => { byId[c.id] = c; });
+  const keep = Array.isArray(review.keep) ? review.keep.map(Number).filter((id) => byId[id]) : null;
+  if (!keep) return null;
+  const starts = new Set(Array.isArray(review.start) ? review.start.map(Number) : []);
+  const holds = keep.map((id) => {
+    const c = byId[id];
+    return starts.has(id) ? { x: c.x, y: c.y, s: 1 } : { x: c.x, y: c.y };
+  });
+  (Array.isArray(review.add) ? review.add : []).slice(0, MAX_ADD).forEach((p) => {
+    const x = clampPct(p && p.x), y = clampPct(p && p.y);
+    if (x == null || y == null) return;
+    if (holds.some((h) => Math.hypot(h.x - x, h.y - y) < 3)) return;
+    holds.push(p.s ? { x: x, y: y, s: 1 } : { x: x, y: y });
+  });
+  return holds.sort((a, b) => b.y - a.y);
+}
+
+function holdsPrompt(color, n) {
+  const name = COLOR_NAMES[color] || color;
+  return [
+    '这是一面室内抱石攀岩墙的照片。图上绿色圆圈和白色数字（1~' + n + '）是算法找到的「' + name + '色」候选岩点；',
+    '图上还有每 10% 一格的虚线网格，边上标了刻度（横向 x、纵向 y，单位为照片宽高的百分比）。',
+    '',
+    '请逐个判断：',
+    '1. 哪些编号是真正的' + name + '色岩点或' + name + '色造型（volume）。以下都不算：胶带标签、地垫、墙上的海报 / 告示 / 贴纸、木质造型的边、其他颜色的岩点、阴影或反光。',
+    '2. 哪些编号是起步点（岩点下方贴着胶带标签的通常是起步点）。',
+    '3. 有没有明显的' + name + '色岩点没被圈到？如有，按网格估计它的中心坐标。没有就返回空数组，不确定的不要加。',
+    '',
+    '只输出一个 JSON 对象，不要输出其他文字：',
+    '{"keep":[编号...],"start":[编号...],"add":[{"x":百分比,"y":百分比}]}'
+  ].join('\n');
+}
+
+function betaPrompt(color, grade, holds) {
+  const name = COLOR_NAMES[color] || color;
+  const hasFeet = holds.some((h) => h.t === 'f');
+  return [
+    '这是一面室内抱石攀岩墙的照片。图上绿色圆圈和数字标出了一条' + name + '色' + (grade ? ' ' + grade : '') + ' 线路的岩点，',
+    '数字是岩友标注的手序（S 开头的是起步点' + (hasFeet ? '，F 开头的是脚点' : '') + '）。',
+    '',
+    '请以有经验的抱石教练身份，结合岩点的形状、朝向、间距和墙面角度，给出这条线的攀爬建议：',
+    '- tips：3~5 条整体要点（起步姿势、关键难点在哪两点之间、发力方式、适合什么身材、容易掉的地方）',
+    '- moves：按手序逐段说明（如「1→2：右手侧拉，左脚高踩到 S 右侧的小脚点再出手」），最多 10 段',
+    '每条不超过 40 个字，用中文，看不清的地方直说不确定，不要编造图上没有的岩点。',
+    '',
+    '只输出一个 JSON 对象，不要输出其他文字：',
+    '{"tips":["..."],"moves":["..."]}'
+  ].join('\n');
+}
+
+async function modeHolds(event) {
+  const color = event.color;
+  if (!event.fileID || !detector.COLOR_DEFS[color]) return { ok: false, err: 'bad params' };
+  let buf;
+  try { buf = await loadImage(event.fileID); } catch (e) { return { ok: false, err: 'download failed: ' + e.message }; }
+  let cands;
+  try { cands = await candidates(buf, color); } catch (e) { return { ok: false, err: 'decode failed: ' + e.message }; }
+  const base = cands.map((c) => ({ x: c.x, y: c.y }));
+  if (!llm.enabled()) {
+    return { ok: true, holds: base, llm: false, note: '色块算法候选点，请人工微调（长按删除 / 标记起步）' };
+  }
+  const marked = cands.map((c, i) => ({ id: i + 1, x: c.x, y: c.y }));
+  try {
+    const img = await drawMarks(buf, marked, { grid: true });
+    const review = await llm.askJSON(img, holdsPrompt(color, marked.length));
+    const holds = mergeReview(marked, review);
+    if (holds && holds.length) {
+      return {
+        ok: true, holds: holds, llm: true,
+        stats: { candidates: marked.length, kept: (review.keep || []).length, added: holds.length - (review.keep || []).length },
+        note: 'AI 已剔除胶带 / 海报等误检并标出起步点，仍可长按微调'
+      };
+    }
+  } catch (e) {
+    console.warn('[aiAnnotate] llm review failed:', e.message);
+  }
+  return { ok: true, holds: base, llm: false, note: 'AI 复核暂不可用，已返回算法候选点' };
+}
+
+async function modeBeta(event) {
+  const holds = Array.isArray(event.holds) ? event.holds.filter((h) => h && isFinite(h.x) && isFinite(h.y)) : [];
+  if (!event.fileID || holds.length < 2) return { ok: false, err: 'bad params' };
+  if (!llm.enabled()) return { ok: false, err: 'llm not configured' };
+  let n = 0, s = 0, f = 0;
+  const marks = holds.map((h) => {
+    if (h.t === 'f') { f++; return { id: 'F' + f, x: h.x, y: h.y }; }
+    if (h.s) { s++; return { id: 'S' + s, x: h.x, y: h.y }; }
+    n++;
+    return { id: n, x: h.x, y: h.y };
+  });
+  try {
+    const buf = await loadImage(event.fileID);
+    const img = await drawMarks(buf, marks, { grid: false });
+    const res = await llm.askJSON(img, betaPrompt(event.color, event.grade, holds), { maxTokens: 1500, timeoutMs: 28000 });
+    const clean = (arr, max) => (Array.isArray(arr) ? arr : [])
+      .map((t) => String(t).trim()).filter(Boolean).slice(0, max).map((t) => t.slice(0, 80));
+    const tips = clean(res.tips, 6);
+    const moves = clean(res.moves, 12);
+    if (!tips.length && !moves.length) return { ok: false, err: 'empty answer' };
+    return { ok: true, tips: tips, moves: moves, model: process.env.VISION_MODEL || 'qwen-vl-max' };
+  } catch (e) {
+    return { ok: false, err: e.message };
+  }
 }
 
 exports.main = async (event) => {
-  const fileID = event && event.fileID;
-  const color = event && event.color;
-  const def = COLOR_DEFS[color];
-  if (!fileID || !def) return { ok: false, err: 'bad params' };
-
-  let img;
-  let rawBuf = null;
-  try {
-    const res = await cloud.downloadFile({ fileID: fileID });
-    rawBuf = res.fileContent;
-    img = await Jimp.read(res.fileContent);
-  } catch (e) {
-    return { ok: false, err: 'download/decode failed: ' + e.message };
-  }
-  img.resize(540, Jimp.AUTO);
-  const W = img.bitmap.width, H = img.bitmap.height;
-
-  const mask = new Uint8Array(W * H);
-  for (let y = 0; y < H; y++) {
-    for (let x = 0; x < W; x++) {
-      const c = Jimp.intToRGBA(img.getPixelColor(x, y));
-      if (match(def, rgb2hsv(c.r, c.g, c.b))) mask[y * W + x] = 1;
-    }
-  }
-
-  const seen = new Uint8Array(W * H);
-  const blobs = [];
-  for (let i = 0; i < W * H; i++) {
-    if (!mask[i] || seen[i]) continue;
-    const queue = [i];
-    seen[i] = 1;
-    let n = 0, sx = 0, sy = 0, minX = W, maxX = 0, minY = H, maxY = 0;
-    while (queue.length) {
-      const p = queue.pop();
-      const px = p % W, py = (p / W) | 0;
-      n++; sx += px; sy += py;
-      if (px < minX) minX = px; if (px > maxX) maxX = px;
-      if (py < minY) minY = py; if (py > maxY) maxY = py;
-      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-      for (let d = 0; d < 4; d++) {
-        const nx = px + dirs[d][0], ny = py + dirs[d][1];
-        if (nx < 0 || nx >= W || ny < 0 || ny >= H) continue;
-        const q = ny * W + nx;
-        if (mask[q] && !seen[q]) { seen[q] = 1; queue.push(q); }
-      }
-    }
-    blobs.push({ n: n, cx: sx / n, cy: sy / n, w: maxX - minX + 1, h: maxY - minY + 1 });
-  }
-
-  let holds = blobs.filter((b) =>
-    b.n >= 35 &&
-    (b.cx / W) > 0.04 && (b.cx / W) < def.xMax &&
-    (b.cy / H) < def.yMax &&
-    Math.max(b.w, b.h) / Math.min(b.w, b.h) < 6
-  ).map((b) => ({
-    x: Math.round((b.cx / W) * 1000) / 10,
-    y: Math.round((b.cy / H) * 1000) / 10,
-    area: b.n
-  }));
-
-  const merged = [];
-  holds.sort((a, b) => b.area - a.area).forEach((hd) => {
-    const hit = merged.find((m) =>
-      Math.sqrt((m.x - hd.x) * (m.x - hd.x) + (m.y - hd.y) * (m.y - hd.y)) < 3.5);
-    if (!hit) merged.push(hd);
-  });
-  holds = merged.sort((a, b) => b.y - a.y).map((h) => ({ x: h.x, y: h.y }));
-
-  // v2：配置 VISION_API_KEY 后用多模态大模型复核候选点（剔除胶带/海报/异物，识别起步点）
-  if (process.env.VISION_API_KEY) {
-    try {
-      const refined = await refineWithLLM(rawBuf, color, holds);
-      if (refined && refined.length) {
-        return { ok: true, holds: refined, llm: true, note: 'AI 复核结果，仍可长按微调' };
-      }
-    } catch (e) {
-      // 大模型失败 → 静默退回色块算法结果
-    }
-  }
-  return { ok: true, holds: holds, note: '候选点为色块算法结果，请人工微调（长按删除/标记起步）' };
+  event = event || {};
+  if (event.mode === 'beta') return modeBeta(event);
+  return modeHolds(event);
 };
 
-/* ---------- 多模态大模型复核（OpenAI 兼容协议） ----------
- * 环境变量（云开发控制台 → 云函数 aiAnnotate → 配置 → 环境变量）：
- *   VISION_API_KEY   必填，API 密钥
- *   VISION_API_URL   选填，默认 https://api.openai.com/v1/chat/completions
- *                    （通义/混元/智谱等兼容端点直接换 URL 即可）
- *   VISION_MODEL     选填，默认 gpt-4o-mini（国产模型填对应模型名）
- * 同时建议在控制台把本函数超时调到 30s。 */
-const https = require('https');
-
-function postJSON(urlStr, headers, body) {
-  return new Promise((resolve, reject) => {
-    const u = new URL(urlStr);
-    const req = https.request({
-      hostname: u.hostname,
-      path: u.pathname + u.search,
-      method: 'POST',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
-      timeout: 25000
-    }, (res) => {
-      let data = '';
-      res.on('data', (c) => { data += c; });
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); } catch (e) { reject(new Error('bad json: ' + data.slice(0, 120))); }
-      });
-    });
-    req.on('error', reject);
-    req.on('timeout', () => { req.destroy(new Error('timeout')); });
-    req.write(JSON.stringify(body));
-    req.end();
-  });
-}
-
-async function refineWithLLM(buf, color, candidates) {
-  const b64 = buf.toString('base64');
-  const prompt = '这是一面抱石攀岩墙的照片。以下是算法检测出的「' + color +
-    '」色岩点候选坐标（x、y 为照片宽高的百分比 0-100）：\n' +
-    JSON.stringify(candidates) +
-    '\n请剔除其中不是岩点的项（胶带标签、海报、告示、地垫等），' +
-    '并给贴有胶带标签的起步岩点加 "s":1 标记。' +
-    '只输出 JSON 数组，格式 [{"x":12.3,"y":45.6}] 或 [{"x":12.3,"y":45.6,"s":1}]，不要输出其他内容。';
-  const res = await postJSON(
-    process.env.VISION_API_URL || 'https://api.openai.com/v1/chat/completions',
-    { Authorization: 'Bearer ' + process.env.VISION_API_KEY },
-    {
-      model: process.env.VISION_MODEL || 'gpt-4o-mini',
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + b64 } }
-        ]
-      }],
-      max_tokens: 1000
-    }
-  );
-  const text = res && res.choices && res.choices[0] &&
-    res.choices[0].message && res.choices[0].message.content;
-  if (!text) return null;
-  const m = text.match(/\[[\s\S]*\]/);
-  if (!m) return null;
-  const arr = JSON.parse(m[0]);
-  if (!Array.isArray(arr)) return null;
-  return arr
-    .filter((p) => typeof p.x === 'number' && typeof p.y === 'number')
-    .map((p) => (p.s ? { x: p.x, y: p.y, s: 1 } : { x: p.x, y: p.y }));
-}
+// 供本地测试（tools/hold-detect/test-ai.js）
+exports._internal = { mergeReview, holdsPrompt, betaPrompt, candidates };

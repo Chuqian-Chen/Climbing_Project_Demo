@@ -90,7 +90,7 @@
       <view class="undo-btn small" bindtap="undoHold">⟲ 撤销上一个</view>
     </view>
     <view class="btn btn-soft ai-btn" wx:if="{{pendingRouteId}}" bindtap="aiAnnotate">
-      AI 自动圈点（按岩点颜色识别候选）
+      AI 自动圈点（识别本线颜色的岩点）
     </view>
 
     <!-- 快速建线：这面墙的新线直接在这里建 -->

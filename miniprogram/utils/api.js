@@ -596,6 +596,8 @@ function getRouteDetail(routeId) {
     wallRef: wallRef,
     analysis: analyzeRouteHolds(wallRef && wallRef.holds),
     analysisMoves: buildMoves(wallRef && wallRef.holds),
+    aiBeta: cachedRouteBeta(routeId, wallRef, s),
+    aiBetaAvailable: !!(wallRef && isCloudPhoto(wallRef.photo) && (wallRef.holds || []).length >= 2),
     myTodayCount: (s.checkins || []).filter(
       (k) => k.routeId === routeId && k.date === todayStr
     ).length,
@@ -1721,6 +1723,61 @@ function findRouteWall(route) {
   return null;
 }
 
+/* ---------- AI：云函数 aiAnnotate（算法候选 + 视觉模型复核 / 线路分析） ---------- */
+
+function isCloudPhoto(photo) {
+  return typeof wx !== 'undefined' && !!wx.cloud && String(photo || '').indexOf('cloud://') === 0;
+}
+
+// 岩点识别：云端墙照走云函数（与本地同一份算法 + 模型剔除胶带 / 海报、标起步点）
+// 不可用时 reject，调用方退回本地 canvas 算法
+function aiDetectHolds(photo, color) {
+  if (!isCloudPhoto(photo)) return Promise.reject(new Error('local'));
+  return wx.cloud.callFunction({ name: 'aiAnnotate', data: { fileID: photo, color: color } }).then((r) => {
+    const res = (r && r.result) || {};
+    if (!res.ok || !Array.isArray(res.holds)) throw new Error(res.err || 'aiAnnotate failed');
+    return res;
+  });
+}
+
+// 岩点签名：圈注变了，缓存的 AI 分析就作废
+function holdsSig(holds) {
+  return (holds || []).map((h) => [h.x, h.y, h.s ? 1 : 0, h.t === 'f' ? 1 : 0].join(',')).join(';');
+}
+
+function cachedRouteBeta(routeId, wallRef, state) {
+  const c = ((state || store.get()).aiBeta || {})[routeId];
+  return c && wallRef && c.sig === holdsSig(wallRef.holds) ? c : null;
+}
+
+// 线路深度分析：把按手序编号的岩点画在墙照上交给视觉模型。结果按线路缓存在本地
+function aiRouteBeta(routeId) {
+  const route = findRoute(routeId);
+  const ref = findRouteWall(route);
+  if (!route || !ref || !isCloudPhoto(ref.photo) || (ref.holds || []).length < 2) {
+    return Promise.reject(new Error('需要云端墙照和至少 2 个圈注岩点'));
+  }
+  const holds = ref.holds.map((h) => {
+    const o = { x: h.x, y: h.y };
+    if (h.s) o.s = 1;
+    if (h.f) o.t = 'f';
+    return o;
+  });
+  return wx.cloud.callFunction({
+    name: 'aiAnnotate',
+    data: { mode: 'beta', fileID: ref.photo, holds: holds, color: route.color, grade: route.grade }
+  }).then((r) => {
+    const res = (r && r.result) || {};
+    if (!res.ok) throw new Error(res.err === 'llm not configured' ? 'AI 分析尚未开通' : 'AI 分析失败，稍后再试');
+    const entry = { tips: res.tips || [], moves: res.moves || [], model: res.model || '', sig: holdsSig(ref.holds), date: util.today() };
+    store.update((st) => {
+      if (!st.aiBeta) st.aiBeta = {};
+      st.aiBeta[routeId] = entry;
+    });
+    return entry;
+  });
+}
+
 /* ---------- 搜索 ---------- */
 
 function search(kw) {
@@ -1790,6 +1847,8 @@ function resetDemo() {
 }
 
 module.exports = {
+  aiDetectHolds,
+  aiRouteBeta,
   getHome, markOnboarded,
   getGyms, getGymDetail, getCities, nearestCityKey,
   getRouteDetail, getBetaDetail, getBetaFeed, getRouteBetas,

@@ -227,6 +227,18 @@
   margin-top: 12rpx;
   line-height: 1.6;
 }
+.ai-deep {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  padding: 16rpx 0;
+  background: #f1ecfd;
+  color: #6b3fd6;
+}
+.ai-again {
+  margin-top: 20rpx;
+  color: #7a4de8;
+  text-align: right;
+}
 .wall-link {
   padding: 22rpx 24rpx;
   font-size: 26rpx;
