@@ -8,11 +8,14 @@
 
 ## 演示视频
 
-[`docs/demo/yanyou-beta-demo.mp4`](docs/demo/yanyou-beta-demo.mp4)（约 110 秒，1080p）：首页 Beta 流 → Beta 详情 → 打卡与海报 → 足迹 → 岩馆名录 → TA山墙面圈点与 AI 预判 → 发布 Beta。
+- 横屏 [`docs/demo/yanyou-beta-demo.mp4`](docs/demo/yanyou-beta-demo.mp4)（约 110 秒，1080p，无声）
+- 竖屏 9:16 + 配音讲解 + 字幕，适合视频号：[`docs/demo/yanyou-beta-vertical.mp4`](docs/demo/yanyou-beta-vertical.mp4)（1080×1920）
+
+内容：首页 Beta 流 → Beta 详情 → 打卡与海报 → 足迹 → 岩馆名录 → TA山墙面圈点与 AI 预判 → 发布 Beta。
 
 [![演示视频封面](docs/demo/yanyou-beta-demo-cover.jpg)](docs/demo/yanyou-beta-demo.mp4)
 
-画面由仓库源码在浏览器中渲染后自动录制，改完页面可重新生成：`cd tools/demo-video && npm i && npm run record`（见 [tools/demo-video](tools/demo-video/README.md)）。
+画面由仓库源码在浏览器中渲染后自动录制，改完页面可重新生成：`cd tools/demo-video && npm i && npm run record`（竖屏配音版：`npm run record:vertical`，见 [tools/demo-video](tools/demo-video/README.md)）。
 
 ## 快速开始
 

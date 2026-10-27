@@ -45,6 +45,17 @@
       if (li) li.classList.add('on');
     },
 
+    // 讲解字幕：空字符串 = 隐藏
+    subtitle(text) {
+      const el = $('#subtitle');
+      if (text) {
+        el.querySelector('span').textContent = text;
+        el.classList.add('on');
+      } else {
+        el.classList.remove('on');
+      }
+    },
+
     cover(show, html) {
       const c = $('#cover');
       if (html) c.querySelector('.cover-inner').innerHTML = html;

@@ -1,32 +1,52 @@
 // 录制演示视频：编译小程序 → 本地起服务 → Chromium 按 scenario.js 自动操作 → CDP 逐帧采集 → ffmpeg 合成 MP4
 //
-//   node tools/demo-video/record.js                         # 输出 tools/demo-video/out/yanyou-beta-demo.mp4
-//   node tools/demo-video/record.js --out docs/demo/demo.mp4 --dpr 1.2 --keep-frames
-//   node tools/demo-video/record.js --dry                   # 只跑流程不录（排查脚本用）
+//   node tools/demo-video/record.js                                  # 横屏 1080p，无声
+//   node tools/demo-video/record.js --layout vertical --narrate      # 竖屏 9:16 + 配音讲解 + 字幕（视频号）
+//   node tools/demo-video/record.js --out docs/demo/demo.mp4 --keep-frames
+//   node tools/demo-video/record.js --dry                            # 只跑流程不录（排查脚本用）
 //
-// 依赖：playwright（含 chromium）、ffmpeg（PATH 中）
+// 依赖：playwright（含 chromium）、ffmpeg（PATH 中）；--narrate 另需 `pip install sherpa-onnx`（或 --tts say）
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { chromium } = require('playwright');
 const { start } = require('./serve');
 const scenario = require('./scenario');
+const { synthesize, muxNarration } = require('./narrate');
 
-const STAGE_W = 1600;
-const STAGE_H = 900;
+// 画布尺寸（CSS 像素）× dpr = 输出分辨率
+const LAYOUTS = {
+  horizontal: { w: 1600, h: 900, dpr: 1.2, name: 'yanyou-beta-demo' },          // 1920×1080
+  vertical: { w: 630, h: 1120, dpr: 1080 / 630, name: 'yanyou-beta-vertical' }  // 1080×1920
+};
 
 function parseArgs(argv) {
-  const o = { out: path.join(__dirname, 'out', 'yanyou-beta-demo.mp4'), dpr: 1.2, fps: 30, crf: 20, keepFrames: false, dry: false, headed: false };
+  const o = { layout: 'horizontal', fps: 30, crf: 20, keepFrames: false, dry: false, headed: false, narrate: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--out') o.out = path.resolve(argv[++i]);
+    else if (a === '--layout') o.layout = argv[++i];
     else if (a === '--dpr') o.dpr = +argv[++i];
     else if (a === '--fps') o.fps = +argv[++i];
     else if (a === '--crf') o.crf = +argv[++i];
+    else if (a === '--narrate') o.narrate = true;
+    else if (a === '--tts') o.tts = argv[++i];
+    else if (a === '--voice') o.voice = argv[++i];
+    else if (a === '--speed') o.speed = +argv[++i];
+    else if (a === '--python') o.python = argv[++i];
+    else if (a === '--model-dir') o.modelDir = path.resolve(argv[++i]);
     else if (a === '--keep-frames') o.keepFrames = true;
     else if (a === '--dry') o.dry = true;
     else if (a === '--headed') o.headed = true;
   }
+  const L = LAYOUTS[o.layout];
+  if (!L) throw new Error('--layout 只支持 horizontal / vertical');
+  o.stageW = L.w;
+  o.stageH = L.h;
+  o.dpr = o.dpr || L.dpr;
+  o.outW = Math.round(L.w * o.dpr / 2) * 2;
+  o.outH = Math.round(L.h * o.dpr / 2) * 2;
+  o.out = o.out || path.join(__dirname, 'out', L.name + '.mp4');
   return o;
 }
 
@@ -48,8 +68,8 @@ async function startRecording(page, dir, opts) {
   await client.send('Page.startScreencast', {
     format: 'jpeg',
     quality: 95,
-    maxWidth: Math.round(STAGE_W * opts.dpr),
-    maxHeight: Math.round(STAGE_H * opts.dpr),
+    maxWidth: opts.outW,
+    maxHeight: opts.outH,
     everyNthFrame: 1
   });
   return {
@@ -76,27 +96,31 @@ function encode(frames, endTs, out, opts) {
   txt += "file '" + frames[frames.length - 1].file.replace(/'/g, "'\\''") + "'\n";
   fs.writeFileSync(list, txt);
   fs.mkdirSync(path.dirname(out), { recursive: true });
-  const W = Math.round(STAGE_W * opts.dpr / 2) * 2;
-  const H = Math.round(STAGE_H * opts.dpr / 2) * 2;
   execFileSync('ffmpeg', [
     '-y', '-loglevel', 'error',
     '-f', 'concat', '-safe', '0', '-i', list,
-    '-vf', 'scale=' + W + ':' + H + ':flags=lanczos,fps=' + opts.fps + ',format=yuv420p',
+    '-vf', 'scale=' + opts.outW + ':' + opts.outH + ':flags=lanczos,fps=' + opts.fps + ',format=yuv420p',
     '-c:v', 'libx264', '-preset', 'slow', '-crf', String(opts.crf),
     '-movflags', '+faststart',
     out
   ], { stdio: 'inherit' });
-  // 顺手导出一张封面帧（第 1 章画面）
-  const poster = out.replace(/\.mp4$/, '-cover.jpg');
-  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', '6', '-i', out, '-frames:v', '1', '-q:v', '3', poster]);
-  return { out, poster };
+  return out;
+}
+
+function exportCover(video, at) {
+  const poster = video.replace(/\.mp4$/, '-cover.jpg');
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', String(at), '-i', video, '-frames:v', '1', '-q:v', '3', poster]);
+  return poster;
 }
 
 /* ---------------- 操作原语 ---------------- */
 
-function makeHelpers(page, log) {
+function makeHelpers(page, log, voice) {
   const sleep = (ms) => page.waitForTimeout(ms);
   const top = (sel) => page.locator('[data-top] ' + sel);
+  const spoken = [];
+  let speakUntil = 0;
+  let subToken = 0;
 
   async function locate(sel, opts) {
     opts = opts || {};
@@ -133,6 +157,7 @@ function makeHelpers(page, log) {
     sleep,
     wait: sleep,
     log,
+    spoken,
 
     async chapter(i) {
       log('chapter', i + 1, scenario.chapters[i].title);
@@ -143,6 +168,32 @@ function makeHelpers(page, log) {
     },
     cover(show, html) {
       return page.evaluate(({ show, html }) => window.stage.cover(show, html), { show, html });
+    },
+
+    // 讲解一句：等上一句说完再开口，显示字幕并记下开口时刻；不阻塞后续操作
+    // 未开启 --narrate 时只按字数估算时长占位，保证节奏一致
+    async say(id) {
+      const line = scenario.narration[id];
+      if (!line) throw new Error('scenario.narration 里没有：' + id);
+      const wait = speakUntil - Date.now();
+      if (wait > 0) await sleep(wait + 150);
+      const clip = voice && voice[id];
+      const ms = clip ? clip.dur * 1000 : Math.max(1500, line.text.length * 210);
+      if (clip) {
+        const token = ++subToken;
+        await page.evaluate((t) => window.stage.subtitle(t), line.text);
+        spoken.push({ id, file: clip.file, dur: clip.dur, text: line.text, at: Date.now() / 1000 });
+        setTimeout(() => {
+          if (token === subToken) page.evaluate(() => window.stage.subtitle('')).catch(() => {});
+        }, ms + 200);
+      }
+      speakUntil = Date.now() + ms;
+    },
+    // 等当前这句说完（可再多停 extra 毫秒）
+    async hush(extra) {
+      const wait = speakUntil - Date.now();
+      if (wait > 0) await sleep(wait);
+      if (extra) await sleep(extra);
     },
 
     async tap(sel, opts) {
@@ -215,11 +266,16 @@ function makeHelpers(page, log) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
+  const log = (...a) => console.log('[record]', ...a);
+  log('布局 ' + opts.layout + ' → ' + opts.outW + '×' + opts.outH + (opts.narrate ? ' · 配音' : ''));
+  // 先合成配音：每句时长决定画面节奏
+  const voice = opts.narrate ? synthesize(scenario.narration, opts) : null;
+
   const server = await start(0);
   const port = server.address().port;
   const browser = await chromium.launch({ headless: !opts.headed });
   const context = await browser.newContext({
-    viewport: { width: STAGE_W, height: STAGE_H },
+    viewport: { width: opts.stageW, height: opts.stageH },
     deviceScaleFactor: opts.dpr,
     locale: 'zh-CN',
     timezoneId: 'Asia/Shanghai'
@@ -233,18 +289,18 @@ async function main() {
     else if (m.type() === 'warning' && t.indexOf('[sim]') === 0) console.log('[warn]', t);
   });
 
-  const log = (...a) => console.log('[record]', ...a);
-  await page.goto('http://127.0.0.1:' + port + '/?cover=1');
+  await page.goto('http://127.0.0.1:' + port + '/?cover=1&layout=' + opts.layout);
   await page.waitForFunction(() => window.__stageReady);
   await page.evaluate((list) => window.stage.setChapters(list), scenario.chapters.map((c) => ({ label: c.label })));
   // 预热：等图片解码
   await page.waitForTimeout(1200);
 
-  const framesDir = path.join(__dirname, 'out', 'frames');
+  const framesDir = path.join(__dirname, 'out', 'frames-' + opts.layout);
   const rec = opts.dry ? null : await startRecording(page, framesDir, opts);
+  const helpers = makeHelpers(page, log, voice);
   const t0 = Date.now();
   try {
-    await scenario.run(makeHelpers(page, log));
+    await scenario.run(helpers);
   } finally {
     const end = rec ? await rec.stop() : 0;
     log('脚本耗时 ' + ((Date.now() - t0) / 1000).toFixed(1) + 's');
@@ -252,10 +308,18 @@ async function main() {
     server.close();
     if (rec) {
       log('采集 ' + rec.frames.length + ' 帧，编码中…');
-      const r = encode(rec.frames, end, opts.out, opts);
+      const silent = voice ? opts.out.replace(/\.mp4$/, '.silent.mp4') : opts.out;
+      encode(rec.frames, end, silent, opts);
+      if (voice) {
+        muxNarration(silent, helpers.spoken, rec.frames[0].ts, opts.out);
+        fs.rmSync(silent, { force: true });
+        log('配音 ' + helpers.spoken.length + ' 句已合入');
+      }
+      // 竖屏取开口前的片头卡（可直接做视频号封面），横屏取首页画面
+      const poster = exportCover(opts.out, opts.layout === 'vertical' ? 0.5 : 6);
       if (!opts.keepFrames) fs.rmSync(framesDir, { recursive: true, force: true });
-      log('完成 → ' + path.relative(process.cwd(), r.out));
-      log('封面 → ' + path.relative(process.cwd(), r.poster));
+      log('完成 → ' + path.relative(process.cwd(), opts.out));
+      log('封面 → ' + path.relative(process.cwd(), poster));
     }
   }
   if (errors.length) {

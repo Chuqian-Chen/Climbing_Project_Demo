@@ -175,3 +175,76 @@ body { overflow: hidden; font-family: "Noto Sans SC", "PingFang SC", "Microsoft 
 .cover-meta { font-size: 18px; color: var(--ink-3); margin-top: 40px; letter-spacing: 1px; }
 .cover-points { display: flex; gap: 18px; justify-content: center; margin-top: 44px; }
 .cover-points span { font-size: 20px; padding: 10px 22px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+/* ---------- 讲解字幕 ---------- */
+#subtitle {
+  position: absolute;
+  left: 780px;
+  top: 650px;
+  width: 700px;
+  z-index: 9600; /* 高于片头片尾，开场白也有字幕 */
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#subtitle.on { opacity: 1; transform: none; }
+#subtitle span {
+  display: inline-block;
+  font-size: 24px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #fff;
+  padding: 12px 18px;
+  border-left: 4px solid var(--brand);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ================= 竖屏 9:16（视频号）：630×1120 画布 → 1080×1920 ================= */
+html.vertical #stage { width: 630px; height: 1120px; }
+html.vertical #stage .glow { left: 15px; top: 220px; width: 600px; height: 700px; }
+html.vertical #phone { left: 113px; top: 176px; }
+
+html.vertical #panel { left: 0; top: 0; width: 630px; height: 176px; }
+html.vertical .brand { top: 34px; left: 0; right: 0; justify-content: center; gap: 8px; }
+html.vertical .brand-logo { width: 26px; height: 26px; border-radius: 8px; font-size: 15px; }
+html.vertical .brand-name { font-size: 16px; }
+html.vertical .brand-sub { font-size: 12px; padding-left: 8px; }
+html.vertical #chapter { top: 70px; text-align: center; }
+html.vertical .ch-no { font-size: 13px; letter-spacing: 2px; margin-bottom: 4px; }
+html.vertical .ch-title { font-size: 30px; letter-spacing: 1px; }
+html.vertical .ch-desc, html.vertical .ch-bullets { display: none; }
+html.vertical #progress { top: 140px; bottom: auto; left: 56px; right: 56px; gap: 6px; }
+html.vertical #progress .bar { height: 3px; }
+html.vertical #progress .lbl { font-size: 11px; margin-top: 5px; text-align: center; }
+
+/* 字幕压在手机下部（画面 75%~80% 高度），避开视频号底部的标题区 */
+html.vertical #subtitle {
+  left: 34px;
+  right: 34px;
+  top: auto;
+  bottom: 236px;
+  width: auto;
+  text-align: center;
+}
+html.vertical #subtitle span {
+  font-size: 21px;
+  line-height: 1.45;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-left: 0;
+  border-radius: 12px;
+  background: rgba(14, 15, 20, 0.84);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+html.vertical .cover-inner { padding: 0 40px; }
+html.vertical .cover-logo { width: 76px; height: 76px; border-radius: 22px; font-size: 42px; margin-bottom: 24px; }
+html.vertical .cover-title { font-size: 54px; letter-spacing: 3px; }
+html.vertical .cover-tag { font-size: 21px; line-height: 1.5; margin-top: 14px; }
+html.vertical .cover-meta { font-size: 13px; line-height: 1.6; margin-top: 30px; }
+html.vertical .cover-points { flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+html.vertical .cover-points span { font-size: 16px; padding: 8px 16px; }

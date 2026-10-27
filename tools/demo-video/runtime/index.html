@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="/runtime/stage.css">
 </head>
 <body>
+<script>if (/[?&]layout=vertical\b/.test(location.search)) document.documentElement.classList.add('vertical');</script>
 <div id="stage">
   <div class="glow"></div>
 
@@ -42,6 +43,8 @@
     </div>
     <div id="progress"></div>
   </div>
+
+  <div id="subtitle"><span></span></div>
 
   <div id="touch-layer"></div>
 
