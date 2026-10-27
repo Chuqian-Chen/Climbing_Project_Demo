@@ -5,15 +5,15 @@
   margin-right: 20rpx;
 }
 .head-nick {
-  font-size: 34rpx;
+  font-size: var(--fs-lg);
   font-weight: 800;
 }
 .head-setter {
-  font-size: 20rpx;
-  color: #7a4de8;
+  font-size: var(--fs-xs);
+  color: var(--ai);
   background: transparent;
   border: 1rpx solid #cdbcf2;
-  border-radius: 8rpx;
+  border-radius: var(--r-xs);
   padding: 4rpx 12rpx;
   font-weight: 600;
   vertical-align: middle;
@@ -22,25 +22,25 @@
   margin-top: 4rpx;
 }
 .edit-btn {
-  font-size: 24rpx;
-  color: #e8571f;
-  background: #fff1ea;
+  font-size: var(--fs-md);
+  color: var(--brand-deep);
+  background: var(--brand-soft);
   padding: 8rpx 24rpx;
   border-radius: 999rpx;
 }
 .tip {
   margin-top: 20rpx;
-  background: #f7f8fa;
-  border-radius: 12rpx;
+  background: var(--sunken);
+  border-radius: var(--r-sm);
   padding: 14rpx 18rpx;
-  font-size: 22rpx;
-  color: #5a6072;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
 }
 .gym-row {
   margin-top: 16rpx;
 }
 .gym-pick {
-  color: #e8571f;
+  color: var(--brand-deep);
   font-weight: 600;
 }
 
@@ -49,16 +49,16 @@
   display: flex;
   align-items: center;
   padding: 16rpx 0;
-  border-bottom: 1rpx solid #f0f2f5;
+  border-bottom: 1rpx solid var(--chip);
 }
 .edit-label {
   width: 120rpx;
-  font-size: 26rpx;
-  color: #5a6072;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
 }
 .edit-input {
   flex: 1;
-  font-size: 28rpx;
+  font-size: var(--fs-base);
 }
 .avatar-btn {
   background: transparent;
@@ -97,13 +97,13 @@
 .seg-item {
   flex: 1;
   text-align: center;
-  font-size: 24rpx;
-  color: #5a6072;
+  font-size: var(--fs-md);
+  color: var(--ink-2);
   padding: 12rpx 0;
   border-radius: 999rpx;
 }
 .seg-item.on {
-  background: #1b1e28;
+  background: var(--ink);
   color: #fff;
   font-weight: 700;
 }
@@ -121,5 +121,5 @@
   margin-bottom: 16rpx;
 }
 .danger {
-  color: #e5484d;
+  color: var(--red);
 }

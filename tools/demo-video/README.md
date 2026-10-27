@@ -24,31 +24,37 @@ npm run record              # → out/yanyou-beta-demo.mp4 + out/yanyou-beta-dem
 npm run record:vertical     # → out/yanyou-beta-vertical.mp4（1080×1920，无声）+ -cover.jpg（片头卡，可做视频号封面）
 ```
 
-- 字幕文字在 `scenario.js` 的 `narration`（`text` 字段）；每句按阅读速度停留，`s.say(id)` 显示后不阻塞，手机里的操作同时进行，下一句会等上一句播完，`s.hush()` 用在换页前。
+- 字幕文字在 `scenario.js` 的 `captions`；`s.caption(id)` 出字幕后不阻塞，手机里的操作同时进行，下一句会等上一句播完，`s.waitCaption()` 用在换页前。
+- 字幕停留时长按阅读速度（约 6 字/秒）计算，成片加速后仍然看得完。
 - 字幕压在画面 75%~80% 高度，避开视频号底部的标题和互动区。
 - 成片无声，发布时可在视频号 App 里加背景音乐。
 
-#### 可选：配音讲解
+### 快慢
 
-`npm run record:vertical-voice`（即 `--narrate`）会逐句合成中文配音并铺到时间线上，字幕时长改为跟随音频，另输出 `.srt` 外挂字幕：
-
-- 需要 `pip install sherpa-onnx`，首次运行自动下载 Kokoro v1.1-zh 模型（约 147MB，Apache-2.0）；Mac 也可用系统朗读 `--tts say --voice Tingting`。
-- `speak` 字段是实际朗读的文字：TTS 读英文缩写不稳，朗读里写成中文说法（Beta→贝塔、TA山→他山、AI→人工智能），字幕保留原词。
-- 换音色 `--voice <0-102>`（默认 5，女声；例如 60 是男声），语速 `--speed 1.05`；音频按内容哈希缓存在 `out/voice/`；响度归一到 -16 LUFS。
+录制按真实速度操作，合成时整体加速，默认 `--rate 1.25`。想更快改大（如 `--rate 1.5`），想看清每一步就用 `--rate 1`。字幕停留时间会自动补偿，不会因为加速读不完。
 
 常用参数（`node record.js ...`）：
 
 | 参数 | 作用 |
 | --- | --- |
 | `--layout vertical` | 竖屏 630×1120 画布 → 1080×1920；默认 `horizontal`（1600×900 → 1920×1080） |
-| `--captions` | 显示讲解字幕（无声） |
-| `--narrate` | 可选：合成配音 + 字幕；`--tts kokoro\|say`、`--voice`、`--speed`、`--python`、`--model-dir` |
+| `--captions` | 显示讲解字幕（竖屏用） |
+| `--rate 1.25` | 成片播放倍速，默认 1.25 |
 | `--out <path>` | 输出路径，默认 `out/yanyou-beta-demo.mp4` / `out/yanyou-beta-vertical.mp4` |
 | `--dpr` | 画布缩放倍数；横屏默认 1.2（1080p），2.4 → 4K |
 | `--crf 20` | x264 质量，越小越清晰、文件越大 |
 | `--dry` | 只跑分镜不录制，调试脚本用 |
 | `--headed` | 弹出浏览器窗口，边看边跑 |
-| `--keep-frames` | 保留 `out/frames/` 原始帧 |
+| `--keep-frames` | 保留 `out/frames-<layout>/` 原始帧 |
+
+## 核心流程测试
+
+```bash
+npm test                    # 11 个用例：页面渲染、到馆卡、打卡→推荐→足迹、发布向导、一键识别全墙…
+npm test -- 打卡             # 只跑标题含「打卡」的用例
+```
+
+`e2e.js` 复用同一套模拟器，每个用例重新加载页面（seed 数据重置）；可用 `{ location }` 指定定位，测「在馆 / 不在馆」两种首页。页面有 `console.error` 或未捕获异常也算失败。
 
 ## 在浏览器里手动玩
 
@@ -67,24 +73,24 @@ runtime/     浏览器端的小程序运行时：Page / Component / setData / wx
              wx.* API（路由栈、storage、toast、modal、picker、定位、canvas 等）
              index.html + stage.*：手机外壳、字幕面板、触点动画
 seed.js      录制前写入 storage 的数据：个人档案、近两月打卡、TA山真实墙照与圈点
-scenario.js  分镜：7 个章节的字幕 + 讲解词 + 每一步操作
-narrate.js   可选配音：逐句合成（tts_kokoro.py / macOS say）、按开口时刻铺轨与视频合成
+scenario.js  分镜：7 个章节的要点 + 讲解字幕 + 每一步操作
 record.js    起本地服务 → Chromium 打开舞台页 → 执行分镜 → CDP screencast 采帧 → ffmpeg 合成
 serve.js     零依赖静态服务（预览与录制共用）
 shot.js      调试：逐页截图，核对渲染
+e2e.js       核心流程端到端测试（npm test）
 ```
 
 - `wx.cloud` 在模拟器里恒为 `undefined`，`api.js` 自动走「本地演示数据」分支，和开发者工具未开通云开发时一致。
-- 定位固定在北京望京（`runtime.js` 里 `CFG.location`），所以首页「附近岩馆」第一个是磐石·望京，Beta 流里出现「本馆」标。
+- 定位固定在北京望京（`runtime.js` 里 `CFG.location`，可用 `window.__SIM_CONFIG__` 覆盖），离磐石·望京 377m，所以首页显示到馆卡。
 - 墙面圈点章节用的是 `cloudfunctions/initDb/real-content.js` 里 TA山 主墙的真实标注，墙照为 `docs/tashan.jpg`；线路的上墙 / 拆线日期按「今天」滚动。
 
 ## 改分镜
 
-编辑 `scenario.js`：`chapters` 是右侧字幕，`run(s)` 里是操作序列。可用的操作：
+编辑 `scenario.js`：`chapters` 是章节标题与要点，`captions` 是讲解字幕，`run(s)` 里是操作序列。可用的操作：
 
 ```js
 s.chapter(i)                          // 切换到第 i 章字幕（不 await = 与下一步页面跳转同时开始）
-s.say('id') / s.hush(ms)              // 讲解一句（不阻塞）/ 等这句说完
+s.caption('id') / s.waitCaption(ms)   // 出一句讲解字幕（不阻塞）/ 等这句播完
 s.bullet(i)                           // 点亮当前章第 i 条要点
 s.tap('.selector', { text, nth })     // 点当前页元素；目标不在视野时先自动滑过去
 s.type('.input', '文字')              // 点输入框并逐字输入

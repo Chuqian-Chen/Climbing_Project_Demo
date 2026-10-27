@@ -446,7 +446,9 @@ function getHome(loc) {
   // 到馆场景：人在某馆 2km 内时，该馆的 Beta 置顶（打「本馆」标），其余按热度
   let feedBetas = hotBetas;
   const nearest = nearGyms[0];
-  if (nearest && nearest.distance != null && nearest.distance <= 2) {
+  const atGym = nearest && nearest.distance != null && nearest.distance <= 2
+    ? buildAtGym(nearest, s) : null;
+  if (atGym) {
     const local = [];
     const rest = [];
     hotBetas.forEach((b) => {
@@ -463,8 +465,39 @@ function getHome(loc) {
     hotBetas: feedBetas,
     newRoutes: newRoutes,
     gyms: nearGyms,
-    gymCounts: counts
+    gymCounts: counts,
+    atGym: atGym
   });
+}
+
+// 到馆卡：本馆我在磕的线 / 新线 / 即将拆线 / 墙面照入口
+function buildAtGym(gym, s) {
+  const routes = gymActiveRoutes(gym.id, s).map((r) => decorateRoute(r, s));
+  const sent = {};
+  (s.checkins || []).forEach((k) => { if (k.result !== 'attempt') sent[k.routeId] = true; });
+  const projectIds = [];
+  (s.checkins || []).slice().reverse().forEach((k) => {
+    if (k.result === 'attempt' && !sent[k.routeId] && projectIds.indexOf(k.routeId) < 0) projectIds.push(k.routeId);
+  });
+  const chip = (r) => ({
+    id: r.id, name: r.name, grade: r.grade, gradeColor: r.gradeColor,
+    colorHex: r.colorHex, colorLight: r.colorLight, wallName: r.wallName,
+    daysLeft: r.daysLeft, betaCount: r.betaCount, visual: r.visual
+  });
+  const walls = gymWalls(gym).map((w) => {
+    const doc = getWallDoc(gym.id, w.id, s);
+    return { id: w.id, name: w.name, photo: doc ? (doc.photoFileID || doc.photoPath || '') : '', markerCount: doc ? (doc.markers || []).length : 0 };
+  });
+  return {
+    id: gym.id,
+    name: gym.name,
+    distanceText: gym.distanceText,
+    routeCount: routes.length,
+    projects: projectIds.map((id) => routes.find((r) => r.id === id)).filter(Boolean).slice(0, 4).map(chip),
+    newRoutes: routes.filter((r) => r.isNew).sort((a, b) => (a.setDate < b.setDate ? 1 : -1)).slice(0, 6).map(chip),
+    removing: routes.filter((r) => r.removingSoon).sort((a, b) => a.daysLeft - b.daysLeft).slice(0, 6).map(chip),
+    wall: walls.find((w) => w.photo) || walls[0] || null
+  };
 }
 
 function markOnboarded() {
@@ -550,12 +583,20 @@ function getGymDetail(gymId, loc) {
     };
   });
 
-  // 墙面照片状态（KAYA 式整墙浏览入口）
+  // 墙面照片状态（KAYA 式整墙浏览入口）；有照片的墙带上各线徽章，馆详情顶部大图直接显示
   const walls = gymWalls(gym).map((w) => {
     const doc = getWallDoc(gym.id, w.id, s);
+    const photo = doc ? (doc.photoFileID || doc.photoPath || '') : '';
+    const markers = photo ? (doc.markers || []).map((m) => {
+      const r = findRoute(m.routeId, s);
+      if (!r || r.status !== 'active') return null;
+      const c = gradeUtil.HOLD_COLORS[r.color] || {};
+      return { routeId: r.id, x: m.x, y: m.y, grade: r.grade, colorHex: c.hex || '#ccc', colorLight: !!c.light };
+    }).filter(Boolean) : [];
     return Object.assign({}, w, {
-      photo: doc ? (doc.photoFileID || doc.photoPath || '') : '',
-      markerCount: doc ? (doc.markers || []).length : 0
+      photo: photo,
+      markerCount: doc ? (doc.markers || []).length : 0,
+      markers: markers
     });
   });
   return Promise.resolve({
@@ -596,6 +637,8 @@ function getRouteDetail(routeId) {
     wallRef: wallRef,
     analysis: analyzeRouteHolds(wallRef && wallRef.holds),
     analysisMoves: buildMoves(wallRef && wallRef.holds),
+    aiBeta: cachedRouteBeta(routeId, wallRef, s),
+    aiBetaAvailable: !!(wallRef && isCloudPhoto(wallRef.photo) && (wallRef.holds || []).length >= 2),
     myTodayCount: (s.checkins || []).filter(
       (k) => k.routeId === routeId && k.date === todayStr
     ).length,
@@ -843,6 +886,33 @@ function doAddCheckin(data) {
     todayCount: todayCount,
     newBadges: newBadges
   });
+}
+
+// 打卡后推荐下一条：同馆在墙、我还没完攀；难度贴近（同级 > 高一级 > 低一级 > 其余 ±2 内），有 Beta 的优先
+function recommendNext(routeId) {
+  const s = store.get();
+  const cur = findRoute(routeId, s);
+  if (!cur) return Promise.resolve([]);
+  const sent = {};
+  (s.checkins || []).forEach((k) => { if (k.result !== 'attempt') sent[k.routeId] = true; });
+  const base = gradeUtil.gradeIndex(cur.grade);
+  const why = (d) => (d === 0 ? '同难度' : d === 1 ? '进阶一级' : d === -1 ? '稳一手' : d > 0 ? '挑战一下' : '热身');
+  const list = gymActiveRoutes(cur.gymId, s)
+    .filter((r) => r.id !== routeId && !sent[r.id])
+    .map((r) => {
+      const d = gradeUtil.gradeIndex(r.grade) - base;
+      const rank = d === 0 ? 0 : (d === 1 ? 1 : (d === -1 ? 2 : 2 + Math.abs(d)));
+      return { r: decorateRoute(r, s), rank: rank, d: d };
+    })
+    .filter((x) => x.rank <= 4)
+    .sort((a, b) => (a.rank - b.rank) || (b.r.betaCount - a.r.betaCount))
+    .slice(0, 3)
+    .map((x) => ({
+      id: x.r.id, name: x.r.name, grade: x.r.grade, gradeColor: x.r.gradeColor,
+      colorHex: x.r.colorHex, colorLight: x.r.colorLight, wallName: x.r.wallName,
+      betaCount: x.r.betaCount, why: why(x.d)
+    }));
+  return Promise.resolve(list);
 }
 
 /* ---------- 足迹 ---------- */
@@ -1721,6 +1791,61 @@ function findRouteWall(route) {
   return null;
 }
 
+/* ---------- AI：云函数 aiAnnotate（算法候选 + 视觉模型复核 / 线路分析） ---------- */
+
+function isCloudPhoto(photo) {
+  return typeof wx !== 'undefined' && !!wx.cloud && String(photo || '').indexOf('cloud://') === 0;
+}
+
+// 岩点识别：云端墙照走云函数（与本地同一份算法 + 模型剔除胶带 / 海报、标起步点）
+// 不可用时 reject，调用方退回本地 canvas 算法
+function aiDetectHolds(photo, color) {
+  if (!isCloudPhoto(photo)) return Promise.reject(new Error('local'));
+  return wx.cloud.callFunction({ name: 'aiAnnotate', data: { fileID: photo, color: color } }).then((r) => {
+    const res = (r && r.result) || {};
+    if (!res.ok || !Array.isArray(res.holds)) throw new Error(res.err || 'aiAnnotate failed');
+    return res;
+  });
+}
+
+// 岩点签名：圈注变了，缓存的 AI 分析就作废
+function holdsSig(holds) {
+  return (holds || []).map((h) => [h.x, h.y, h.s ? 1 : 0, h.t === 'f' ? 1 : 0].join(',')).join(';');
+}
+
+function cachedRouteBeta(routeId, wallRef, state) {
+  const c = ((state || store.get()).aiBeta || {})[routeId];
+  return c && wallRef && c.sig === holdsSig(wallRef.holds) ? c : null;
+}
+
+// 线路深度分析：把按手序编号的岩点画在墙照上交给视觉模型。结果按线路缓存在本地
+function aiRouteBeta(routeId) {
+  const route = findRoute(routeId);
+  const ref = findRouteWall(route);
+  if (!route || !ref || !isCloudPhoto(ref.photo) || (ref.holds || []).length < 2) {
+    return Promise.reject(new Error('需要云端墙照和至少 2 个圈注岩点'));
+  }
+  const holds = ref.holds.map((h) => {
+    const o = { x: h.x, y: h.y };
+    if (h.s) o.s = 1;
+    if (h.f) o.t = 'f';
+    return o;
+  });
+  return wx.cloud.callFunction({
+    name: 'aiAnnotate',
+    data: { mode: 'beta', fileID: ref.photo, holds: holds, color: route.color, grade: route.grade }
+  }).then((r) => {
+    const res = (r && r.result) || {};
+    if (!res.ok) throw new Error(res.err === 'llm not configured' ? 'AI 分析尚未开通' : 'AI 分析失败，稍后再试');
+    const entry = { tips: res.tips || [], moves: res.moves || [], model: res.model || '', sig: holdsSig(ref.holds), date: util.today() };
+    store.update((st) => {
+      if (!st.aiBeta) st.aiBeta = {};
+      st.aiBeta[routeId] = entry;
+    });
+    return entry;
+  });
+}
+
 /* ---------- 搜索 ---------- */
 
 function search(kw) {
@@ -1790,6 +1915,9 @@ function resetDemo() {
 }
 
 module.exports = {
+  recommendNext,
+  aiDetectHolds,
+  aiRouteBeta,
   getHome, markOnboarded,
   getGyms, getGymDetail, getCities, nearestCityKey,
   getRouteDetail, getBetaDetail, getBetaFeed, getRouteBetas,

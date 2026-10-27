@@ -108,6 +108,7 @@ Page({
         routes: res.routes,
         leaderboard: res.leaderboard,
         wallPhotos: res.walls || [],
+        featuredWall: (res.walls || []).find((w) => w.photo) || null,
         gradeSystem: res.gradeSystem || [],
         gradeNote: res.gradeNote || '',
         gradeBy: res.gradeBy || 'hold',

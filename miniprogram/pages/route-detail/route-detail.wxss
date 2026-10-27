@@ -3,14 +3,14 @@
 }
 .hero-photo {
   width: 100%;
-  border-radius: 24rpx;
+  border-radius: var(--radius);
   margin-bottom: 20rpx;
-  background: #f0f2f5;
+  background: var(--chip);
   display: block;
 }
 .hero-wall {
   position: relative;
-  border-radius: 24rpx;
+  border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 20rpx;
   background: #16181f;
@@ -35,7 +35,7 @@
 }
 .hero-dot-t {
   color: #fff;
-  font-size: 20rpx;
+  font-size: var(--fs-xs);
   font-weight: 800;
 }
 .hero-dot.light .hero-dot-t {
@@ -68,11 +68,11 @@
   margin-top: 10rpx;
 }
 .edit-link {
-  color: #ff6b35;
+  color: var(--brand);
   font-weight: 600;
 }
 .del-link {
-  color: #e5484d;
+  color: var(--red);
 }
 .feel-line {
   margin-top: 10rpx;
@@ -93,13 +93,13 @@
   margin: 0 16rpx;
 }
 .main-name {
-  font-size: 36rpx;
+  font-size: var(--fs-xl);
   font-weight: 800;
-  margin-right: 12rpx;
+  margin: 0 12rpx;
 }
 .main-grade {
   min-width: 88rpx;
-  font-size: 30rpx;
+  font-size: var(--fs-lg);
   padding: 6rpx 18rpx;
 }
 .main-tags {
@@ -109,7 +109,7 @@
   margin-top: 8rpx;
 }
 .warn {
-  color: #e5484d;
+  color: var(--red);
   font-weight: 600;
 }
 
@@ -121,11 +121,11 @@
   height: 16rpx;
   border-radius: 999rpx;
   overflow: hidden;
-  background: #f0f2f5;
+  background: var(--chip);
 }
-.feel-soft { background: #30a46c; }
-.feel-fair { background: #ffb224; }
-.feel-hard { background: #e5484d; }
+.feel-soft { background: var(--green); }
+.feel-fair { background: var(--amber); }
+.feel-hard { background: var(--red); }
 .feel-legend {
   margin-top: 8rpx;
 }
@@ -138,13 +138,13 @@
 .vote-chip {
   padding: 6rpx 24rpx;
   border-radius: 999rpx;
-  background: #f0f2f5;
-  color: #5a6072;
-  font-size: 22rpx;
+  background: var(--chip);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
   margin-right: 12rpx;
 }
 .vote-chip.on {
-  background: #1b1e28;
+  background: var(--ink);
   color: #fff;
   font-weight: 700;
 }
@@ -167,13 +167,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: var(--fs-xl);
   margin-left: 4rpx;
   margin-right: 12rpx;
-  box-shadow: 0 2rpx 12rpx rgba(27, 30, 40, 0.05);
+  box-shadow: var(--shadow-card);
 }
 .act-side.on {
-  background: #fff1ea;
+  background: var(--brand-soft);
 }
 /* 原生 button 默认样式全量覆盖，锁成圆形图标按钮 */
 .share-btn {
@@ -186,7 +186,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: var(--fs-xl);
   line-height: normal;
   border: none;
   border-radius: 50%;
@@ -210,30 +210,42 @@
 }
 .hero-num {
   color: #ffffff;
-  font-size: 20rpx;
+  font-size: var(--fs-xs);
   font-weight: 800;
   text-shadow: 0 0 6rpx rgba(0, 0, 0, 0.9);
 }
 .ai-sub {
   margin-top: 20rpx;
-  color: #7a4de8;
+  color: var(--ai);
 }
 .ai {
   background: #fbfaff;
   border: 2rpx solid #ece6fb;
 }
 .ai-tip {
-  color: #5a6072;
+  color: var(--ink-2);
   margin-top: 12rpx;
   line-height: 1.6;
 }
+.ai-deep {
+  margin-top: 24rpx;
+  font-size: var(--fs-body);
+  padding: 16rpx 0;
+  background: var(--ai-soft);
+  color: #6b3fd6;
+}
+.ai-again {
+  margin-top: 20rpx;
+  color: var(--ai);
+  text-align: right;
+}
 .wall-link {
   padding: 22rpx 24rpx;
-  font-size: 26rpx;
+  font-size: var(--fs-body);
 }
 .hfilter {
-  font-size: 22rpx;
-  color: #5a6072;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
   background: #ffffff;
   padding: 6rpx 20rpx;
   border-radius: 999rpx;
@@ -241,8 +253,8 @@
   font-weight: 400;
 }
 .hfilter.on {
-  background: #fff1ea;
-  color: #e8571f;
+  background: var(--brand-soft);
+  color: var(--brand-deep);
   font-weight: 700;
 }
 
@@ -253,7 +265,7 @@
 .ck-avatar {
   width: 56rpx;
   height: 56rpx;
-  font-size: 30rpx;
+  font-size: var(--fs-lg);
   margin-right: 14rpx;
 }
 
@@ -266,10 +278,10 @@
 .removed-banner {
   margin-top: 12rpx;
   padding: 12rpx 16rpx;
-  border-radius: 12rpx;
+  border-radius: var(--r-sm);
   background: #fff7ed;
   color: #c2410c;
-  font-size: 24rpx;
+  font-size: var(--fs-md);
 }
 .report-link {
   text-align: center;

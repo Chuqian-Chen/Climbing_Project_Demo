@@ -2,11 +2,11 @@
   margin-left: 16rpx;
 }
 .setter-badge {
-  font-size: 20rpx;
-  color: #7a4de8;
+  font-size: var(--fs-xs);
+  color: var(--ai);
   background: transparent;
   border: 1rpx solid #cdbcf2;
-  border-radius: 8rpx;
+  border-radius: var(--r-xs);
   padding: 2rpx 10rpx;
   font-weight: 600;
 }
@@ -17,9 +17,9 @@
 .ms-cover {
   position: absolute;
   inset: 0;
-  border-radius: 16rpx;
+  border-radius: var(--r-md);
   overflow: hidden;
-  background: #1b1e28;
+  background: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,13 +50,13 @@
   bottom: 16rpx;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   padding: 4rpx 14rpx;
-  border-radius: 8rpx;
+  border-radius: var(--r-xs);
 }
 
 .cm-del {
-  color: #9aa1b2;
+  color: var(--ink-3);
   margin-right: 16rpx;
 }
 
@@ -64,43 +64,43 @@
 .caution-banner {
   display: flex;
   align-items: flex-start;
-  background: #fff3f3;
-  border-left: 6rpx solid #e5484d;
-  border-radius: 12rpx;
+  background: var(--red-soft);
+  border-left: 6rpx solid var(--red);
+  border-radius: var(--r-sm);
   padding: 16rpx 20rpx;
   margin: 4rpx 0 16rpx;
 }
 .caution-tag {
-  color: #e5484d;
-  font-size: 22rpx;
+  color: var(--red);
+  font-size: var(--fs-sm);
   font-weight: 800;
   flex-shrink: 0;
   margin-right: 14rpx;
 }
 .caution-text {
-  font-size: 26rpx;
+  font-size: var(--fs-body);
   color: #7a3b3b;
   line-height: 1.5;
 }
 
 .del-beta {
-  color: #e5484d;
+  color: var(--red);
   padding: 8rpx 16rpx;
 }
 .edit-beta {
-  color: #ff6b35;
+  color: var(--brand);
 }
 .follow {
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   color: #fff;
-  background: #ff6b35;
+  background: var(--brand);
   padding: 10rpx 28rpx;
   border-radius: 999rpx;
   font-weight: 600;
 }
 .follow.on {
-  background: #f0f2f5;
-  color: #9aa1b2;
+  background: var(--chip);
+  color: var(--ink-3);
 }
 
 /* 媒体区：视频+图片统一横滑条 */
@@ -112,7 +112,7 @@
   display: inline-block;
   width: 600rpx;
   height: 420rpx;
-  border-radius: 20rpx;
+  border-radius: var(--radius);
   background: #000;
   margin-right: 14rpx;
   vertical-align: top;
@@ -121,7 +121,7 @@
   display: inline-block;
   width: 300rpx;
   height: 420rpx;
-  border-radius: 20rpx;
+  border-radius: var(--radius);
   margin-right: 14rpx;
   vertical-align: top;
 }
@@ -151,10 +151,10 @@
   position: absolute;
   right: 24rpx;
   bottom: 20rpx;
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   background: rgba(0, 0, 0, 0.4);
   padding: 4rpx 14rpx;
-  border-radius: 8rpx;
+  border-radius: var(--r-xs);
 }
 .media-hint {
   margin-top: 20rpx;
@@ -171,7 +171,7 @@
 }
 
 .title {
-  font-size: 36rpx;
+  font-size: var(--fs-xl);
   font-weight: 800;
   margin: 8rpx 4rpx 16rpx;
 }
@@ -197,7 +197,7 @@
   top: 48rpx;
   bottom: 0;
   width: 2rpx;
-  background: #eceef2;
+  background: var(--line);
 }
 .step:last-child::before {
   display: none;
@@ -213,21 +213,21 @@
   width: 44rpx;
   height: 44rpx;
   border-radius: 50%;
-  background: #fff1ea;
-  color: #e8571f;
+  background: var(--brand-soft);
+  color: var(--brand-deep);
   font-weight: 800;
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .step-phase {
   font-weight: 800;
-  font-size: 28rpx;
+  font-size: var(--fs-base);
 }
 .step-text {
-  color: #5a6072;
-  font-size: 27rpx;
+  color: var(--ink-2);
+  font-size: var(--fs-body);
 }
 
 .acts {
@@ -241,20 +241,20 @@
   border-radius: 999rpx;
   padding: 18rpx 0;
   text-align: center;
-  font-size: 26rpx;
+  font-size: var(--fs-body);
   font-weight: 600;
-  box-shadow: 0 2rpx 12rpx rgba(27, 30, 40, 0.04);
+  box-shadow: var(--shadow-card);
   margin-right: 16rpx;
 }
 .act:last-child {
   margin-right: 0;
 }
 .act.liked {
-  color: #e5484d;
-  background: #fff3f3;
+  color: var(--red);
+  background: var(--red-soft);
 }
 .act-heart {
-  font-size: 32rpx;
+  font-size: var(--fs-lg);
 }
 /* 原生 button 默认样式全量覆盖 */
 .act.share {
@@ -263,7 +263,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 18rpx 0;
-  font-size: 26rpx;
+  font-size: var(--fs-body);
   font-weight: 600;
   line-height: 1.55;
   border: none;
@@ -281,11 +281,11 @@
 .cm-avatar {
   width: 56rpx;
   height: 56rpx;
-  font-size: 30rpx;
+  font-size: var(--fs-lg);
   margin-right: 14rpx;
 }
 .cm-text {
-  font-size: 26rpx;
+  font-size: var(--fs-body);
   margin-top: 4rpx;
 }
 .cm-input-wrap {
@@ -295,18 +295,18 @@
 }
 .cm-input {
   flex: 1;
-  font-size: 26rpx;
+  font-size: var(--fs-body);
 }
 .cm-send {
-  font-size: 24rpx;
-  color: #9aa1b2;
-  background: #f0f2f5;
+  font-size: var(--fs-md);
+  color: var(--ink-3);
+  background: var(--chip);
   padding: 10rpx 28rpx;
   border-radius: 999rpx;
 }
 .cm-send.on {
   color: #fff;
-  background: #ff6b35;
+  background: var(--brand);
   font-weight: 600;
 }
 .tap {

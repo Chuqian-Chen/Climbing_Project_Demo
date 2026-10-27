@@ -1,6 +1,6 @@
 .bt {
   background: #ffffff;
-  border-radius: 16rpx;
+  border-radius: var(--r-md);
   overflow: hidden;
   margin-bottom: 16rpx;
 }
@@ -34,19 +34,19 @@
   bottom: 12rpx;
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  font-size: 20rpx;
+  font-size: var(--fs-xs);
   padding: 4rpx 12rpx;
-  border-radius: 8rpx;
+  border-radius: var(--r-xs);
 }
 .bt-fit {
   position: absolute;
   left: 12rpx;
   top: 12rpx;
-  background: #ff6b35;
+  background: var(--brand);
   color: #fff;
-  font-size: 20rpx;
+  font-size: var(--fs-xs);
   padding: 4rpx 12rpx;
-  border-radius: 8rpx;
+  border-radius: var(--r-xs);
 }
 /* 右上角难度圆徽章（与墙面图上的线路徽章同款语言） */
 .bt-corner {
@@ -59,7 +59,7 @@
   border-radius: 50%;
   border: 4rpx solid #ffffff;
   color: #fff;
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -81,8 +81,8 @@
   line-height: 1;
 }
 .bt-fb-name {
-  font-size: 22rpx;
-  color: #5a6072;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
   margin-top: 10rpx;
   max-width: 90%;
   overflow: hidden;
@@ -94,7 +94,7 @@
   padding: 16rpx 20rpx 18rpx;
 }
 .bt-title {
-  font-size: 28rpx;
+  font-size: var(--fs-base);
   font-weight: 600;
   line-height: 1.4;
   display: -webkit-box;
@@ -103,16 +103,16 @@
   overflow: hidden;
 }
 .bt-caution {
-  font-size: 20rpx;
-  color: #e5484d;
-  background: #fff3f3;
-  border-radius: 8rpx;
+  font-size: var(--fs-xs);
+  color: var(--red);
+  background: var(--red-soft);
+  border-radius: var(--r-xs);
   padding: 6rpx 12rpx;
   margin-top: 10rpx;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  /* 单行截断：-webkit-line-clamp 配合 padding 会把第二行露在内边距里 */
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 .bt-route {
   display: flex;
@@ -125,8 +125,8 @@
   flex-shrink: 0;
 }
 .bt-route-name {
-  font-size: 22rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
   margin: 0 8rpx;
   overflow: hidden;
   white-space: nowrap;
@@ -134,7 +134,7 @@
   max-width: 200rpx;
 }
 .bt-grade {
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   font-weight: 700;
 }
 .bt-foot {
@@ -152,11 +152,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
 }
 .bt-nick {
-  font-size: 22rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
   margin-left: 10rpx;
   overflow: hidden;
   white-space: nowrap;
@@ -164,19 +164,19 @@
   max-width: 160rpx;
 }
 .bt-local {
-  font-size: 18rpx;
+  font-size: var(--fs-xs);
   color: #2f7a58;
   border: 1rpx solid #bcdccb;
-  border-radius: 6rpx;
+  border-radius: var(--r-xs);
   padding: 0 8rpx;
   margin-left: 10rpx;
   flex-shrink: 0;
 }
 .bt-like {
-  font-size: 22rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
   padding: 4rpx 0 4rpx 12rpx;
 }
 .bt-liked {
-  color: #e5484d;
+  color: var(--red);
 }

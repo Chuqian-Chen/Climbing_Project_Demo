@@ -89,6 +89,7 @@ Page({
       note: d.note.trim()
     }).then((res) => {
       this.setData({ done: true, doneInfo: res });
+      api.recommendNext(this.routeId).then((list) => this.setData({ nextRoutes: list }));
       wx.vibrateShort({ type: 'medium' });
       // 顺手请求「每周小结」订阅（模板未配置时静默跳过）
       subscribe.ask('weekly');
@@ -256,6 +257,10 @@ Page({
 
   backToRoute() {
     wx.navigateBack();
+  },
+  // 推荐的下一条：替换当前打卡页，返回键直接回到原线路
+  goNext(e) {
+    wx.redirectTo({ url: '/pages/route-detail/route-detail?id=' + e.currentTarget.dataset.id });
   },
   goLogbook() {
     wx.switchTab({ url: '/pages/logbook/logbook' });

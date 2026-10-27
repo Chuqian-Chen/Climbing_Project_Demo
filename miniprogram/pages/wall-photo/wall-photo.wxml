@@ -14,6 +14,13 @@
   <block wx:if="{{photo}}">
     <view class="wall-wrap" bindtap="onImgTap">
       <image id="wall-img" class="wall-img" src="{{photo}}" mode="widthFix" bindload="onImgLoad" />
+      <!-- 一键识别全墙：当前预览颜色的候选点 -->
+      <view
+        wx:for="{{scanPreview}}"
+        wx:key="index"
+        class="scan-ring"
+        style="left:{{item.x}}%;top:{{item.y}}%;border-color:{{scanColorHex}}"
+      ></view>
 
       <!-- 选中线路的连线（一笔勾出整条线） -->
       <view
@@ -90,9 +97,29 @@
       <view class="undo-btn small" bindtap="undoHold">⟲ 撤销上一个</view>
     </view>
     <view class="btn btn-soft ai-btn" wx:if="{{pendingRouteId}}" bindtap="aiAnnotate">
-      AI 自动圈点（按岩点颜色识别候选）
+      AI 自动圈点（识别本线颜色的岩点）
     </view>
 
+    <view class="btn btn-soft ai-btn scan-btn" wx:if="{{photo && !scanItems.length}}" bindtap="scanWall">一键识别全墙（找出所有颜色的线）</view>
+    <view class="scan" wx:if="{{scanItems.length}}">
+      <view class="between scan-head">
+        <text class="bold small">识别到 {{scanItems.length}} 种颜色</text>
+        <text class="small faint" bindtap="closeScan">收起</text>
+      </view>
+      <view
+        class="scan-row {{scanIdx === index ? 'on' : ''}}"
+        wx:for="{{scanItems}}"
+        wx:key="color"
+        data-i="{{index}}"
+        bindtap="previewScan"
+      >
+        <view class="hold-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+        <text class="scan-name">{{item.colorName}}色 · {{item.count}} 个岩点</text>
+        <view class="flex-1"></view>
+        <text class="scan-act {{item.done ? 'done' : ''}}" data-i="{{index}}" catchtap="applyScan">{{item.done ? '已填入 ✓' : (item.routeId ? '填入「' + item.routeLabel + '」' : '新建这条线')}}</text>
+      </view>
+      <view class="small faint scan-tip">候选点来自颜色算法，同色的胶带 / 告示可能混入，填入后长按可删</view>
+    </view>
     <!-- 快速建线：这面墙的新线直接在这里建 -->
     <view class="qc-toggle small" bindtap="toggleCreate">
       {{showCreate ? '收起' : '＋ 快速建线'}}{{routeLabels.length ? '' : '（这面墙还没有线，先建一条）'}}

@@ -11,5 +11,5 @@
   margin-top: 4rpx;
 }
 .danger {
-  color: #e5484d;
+  color: var(--red);
 }

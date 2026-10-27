@@ -105,41 +105,216 @@ const ROUTES = [
 
 const DEMO_VIDEO = 'cloud://cloud1-d9gjpqqv42f005e11.636c-cloud1-d9gjpqqv42f005e11-1459753686/videos/demo-train.mp4';
 const BETAS = [
-  { id: 'b1', routeId: 'r105', userId: 'u1', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 128, createdAt: d(-7), imageFileIDs: ['/assets/demo/climb3.jpg'], caution: '第三个点手顺反了必掉：先右手再左手', title: '起手双拍直上版', heightFit: [170, 185], moveTags: ['动态跳跃', '挂脚跟'], steps: [{ phase: '起手', text: '左手大圆点、右手侧拉点同时起，双脚上高脚踩稳再出手。' }, { phase: '中段', text: '核心收紧直接 dyno 到顶部横条，注意用胯部先顶出去，手是最后到的。' }, { phase: '收尾', text: '接住横条后右脚挂脚跟锁住，换手到顶点即可。' }] },
-  { id: 'b2', routeId: 'r105', userId: 'u2', type: 'text', likes: 96, createdAt: d(-5), title: '160cm 小个子友好版', heightFit: [150, 168], moveTags: ['高脚', '挂脚跟'], steps: [{ phase: '起手', text: '够不到侧拉点没关系：先左手起手点，右脚直接上到中间的黄色脚点。' }, { phase: '中段', text: '不 dyno！右手先摸中间棕色小点做过渡，胯贴墙，左脚挂脚跟再出右手。' }, { phase: '收尾', text: '两步静态到顶，比跳的稳多了，亲测省力。' }] },
-  { id: 'b3', routeId: 'r103', userId: 'u4', type: 'text', likes: 40, createdAt: d(-9), imageFileIDs: ['/assets/demo/climb2.jpg'], title: '新手视角拆解', heightFit: [160, 175], moveTags: ['锁定', '小点发力'], steps: [{ phase: '起手', text: '坐地起手，先把右脚踩上去再发力，直接站起来会滑。' }, { phase: '中段', text: '中间两个小点要"捏"不要"抓"，重心压低慢慢倒。' }, { phase: '收尾', text: '最后一步左手锁定到90度再出右手，不要甩。' }] },
-  { id: 'b4', routeId: 'r104', userId: 'u3', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 75, createdAt: d(-12), title: '高个子静态解法', heightFit: [178, 190], moveTags: ['锁定', '高脚'], steps: [{ phase: '起手', text: '利用臂展优势直接越过第一个过渡点，右手到黑色棱角点。' }, { phase: '中段', text: '左脚高脚到起手点位置，身体折叠后慢慢站起。' }, { phase: '收尾', text: '顶点是个暗兜，摸到内侧再发力，直接拍会脱。' }] },
-  { id: 'b5', routeId: 'r106', userId: 'u6', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 210, createdAt: d(-20), imageFileIDs: ['/assets/demo/climb1.jpg'], caution: '出口斜板很滑，最后一步重心别急着往上送', title: '定线员亲拆', heightFit: [165, 185], moveTags: ['顶胯', '挂脚跟', '大圆点'], steps: [{ phase: '起手', text: '设计思路是"先坐后站"：起手先做一个假坐姿，把右脚跟挂上去。' }, { phase: '中段', text: '关键在第三手：大圆点要用推的，顶胯把重心送过中线。' }, { phase: '收尾', text: '最后翻身上墙时先换脚，很多人败在没换脚直接翻。' }] },
-  { id: 'b6', routeId: 'r107', userId: 'u5', type: 'text', likes: 33, createdAt: d(-2), title: '屋檐省力路书', heightFit: [162, 180], moveTags: ['勾脚尖', '核心张力'], steps: [{ phase: '起手', text: '屋檐线先想脚再想手：起手同时右脚尖勾住第二脚点。' }, { phase: '中段', text: '身体像吊床一样绷直，手换点时脚不动，脚换点时手不动。' }, { phase: '收尾', text: '出屋檐唇口时先甩左脚上去挂跟，再翻身，不要硬拉。' }] },
-  { id: 'b7', routeId: 'r108', userId: 'u3', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 66, createdAt: d(-1), title: '首完攀记录', heightFit: [175, 190], moveTags: ['动态跳跃', '双手起跳'], steps: [{ phase: '起手', text: '双手起跳前先空摆两次找节奏，第三次再真跳。' }, { phase: '中段', text: '接住后立刻勾右脚尖稳住摆动，等完全静止再出下一手。' }, { phase: '收尾', text: '顶部两点都不正，用捏的姿势更牢。' }] },
-  { id: 'b8', routeId: 'r201', userId: 'u7', type: 'text', likes: 12, createdAt: d(-8), title: '零基础也能顺下来', heightFit: [150, 175], moveTags: ['平衡', '手点顺序'], steps: [{ phase: '起手', text: '按点上的编号来就行，1-2-3 不要跳。' }, { phase: '中段', text: '第4个点记得先换脚再伸手，不换脚会很别扭。' }, { phase: '收尾', text: '顶点很大很友好，放心冲。' }] },
-  { id: 'b9', routeId: 'r203', userId: 'u5', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 58, createdAt: d(-14), imageFileIDs: ['/assets/demo/climb6.jpg'], caution: '中段捏点最费指力，前面省着点用', title: '交叉手不打结指南', heightFit: [163, 180], moveTags: ['交叉手', '侧拉'], steps: [{ phase: '起手', text: '起手就决定了后面顺不顺：左手在上右手在下，别反。' }, { phase: '中段', text: '第二次交叉时先转肩再出手，让身体自然螺旋上去。' }, { phase: '收尾', text: '解开缠绕的瞬间左脚外侧踩，一步到顶。' }] },
-  { id: 'b10', routeId: 'r204', userId: 'u1', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 150, createdAt: d(-11), imageFileIDs: ['/assets/demo/climb5.jpg'], caution: '动态那一下必须脚先蹬出去，光靠手够不到', title: '全程动态爽版', heightFit: [172, 188], moveTags: ['动态跳跃', '双手起跳'], steps: [{ phase: '起手', text: '第一跳落点比看起来近，七分力就够，全力会飞过。' }, { phase: '中段', text: '连续两跳之间必须停稳呼吸一次，贪快必掉。' }, { phase: '收尾', text: '最后一跳向左上 45°，用右手先拍稳再补左手。' }] },
-  { id: 'b11', routeId: 'r204', userId: 'u2', type: 'text', likes: 88, createdAt: d(-9), title: '矮个子静态破解', heightFit: [152, 168], moveTags: ['高脚', '折膝', '侧拉'], steps: [{ phase: '起手', text: '别信"必须跳"的邪，右侧有个白色配角点可以借用（同色规则内）。' }, { phase: '中段', text: '高脚+折膝把身体叠起来，慢慢站，第二段同理。' }, { phase: '收尾', text: '最后确实要一小跳，但只剩 20cm，闭眼都能中。' }] },
-  { id: 'b12', routeId: 'r302', userId: 'u8', type: 'text', likes: 20, createdAt: d(-10), title: '为什么你总在第三个点掉', heightFit: [158, 182], moveTags: ['手点顺序', '平衡'], steps: [{ phase: '起手', text: '前两点正常走，节奏放慢。' }, { phase: '中段', text: '第三点是"假点"，只用来过渡，真正要抓的是它上方的斜面。' }, { phase: '收尾', text: '最后两步重心全在脚上，手只是扶。' }] },
-  { id: 'b13', routeId: 'r304', userId: 'u3', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 47, createdAt: d(-16), title: '洞穴脚法示范', heightFit: [170, 188], moveTags: ['勾脚尖', '核心张力'], steps: [{ phase: '起手', text: '进洞先挂双脚再出手，顺序反了就只能靠臂力硬顶。' }, { phase: '中段', text: '换手时脚尖发力下压，身体就不会荡。' }, { phase: '收尾', text: '出洞口那步深呼吸，左手锁定，右脚跟上唇口。' }] },
-  { id: 'b14', routeId: 'r305', userId: 'u6', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 180, createdAt: d(-18), imageFileIDs: ['/assets/demo/climb4.jpg'], title: '七个点的完整讲解', heightFit: [168, 185], moveTags: ['小点发力', '动态跳跃', '锁定'], steps: [{ phase: '起手', text: '前三"星"是小点静态，指力省着用，开握为主。' }, { phase: '中段', text: '第四到第五星是全线路难点：左手锁定到底，右手小 dyno。' }, { phase: '收尾', text: '最后两星放松走完，顶前别庆祝，掉过的人不止一个。' }] },
-  { id: 'b15', routeId: 'r206', userId: 'u7', type: 'text', likes: 31, createdAt: d(-4), title: '用重心画S线', heightFit: [155, 172], moveTags: ['重心转换', '大圆点'], steps: [{ phase: '起手', text: '波浪墙的逻辑：手固定，重心左右荡，荡到位再换手。' }, { phase: '中段', text: '每个大圆点都推着走，抓死反而累。' }, { phase: '收尾', text: '最后一荡幅度最大，先目测好右脚落点。' }] }
+  {
+    id: 'b1', routeId: 'r105', userId: 'u1', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 128, createdAt: d(-7),
+    imageFileIDs: ['/assets/demo/climb6.jpg'],
+    caution: '第三手先右后左，手顺反了必掉',
+    title: '起手双拍，一跳到横条',
+    heightFit: [170, 185],
+    moveTags: ['动态跳跃', '挂脚跟'],
+    steps: [
+      { phase: '起手', text: '左手大圆点、右手侧拉同时起，双脚都上高脚踩稳了再动，别急着跳。' },
+      { phase: '中段', text: '核心收紧，胯先往墙里顶，借胯的力量 dyno 到顶部横条，手是最后才到的。' },
+      { phase: '收尾', text: '接住横条后右脚马上挂脚跟止荡，确认不晃了再换手摸顶。' }
+    ]
+  },
+  {
+    id: 'b2', routeId: 'r105', userId: 'u2', type: 'text', likes: 96, createdAt: d(-5),
+    caution: '过渡的小捏点很浅，手指放平去贴，别抠',
+    title: '160cm 静态版：不跳也能过',
+    heightFit: [150, 168],
+    moveTags: ['高脚', '挂脚跟', '锁定'],
+    steps: [
+      { phase: '起手', text: '够不到右侧拉没关系：左手起，右脚直接踩上中间那个红色小脚点（本馆手脚同色）。' },
+      { phase: '中段', text: '不跳。右手先摸横条下方的红色小捏点过渡，胯贴墙，左脚挂脚跟后再出右手。' },
+      { phase: '收尾', text: '两步静态到顶，比跳稳得多，就是很吃左手锁定，平时多练引体停顿。' }
+    ]
+  },
+  {
+    id: 'b3', routeId: 'r103', userId: 'u4', type: 'text', likes: 40, createdAt: d(-9),
+    caution: '坐姿起步右脚先踩实，直接站会滑脚',
+    title: '入门 V3：小点怎么捏',
+    heightFit: [160, 175],
+    moveTags: ['锁定', '小点发力'],
+    steps: [
+      { phase: '起手', text: '坐姿起步，先把右脚踩上去、屁股离地，再发力站起来。' },
+      { phase: '中段', text: '中间两个小点用「捏」不用「抓」：拇指压住侧面，重心压低慢慢倒过去。' },
+      { phase: '收尾', text: '最后一手左手锁到 90 度再出右手，甩上去会脱。' }
+    ]
+  },
+  {
+    id: 'b4', routeId: 'r104', userId: 'u3', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 75, createdAt: d(-12),
+    caution: '顶点是个暗兜，摸到内侧再发力，直接拍会脱',
+    title: '臂展党：跳过第一个过渡点',
+    heightFit: [178, 190],
+    moveTags: ['锁定', '高脚'],
+    steps: [
+      { phase: '起手', text: '臂展够的话直接越过第一个过渡点，右手去抓上面那个黑色棱角。' },
+      { phase: '中段', text: '左脚高脚踩到起手点的位置，身体折叠起来，慢慢站。' },
+      { phase: '收尾', text: '站稳后右手摸顶点暗兜的内侧，确认摸到再发力。' }
+    ]
+  },
+  {
+    id: 'b5', routeId: 'r106', userId: 'u6', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 210, createdAt: d(-20),
+    imageFileIDs: ['/assets/demo/climb1.jpg'],
+    caution: '出口斜板很滑，最后一步重心别急着往上送',
+    title: '定线员亲拆：先坐后站',
+    heightFit: [165, 185],
+    moveTags: ['顶胯', '挂脚跟', '大圆点'],
+    steps: [
+      { phase: '起手', text: '设计思路是「先坐后站」：起手先做一个假坐姿，把右脚跟挂上去。' },
+      { phase: '中段', text: '关键在第三手：大圆点要用推的，顶胯把重心送过中线。' },
+      { phase: '收尾', text: '翻上斜板前先换脚，很多人败在没换脚直接翻。' }
+    ]
+  },
+  {
+    id: 'b6', routeId: 'r107', userId: 'u5', type: 'text', likes: 33, createdAt: d(-2),
+    caution: '出唇口别硬拉，先把左脚跟挂上去',
+    title: '屋檐省力：脚一直别离墙',
+    heightFit: [162, 180],
+    moveTags: ['勾脚尖', '核心张力'],
+    steps: [
+      { phase: '起手', text: '屋檐线先想脚再想手：起手的同时右脚尖勾住第二个脚点。' },
+      { phase: '中段', text: '身体像吊床一样绷着：换手时脚不动，换脚时手不动。' },
+      { phase: '收尾', text: '到唇口先甩左脚挂跟，用腿把身体拉上去再翻身。' }
+    ]
+  },
+  {
+    id: 'b7', routeId: 'r108', userId: 'u3', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 66, createdAt: d(-1),
+    caution: '接住后先勾脚尖止荡，荡停了再出手',
+    title: '双手起跳：空摆两下找节奏',
+    heightFit: [175, 190],
+    moveTags: ['动态跳跃', '双手起跳', '勾脚尖'],
+    steps: [
+      { phase: '起手', text: '起跳前先空摆两次找节奏，第三次再真跳，蹬腿比拉手重要。' },
+      { phase: '中段', text: '双手接住后右脚尖立刻勾住，等身体完全不荡再出下一手。' },
+      { phase: '收尾', text: '顶部两个点都不正，用捏的姿势比抠更牢。' }
+    ]
+  },
+  {
+    id: 'b8', routeId: 'r201', userId: 'u7', type: 'text', likes: 12, createdAt: d(-8),
+    caution: '第四手前先换脚，不换会别着身体',
+    title: '零基础也能顺下来',
+    heightFit: [150, 175],
+    moveTags: ['平衡', '手点顺序'],
+    steps: [
+      { phase: '起手', text: '从贴标的起步点开始，按高度一个个往上，别跳点。' },
+      { phase: '中段', text: '第四个手点之前先把右脚换到左脚的位置，再伸手就顺了。' },
+      { phase: '收尾', text: '顶点很大很友好，放心冲。' }
+    ]
+  },
+  {
+    id: 'b9', routeId: 'r203', userId: 'u5', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 58, createdAt: d(-14),
+    caution: '中段捏点最费指力，前面省着点用',
+    title: '交叉手不打结指南',
+    heightFit: [163, 180],
+    moveTags: ['交叉手', '侧拉'],
+    steps: [
+      { phase: '起手', text: '起手就决定后面顺不顺：左手在上、右手在下，别反。' },
+      { phase: '中段', text: '第二次交叉前先转肩再出手，让身体自然螺旋上去。' },
+      { phase: '收尾', text: '交叉解开的瞬间左脚外侧踩，一步到顶。' }
+    ]
+  },
+  {
+    id: 'b10', routeId: 'r204', userId: 'u1', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 150, createdAt: d(-11),
+    imageFileIDs: ['/assets/demo/climb5.jpg'],
+    caution: '动态那一下脚要先蹬出去，光靠手够不到',
+    title: '训练板全程动态',
+    heightFit: [172, 188],
+    moveTags: ['动态跳跃', '双手起跳'],
+    steps: [
+      { phase: '起手', text: '第一跳落点比看起来近，七分力就够，全力会飞过。' },
+      { phase: '中段', text: '连续两跳之间必须停稳、呼吸一次，贪快必掉。' },
+      { phase: '收尾', text: '最后一跳往左上 45°，右手先拍稳再补左手。' }
+    ]
+  },
+  {
+    id: 'b11', routeId: 'r204', userId: 'u2', type: 'text', likes: 88, createdAt: d(-9),
+    caution: '最后那一小跳要先看准落点再动',
+    title: '矮个子静态破解',
+    heightFit: [152, 168],
+    moveTags: ['高脚', '折膝', '侧拉'],
+    steps: [
+      { phase: '起手', text: '别信「必须跳」：右侧有个同色小脚点很多人没注意，踩上去能把身体叠高一截。' },
+      { phase: '中段', text: '高脚 + 折膝把身体叠起来，慢慢站；第二段同样的思路再来一次。' },
+      { phase: '收尾', text: '最后确实要一小跳，但只剩 20cm，看准了就能中。' }
+    ]
+  },
+  {
+    id: 'b12', routeId: 'r302', userId: 'u8', type: 'text', likes: 20, createdAt: d(-10),
+    caution: '第三个点只能过渡，别把重心压上去',
+    title: '为什么你总在第三个点掉',
+    heightFit: [158, 182],
+    moveTags: ['手点顺序', '平衡'],
+    steps: [
+      { phase: '起手', text: '前两手正常走，节奏放慢。' },
+      { phase: '中段', text: '第三个点只能当过渡，真正要抓的是它上方那条斜边。' },
+      { phase: '收尾', text: '最后两步重心全在脚上，手只是扶着。' }
+    ]
+  },
+  {
+    id: 'b13', routeId: 'r304', userId: 'u3', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 47, createdAt: d(-16),
+    caution: '换手时脚尖要往下压，一松身体就荡出去',
+    title: '主墙勾脚尖示范',
+    heightFit: [170, 188],
+    moveTags: ['勾脚尖', '核心张力'],
+    steps: [
+      { phase: '起手', text: '先把双脚都放上墙再出手，顺序反了就只能靠臂力硬顶。' },
+      { phase: '中段', text: '右脚尖勾住大点的边，换手时脚尖往下压，身体就不会荡。' },
+      { phase: '收尾', text: '最后一步深呼吸，左手锁定，右脚跟到上一个脚点再摸顶。' }
+    ]
+  },
+  {
+    id: 'b14', routeId: 'r305', userId: 'u6', type: 'video', videoFileID: DEMO_VIDEO, videoDur: '0:12', likes: 180, createdAt: d(-18),
+    imageFileIDs: ['/assets/demo/climb4.jpg'],
+    caution: '第四到第五手是难点，前三手别把指力用光',
+    title: '七手完整讲解（定线员）',
+    heightFit: [168, 185],
+    moveTags: ['小点发力', '动态跳跃', '锁定'],
+    steps: [
+      { phase: '起手', text: '前三手都是小点静态，开握为主，指力省着用。' },
+      { phase: '中段', text: '第四到第五手是全线难点：左手锁到底，右手一个小 dyno。' },
+      { phase: '收尾', text: '最后两手放松走完，摸顶前别松劲，掉过的人不止一个。' }
+    ]
+  },
+  {
+    id: 'b15', routeId: 'r206', userId: 'u7', type: 'text', likes: 31, createdAt: d(-4),
+    caution: '最后一荡幅度最大，先看好右脚落点',
+    title: '用重心画 S 线',
+    heightFit: [155, 172],
+    moveTags: ['重心转换', '大圆点'],
+    steps: [
+      { phase: '起手', text: '波浪墙的逻辑：手固定，重心左右荡，荡到位再换手。' },
+      { phase: '中段', text: '每个大圆点都推着走，抓死反而累。' },
+      { phase: '收尾', text: '最后一荡幅度最大，荡过去之前先看好右脚要踩哪里。' }
+    ]
+  }
 ];
 
 const COMMENTS = {
   b1: [
-    { id: 'c1', userId: 'u4', text: '照这个 beta 今天出坑了！dyno 那步顶胯真的关键', date: d(-4) },
-    { id: 'c2', userId: 'u8', text: '中段那下漂亮，就是我这老腰跳不动了 😂', date: d(-3) }
+    { id: 'c1', userId: 'u4', text: '照这个 Beta 今天出了！跳之前胯先顶真的关键', date: d(-4) },
+    { id: 'c2', userId: 'u8', text: '中段那下漂亮，就是我这老腰跳不动了 😂 去看 Momo 的静态版', date: d(-3) }
   ],
   b2: [
-    { id: 'c3', userId: 'u7', text: '感谢小个子救星！棕色过渡点我之前完全没看到', date: d(-3) },
-    { id: 'c4', userId: 'u1', text: '看完发现静态版确实更稳，收回我"必须跳"的话 🙏', date: d(-2) }
+    { id: 'c3', userId: 'u7', text: '那个小捏点我之前完全没看到，感谢小个子救星', date: d(-3) },
+    { id: 'c4', userId: 'u1', text: '试了一下静态版确实更稳，收回我「必须跳」的话 🙏', date: d(-2) }
+  ],
+  b3: [
+    { id: 'c9', userId: 'u2', text: '「捏不要抓」这句太对了，指力省一半', date: d(-8) }
   ],
   b5: [
     { id: 'c5', userId: 'u2', text: '定线员亲拆太宝贵了，求多来点这个系列！', date: d(-19) },
     { id: 'c6', userId: 'u5', text: '换脚那个细节说到点子上了', date: d(-17) }
   ],
+  b6: [
+    { id: 'c10', userId: 'u3', text: '「换手脚不动、换脚手不动」记下了，屋檐通用', date: d(-1) }
+  ],
   b11: [
-    { id: 'c7', userId: 'u7', text: '试了三周的线看完当天出，泪目', date: d(-6) }
+    { id: 'c7', userId: 'u7', text: '磕了三周的线，看完当天就出了，泪目', date: d(-6) }
   ],
   b14: [
-    { id: 'c8', userId: 'u1', text: '第五星那个小 dyno 距离拿捏得太准了', date: d(-15) }
+    { id: 'c8', userId: 'u1', text: '第五手那个小 dyno 距离拿捏得太准了', date: d(-15) }
   ]
 };
 

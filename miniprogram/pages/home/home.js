@@ -26,6 +26,7 @@ Page({
     newRoutes: [],
     gyms: [],
     gymCounts: null,
+    atGym: null,
     gradeBands: GRADE_BANDS,
     bandKey: 'all',
     loadError: ''
@@ -70,6 +71,7 @@ Page({
         newRoutes: res.newRoutes,
         gyms: res.gyms,
         gymCounts: res.gymCounts,
+        atGym: res.atGym || null,
         loadError: ''
       });
       this.applyBand();
@@ -114,6 +116,18 @@ Page({
   },
   goGym(e) {
     wx.navigateTo({ url: '/pages/gym-detail/gym-detail?id=' + e.currentTarget.dataset.id });
+  },
+  goRoute(e) {
+    wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + e.currentTarget.dataset.id });
+  },
+  goAtGym() {
+    if (!this.data.atGym) return;
+    wx.navigateTo({ url: '/pages/gym-detail/gym-detail?id=' + this.data.atGym.id });
+  },
+  goAtGymWall() {
+    const g = this.data.atGym;
+    if (!g || !g.wall) return;
+    wx.navigateTo({ url: '/pages/wall-photo/wall-photo?gymId=' + g.id + '&wallId=' + g.wall.id });
   },
   goGyms() {
     wx.switchTab({ url: '/pages/gyms/gyms' });
