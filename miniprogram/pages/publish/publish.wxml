@@ -1,134 +1,173 @@
 <view class="page-pad pub">
 
-  <!-- 编辑模式：线路已固定 -->
-  <view class="card" wx:if="{{editMode}}">
-    <view class="bold sec-title">编辑 Beta</view>
-    <view class="small muted edit-route-line">{{editRouteText}}</view>
-    <view class="small faint">线路和媒体不能改，换线请删了重发</view>
+  <!-- 三步：选线与素材 → 写拆解 → 标签与发布 -->
+  <view class="wz">
+    <view class="wz-item {{step === 1 ? 'on' : ''}} {{step1Ok ? 'ok' : ''}}" data-s="1" bindtap="goStep">
+      <view class="wz-no">{{step1Ok && step !== 1 ? '✓' : '1'}}</view>
+      <text class="wz-label">选线</text>
+    </view>
+    <view class="wz-line {{step1Ok ? 'ok' : ''}}"></view>
+    <view class="wz-item {{step === 2 ? 'on' : ''}} {{step2Ok ? 'ok' : ''}}" data-s="2" bindtap="goStep">
+      <view class="wz-no">{{step2Ok && step !== 2 ? '✓' : '2'}}</view>
+      <text class="wz-label">写拆解</text>
+    </view>
+    <view class="wz-line {{step2Ok ? 'ok' : ''}}"></view>
+    <view class="wz-item {{step === 3 ? 'on' : ''}}" data-s="3" bindtap="goStep">
+      <view class="wz-no">3</view>
+      <text class="wz-label">发布</text>
+    </view>
   </view>
 
-  <!-- 从线路/墙进来：线已定，不必再选 -->
-  <view class="card" wx:if="{{routeLocked && !editMode}}">
-    <view class="between">
-      <text class="bold">这条线</text>
-      <text class="small faint" bindtap="unlockRoute">换一条</text>
-    </view>
-    <view class="small muted lock-line">{{lockedRouteText}}</view>
+  <!-- 第 2、3 步顶部提示当前线路，不用翻回去确认 -->
+  <view class="wz-route small" wx:if="{{step > 1 && routeSummary}}">
+    <text class="faint">线路：</text><text class="bold">{{routeSummary}}</text>
   </view>
 
-  <!-- 选线（Tab 发布 / 主动换线） -->
-  <view class="card" wx:if="{{!editMode && !routeLocked}}">
-    <view class="bold sec-title">选哪条线</view>
-    <view class="field">
-      <text class="label">岩馆</text>
-      <picker mode="multiSelector" range="{{gymPickerRange}}" value="{{gymPickerValue}}" bindchange="onGymChange" bindcolumnchange="onGymColumn">
-        <view class="pick {{gymId ? 'has' : ''}}">{{gymLabel || '城市 › 区域 › 岩馆'}}</view>
-      </picker>
+  <!-- ========== 第 1 步：选线 + 素材 ========== -->
+  <block wx:if="{{step === 1}}">
+    <!-- 编辑模式：线路已固定 -->
+    <view class="card" wx:if="{{editMode}}">
+      <view class="bold sec-title">编辑 Beta</view>
+      <view class="small muted edit-route-line">{{editRouteText}}</view>
+      <view class="small faint">线路和媒体不能改，换线请删了重发</view>
     </view>
-    <view class="field" wx:if="{{gymId && hasRoutes}}">
-      <text class="label">线路</text>
-      <picker range="{{routeLabels}}" value="{{routeIdx}}" bindchange="onRouteChange">
-        <view class="pick {{routeIdx >= 0 ? 'has' : ''}}">{{routeIdx >= 0 ? routeLabels[routeIdx] : '选择线路 ›'}}</view>
-      </picker>
+
+    <!-- 从线路/墙进来：线已定，不必再选 -->
+    <view class="card" wx:if="{{routeLocked && !editMode}}">
+      <view class="between">
+        <text class="bold">这条线</text>
+        <text class="small faint" bindtap="unlockRoute">换一条</text>
+      </view>
+      <view class="small muted lock-line">{{lockedRouteText}}</view>
     </view>
-    <view class="pioneer small" wx:if="{{gymId && !hasRoutes}}">暂无线路，先建一条</view>
-    <block wx:if="{{newRouteMode}}">
+
+    <!-- 选线（Tab 发布 / 主动换线） -->
+    <view class="card" wx:if="{{!editMode && !routeLocked}}">
+      <view class="bold sec-title">选哪条线</view>
       <view class="field">
-        <text class="label">岩点颜色</text>
-        <picker range="{{colorNames}}" value="{{colorIdx}}" bindchange="onColorChange">
-          <view class="pick {{colorIdx >= 0 ? 'has' : ''}}">{{colorIdx >= 0 ? colorNames[colorIdx] + '色' : '选择颜色 ›'}}</view>
+        <text class="label">岩馆</text>
+        <picker mode="multiSelector" range="{{gymPickerRange}}" value="{{gymPickerValue}}" bindchange="onGymChange" bindcolumnchange="onGymColumn">
+          <view class="pick {{gymId ? 'has' : ''}}">{{gymLabel || '城市 › 区域 › 岩馆'}}</view>
+        </picker>
+      </view>
+      <view class="field" wx:if="{{gymId && hasRoutes}}">
+        <text class="label">线路</text>
+        <picker range="{{routeLabels}}" value="{{routeIdx}}" bindchange="onRouteChange">
+          <view class="pick {{routeIdx >= 0 ? 'has' : ''}}">{{routeIdx >= 0 ? routeLabels[routeIdx] : '选择线路 ›'}}</view>
+        </picker>
+      </view>
+      <view class="pioneer small" wx:if="{{gymId && !hasRoutes}}">暂无线路，先建一条</view>
+      <block wx:if="{{newRouteMode}}">
+        <view class="field">
+          <text class="label">岩点颜色</text>
+          <picker range="{{colorNames}}" value="{{colorIdx}}" bindchange="onColorChange">
+            <view class="pick {{colorIdx >= 0 ? 'has' : ''}}">{{colorIdx >= 0 ? colorNames[colorIdx] + '色' : '选择颜色 ›'}}</view>
+          </picker>
+        </view>
+        <view class="field">
+          <text class="label">难度</text>
+          <picker range="{{grades}}" value="{{gradeIdx}}" bindchange="onGradeChange">
+            <view class="pick {{gradeIdx >= 0 ? 'has' : ''}}">{{gradeIdx >= 0 ? grades[gradeIdx] : '选择难度 ›'}}</view>
+          </picker>
+        </view>
+      </block>
+    </view>
+
+    <view class="card" wx:if="{{!editMode}}">
+      <view class="between">
+        <text class="bold">视频 / 图片（可选）</text>
+        <text class="small faint" bindtap="toggleTips">拍摄 {{showTips ? '▲' : '▼'}}</text>
+      </view>
+      <view class="tips small muted" wx:if="{{showTips}}">
+        <view>· 别挡攀爬</view>
+        <view>· 横屏拍全墙</view>
+        <view>· 别拍正脸</view>
+        <view>· 视频 ≤60 秒</view>
+      </view>
+      <view class="media-grid">
+        <view class="media-item" wx:for="{{media}}" wx:key="index">
+          <image class="media-thumb" src="{{item.thumb}}" mode="aspectFill" />
+          <view class="media-dur" wx:if="{{item.durText}}">{{item.durText}}</view>
+          <view class="media-del" data-index="{{index}}" catchtap="removeMedia">✕</view>
+        </view>
+        <view class="media-add" wx:if="{{media.length < 9}}" bindtap="chooseMedia">＋</view>
+      </view>
+      <view class="small faint">可选。不传素材也可以发纯图文 Beta</view>
+    </view>
+  </block>
+
+  <!-- ========== 第 2 步：标题 + 三段拆解 + 易掉点 ========== -->
+  <block wx:if="{{step === 2}}">
+    <view class="card">
+      <view class="bold sec-title">标题</view>
+      <input class="title-input" placeholder="比如「160cm 小个子友好版」" maxlength="30" value="{{title}}" bindinput="onTitleInput" />
+    </view>
+
+    <view class="card">
+      <view class="bold steps-title">分步拆解 <text class="small faint title-hint">至少填一步</text></view>
+      <view class="step-field" wx:for="{{steps}}" wx:key="phase">
+        <view class="step-phase">{{item.phase}}</view>
+        <textarea
+          class="step-input"
+          placeholder="{{index === 0 ? '起手点在哪、身体怎么摆…' : index === 1 ? '关键动作、发力顺序、容易掉的点…' : '出顶动作、注意事项…'}}"
+          value="{{item.text}}"
+          maxlength="120"
+          auto-height
+          data-index="{{index}}"
+          bindinput="onStepInput"
+        />
+      </view>
+      <view class="caution-row">
+        <text class="caution-label">易掉点</text>
+        <input class="caution-input" value="{{caution}}" placeholder="易掉点（选填）" maxlength="40" bindinput="onCautionInput" />
+      </view>
+    </view>
+  </block>
+
+  <!-- ========== 第 3 步：标签 + 适配 + 发布 ========== -->
+  <block wx:if="{{step === 3}}">
+    <view class="card">
+      <view class="bold steps-title">动作标签 <text class="small faint title-hint">最多 5 个</text></view>
+      <view class="row wrap">
+        <text
+          class="tag {{pickedTags.indexOf(item) >= 0 ? 'on' : ''}}"
+          wx:for="{{shownTags}}"
+          wx:key="*this"
+          data-tag="{{item}}"
+          bindtap="toggleTag"
+        >{{item}}</text>
+        <text class="tag tag-more" bindtap="toggleTagsExpand">{{tagsExpanded ? '收起 ▲' : '更多 ▼'}}</text>
+      </view>
+      <view class="divider"></view>
+      <view class="field">
+        <text class="label">适合身高</text>
+        <picker range="{{heightRanges}}" value="{{heightIdx}}" bindchange="onHeightChange">
+          <view class="pick has">{{heightRanges[heightIdx]}}{{heightIdx > 0 ? 'cm' : ''}}</view>
         </picker>
       </view>
       <view class="field">
-        <text class="label">难度</text>
-        <picker range="{{grades}}" value="{{gradeIdx}}" bindchange="onGradeChange">
-          <view class="pick {{gradeIdx >= 0 ? 'has' : ''}}">{{gradeIdx >= 0 ? grades[gradeIdx] : '选择难度 ›'}}</view>
-        </picker>
-      </view>
-    </block>
-  </view>
-
-  <!-- 素材 -->
-  <view class="card" wx:if="{{!editMode}}">
-    <view class="between">
-      <text class="bold">视频 / 图片（可选）</text>
-      <text class="small faint" bindtap="toggleTips">拍摄 {{showTips ? '▲' : '▼'}}</text>
-    </view>
-    <view class="tips small muted" wx:if="{{showTips}}">
-      <view>· 别挡攀爬</view>
-      <view>· 横屏拍全墙</view>
-      <view>· 别拍正脸</view>
-      <view>· 视频 ≤60 秒</view>
-    </view>
-    <view class="media-grid">
-      <view class="media-item" wx:for="{{media}}" wx:key="index">
-        <image class="media-thumb" src="{{item.thumb}}" mode="aspectFill" />
-        <view class="media-dur" wx:if="{{item.durText}}">{{item.durText}}</view>
-        <view class="media-del" data-index="{{index}}" catchtap="removeMedia">✕</view>
-      </view>
-      <view class="media-add" wx:if="{{media.length < 9}}" bindtap="chooseMedia">＋</view>
-    </view>
-    <view class="small faint">可选。不传素材也可以发纯图文 Beta</view>
-  </view>
-
-  <!-- 标题 -->
-  <view class="card">
-    <view class="bold sec-title">标题</view>
-    <input class="title-input" placeholder="比如「160cm 小个子友好版」" maxlength="30" value="{{title}}" bindinput="onTitleInput" />
-  </view>
-
-  <!-- 分步拆解 -->
-  <view class="card">
-    <view class="bold steps-title">分步拆解 <text class="small faint title-hint">至少填一步</text></view>
-    <view class="step-field" wx:for="{{steps}}" wx:key="phase">
-      <view class="step-phase">{{item.phase}}</view>
-      <textarea
-        class="step-input"
-        placeholder="{{index === 0 ? '起手点在哪、身体怎么摆…' : index === 1 ? '关键动作、发力顺序、容易掉的点…' : '出顶动作、注意事项…'}}"
-        value="{{item.text}}"
-        maxlength="120"
-        auto-height
-        data-index="{{index}}"
-        bindinput="onStepInput"
-      />
-    </view>
-  </view>
-
-  <!-- 标签 + 适配 -->
-  <view class="card">
-    <view class="caution-row">
-      <text class="caution-label">易掉点</text>
-      <input class="caution-input" value="{{caution}}" placeholder="易掉点（选填）" maxlength="40" bindinput="onCautionInput" />
-    </view>
-
-    <view class="bold steps-title">动作标签 <text class="small faint title-hint">最多 5 个</text></view>
-    <view class="row wrap">
-      <text
-        class="tag {{pickedTags.indexOf(item) >= 0 ? 'on' : ''}}"
-        wx:for="{{shownTags}}"
-        wx:key="*this"
-        data-tag="{{item}}"
-        bindtap="toggleTag"
-      >{{item}}</text>
-      <text class="tag tag-more" bindtap="toggleTagsExpand">{{tagsExpanded ? '收起 ▲' : '更多 ▼'}}</text>
-    </view>
-    <view class="divider"></view>
-    <view class="field">
-      <text class="label">适合身高</text>
-      <picker range="{{heightRanges}}" value="{{heightIdx}}" bindchange="onHeightChange">
-        <view class="pick has">{{heightRanges[heightIdx]}}{{heightIdx > 0 ? 'cm' : ''}}</view>
-      </picker>
-    </view>
-    <view class="field">
-      <text class="label">可见范围</text>
-      <view class="row">
-        <view class="vis {{isPublic ? 'on' : ''}}" data-v="1" bindtap="setPublic">公开</view>
-        <view class="vis {{!isPublic ? 'on' : ''}}" data-v="0" bindtap="setPublic">仅自己</view>
+        <text class="label">可见范围</text>
+        <view class="row">
+          <view class="vis {{isPublic ? 'on' : ''}}" data-v="1" bindtap="setPublic">公开</view>
+          <view class="vis {{!isPublic ? 'on' : ''}}" data-v="0" bindtap="setPublic">仅自己</view>
+        </view>
       </view>
     </view>
-  </view>
 
-  <view class="btn {{canSubmit ? 'btn-primary' : 'btn-disabled'}} submit" bindtap="submit">{{editMode ? '保存' : '发 Beta'}}</view>
-  <view class="small faint safety">发布即表示同意内容规范：内容真实、尊重他人、注意安全</view>
+    <!-- 发布前预览：标题 + 拆解第一步，确认没写错 -->
+    <view class="card wz-preview" wx:if="{{title}}">
+      <view class="small faint">预览</view>
+      <view class="bold wz-preview-title">{{title}}</view>
+      <view class="small muted" wx:if="{{firstStep}}">{{firstStep}}</view>
+      <view class="small wz-preview-caution" wx:if="{{caution}}">易掉点：{{caution}}</view>
+    </view>
+  </block>
+
+  <view class="wz-nav">
+    <view class="btn btn-ghost wz-back" wx:if="{{step > 1}}" bindtap="prevStep">上一步</view>
+    <view class="btn btn-primary wz-next" wx:if="{{step < 3}}" bindtap="nextStep">下一步</view>
+    <view class="btn {{canSubmit ? 'btn-primary' : 'btn-disabled'}} wz-next submit" wx:if="{{step === 3}}" bindtap="submit">{{editMode ? '保存' : '发 Beta'}}</view>
+  </view>
+  <view class="small faint safety" wx:if="{{step === 3}}">发布即表示同意内容规范：内容真实、尊重他人、注意安全</view>
 
 </view>

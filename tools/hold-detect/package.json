@@ -1,0 +1,13 @@
+{
+  "name": "yanyou-hold-detect-eval",
+  "private": true,
+  "description": "岩点检测算法的回归测试与云函数同步",
+  "scripts": {
+    "eval": "node eval.js",
+    "sync": "node -e \"require('fs').copyFileSync('../../miniprogram/utils/hold-detect.js','../../cloudfunctions/aiAnnotate/hold-detect.js');console.log('synced → cloudfunctions/aiAnnotate/hold-detect.js')\"",
+    "test:ai": "node test-ai.js"
+  },
+  "devDependencies": {
+    "jimp": "^0.22.12"
+  }
+}

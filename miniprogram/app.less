@@ -18,7 +18,29 @@ page {
   --amber: #ffb224;
   --red: #e5484d;
   --purple: #8e4ec6;
+  --red-soft: #fff3f3;
+  --ai: #7a4de8;
+  --ai-soft: #f1ecfd;
+  --chip: #f0f2f5;
+  --sunken: #f7f8fa;
+
+  /* 圆角：xs 标签 / sm 小块 / md 缩略图与输入 / 默认卡片 */
+  --r-xs: 8rpx;
+  --r-sm: 12rpx;
+  --r-md: 16rpx;
   --radius: 24rpx;
+
+  /* 字号：xs 角标 / sm 辅助 / md 次要 / body 列表正文 / base 正文 / lg 小标题 / xl 标题 */
+  --fs-xs: 20rpx;
+  --fs-sm: 22rpx;
+  --fs-md: 24rpx;
+  --fs-body: 26rpx;
+  --fs-base: 28rpx;
+  --fs-lg: 32rpx;
+  --fs-xl: 36rpx;
+
+  --shadow-card: 0 2rpx 12rpx rgba(27, 30, 40, 0.04);
+  --shadow-float: 0 12rpx 40rpx rgba(27, 30, 40, 0.18);
 
   background: var(--bg);
   color: var(--ink);
@@ -59,7 +81,7 @@ page {
   border-radius: var(--radius);
   padding: 24rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 2rpx 12rpx rgba(27, 30, 40, 0.04);
+  box-shadow: var(--shadow-card);
 }
 .section-title {
   font-size: 32rpx;

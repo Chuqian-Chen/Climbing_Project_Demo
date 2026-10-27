@@ -5,16 +5,16 @@
   display: flex;
   align-items: center;
   padding: 16rpx 0;
-  border-bottom: 1rpx solid #f0f2f5;
+  border-bottom: 1rpx solid var(--chip);
 }
 .edit-label {
   width: 140rpx;
-  font-size: 26rpx;
-  color: #5a6072;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
 }
 .edit-input {
   flex: 1;
-  font-size: 28rpx;
+  font-size: var(--fs-base);
 }
 .set-item {
   padding: 24rpx;
@@ -28,7 +28,7 @@
   padding: 36rpx 32rpx;
 }
 .sc-id-title {
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   color: #cdbcf2;
   letter-spacing: 2rpx;
 }
@@ -38,8 +38,8 @@
   margin-top: 10rpx;
 }
 .sc-id-gym {
-  font-size: 24rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-md);
+  color: var(--ink-3);
   margin-top: 6rpx;
 }
 
@@ -52,7 +52,7 @@
   text-align: center;
 }
 .sc-pending-title {
-  font-size: 36rpx;
+  font-size: var(--fs-xl);
   font-weight: 800;
 }
 .sc-pending-desc {
@@ -81,7 +81,7 @@
   flex: 1;
   min-height: 80rpx;
   padding: 12rpx 0;
-  font-size: 28rpx;
+  font-size: var(--fs-base);
 }
 .sc-submit {
   margin-top: 24rpx;

@@ -16,6 +16,36 @@
   </view>
 
   <view class="page-pad body">
+    <!-- 按图找线：有墙照时放在最前面，直接看到每条线在墙上哪里 -->
+    <view class="fw" wx:if="{{featuredWall}}" data-id="{{featuredWall.id}}" bindtap="goWall">
+      <view class="fw-clip">
+        <view class="fw-inner">
+          <image class="fw-img" src="{{featuredWall.photo}}" mode="widthFix" />
+          <view
+            wx:for="{{featuredWall.markers}}"
+            wx:key="routeId"
+            class="fw-mk {{item.colorLight ? 'light' : ''}}"
+            style="left:{{item.x}}%;top:{{item.y}}%;background:{{item.colorHex}}"
+          >{{item.grade}}</view>
+        </view>
+      </view>
+      <view class="fw-bar">
+        <view>
+          <view class="fw-title">按图找线</view>
+          <view class="fw-sub">{{featuredWall.name}} · {{featuredWall.markerCount}} 条已圈注</view>
+        </view>
+        <view class="fw-go">打开整墙 ›</view>
+      </view>
+    </view>
+    <view class="fw-empty card" wx:elif="{{wallPhotos.length}}" data-id="{{wallPhotos[0].id}}" bindtap="goWall">
+      <view class="fw-empty-icon">＋</view>
+      <view class="flex-1">
+        <view class="bold">拍第一张墙照</view>
+        <view class="small faint">圈出岩点后，大家来馆里就能按图找线</view>
+      </view>
+      <text class="faint">›</text>
+    </view>
+
     <!-- 位置：打开系统地图导航 -->
     <view class="card loc-card" wx:if="{{gym.lat || gym.address}}" bindtap="openMap">
       <view class="loc-text">
@@ -52,9 +82,9 @@
       </block>
     </view>
 
-    <!-- 墙面：按图找线 -->
-    <view class="card" wx:if="{{wallPhotos.length}}">
-      <view class="bold lb-title">墙面</view>
+    <!-- 全部墙面（多面墙时切换） -->
+    <view class="card" wx:if="{{wallPhotos.length > 1}}">
+      <view class="bold lb-title">全部墙面 <text class="small faint">点开按图找线</text></view>
       <scroll-view scroll-x class="wp-scroll" enhanced show-scrollbar="{{false}}">
         <view class="wp-item" wx:for="{{wallPhotos}}" wx:key="id" data-id="{{item.id}}" bindtap="goWall">
           <image wx:if="{{item.photo}}" class="wp-thumb" src="{{item.photo}}" mode="aspectFill" />

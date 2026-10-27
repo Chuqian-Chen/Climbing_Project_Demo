@@ -1,21 +1,75 @@
 <view class="page-pad tabbar-pad">
 
+  <!-- 搜索入口 -->
   <view class="search-bar" bindtap="goSearch">
-    <text class="faint">搜线路或岩馆</text>
+    <text class="faint">搜线路 / 岩馆 / 岩友 / 动作标签</text>
   </view>
 
+  <!-- 错误兜底 -->
   <view class="load-err" wx:if="{{loadError}}">
     <text>数据加载出错：{{loadError}}</text>
     <text class="load-err-retry" bindtap="retry">重试</text>
   </view>
 
+  <!-- 首次引导：一行轻提示 -->
   <view class="onboard-slim" wx:if="{{!onboarded}}">
-    <text class="onboard-slim-text" bindtap="goProfile">填身高臂展，标出适合你的 Beta ›</text>
+    <text class="onboard-slim-text" bindtap="goProfile">填写身高臂展，帮你标出「适合你」的 Beta ›</text>
     <text class="onboard-close" bindtap="dismissOnboard">✕</text>
   </view>
 
-  <!-- 主环 1：上次没完的线 -->
-  <view class="card proj" wx:if="{{projectRoute}}">
+  <!-- 到馆卡：人在馆内 2km 时首屏就是本馆 -->
+  <view class="ag" wx:if="{{atGym}}">
+    <view class="ag-head" bindtap="goAtGym">
+      <view class="flex-1">
+        <view class="ag-kicker">你在馆里 · {{atGym.distanceText}}</view>
+        <view class="ag-name ellipsis">{{atGym.name}}</view>
+      </view>
+      <view class="ag-count">{{atGym.routeCount}} 条在墙 ›</view>
+    </view>
+    <view class="ag-wall" wx:if="{{atGym.wall}}" bindtap="goAtGymWall">
+      <image wx:if="{{atGym.wall.photo}}" class="ag-wall-img" src="{{atGym.wall.photo}}" mode="aspectFill" />
+      <view class="ag-wall-text">
+        <view class="ag-wall-title">{{atGym.wall.photo ? '按图找线' : '拍一张墙照'}}</view>
+        <view class="ag-wall-sub">{{atGym.wall.photo ? atGym.wall.name + ' · ' + atGym.wall.markerCount + ' 条已圈注' : '圈出岩点，大家就能按图找线'}}</view>
+      </view>
+      <text class="ag-wall-go">›</text>
+    </view>
+    <block wx:if="{{atGym.projects.length}}">
+      <view class="ag-label">我在磕的线</view>
+      <scroll-view scroll-x class="ag-row" enhanced show-scrollbar="{{false}}">
+        <view class="ag-chip ag-proj" wx:for="{{atGym.projects}}" wx:key="id" data-id="{{item.id}}" bindtap="goRoute">
+          <view class="hold-dot ag-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+          <text class="ag-chip-name">{{item.name}}</text>
+          <text class="ag-chip-grade" style="color:{{item.gradeColor}}">{{item.grade}}</text>
+        </view>
+      </scroll-view>
+    </block>
+    <block wx:if="{{atGym.newRoutes.length}}">
+      <view class="ag-label">新线 <text class="ag-label-sub">7 天内上墙</text></view>
+      <scroll-view scroll-x class="ag-row" enhanced show-scrollbar="{{false}}">
+        <view class="ag-chip" wx:for="{{atGym.newRoutes}}" wx:key="id" data-id="{{item.id}}" bindtap="goRoute">
+          <view class="hold-dot ag-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+          <text class="ag-chip-name">{{item.name}}</text>
+          <text class="ag-chip-grade" style="color:{{item.gradeColor}}">{{item.grade}}</text>
+          <text class="ag-chip-meta" wx:if="{{item.betaCount}}">{{item.betaCount}} Beta</text>
+        </view>
+      </scroll-view>
+    </block>
+    <block wx:if="{{atGym.removing.length}}">
+      <view class="ag-label">即将拆线 <text class="ag-label-sub">抓紧完攀</text></view>
+      <scroll-view scroll-x class="ag-row" enhanced show-scrollbar="{{false}}">
+        <view class="ag-chip" wx:for="{{atGym.removing}}" wx:key="id" data-id="{{item.id}}" bindtap="goRoute">
+          <view class="hold-dot ag-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+          <text class="ag-chip-name">{{item.name}}</text>
+          <text class="ag-chip-grade" style="color:{{item.gradeColor}}">{{item.grade}}</text>
+          <text class="ag-chip-warn">{{item.daysLeft === 0 ? '今天' : item.daysLeft + ' 天'}}</text>
+        </view>
+      </scroll-view>
+    </block>
+  </view>
+
+  <!-- 继续磕线（不在馆时；在馆时到馆卡里已有） -->
+  <view class="card proj" wx:if="{{!atGym && projectRoute}}">
     <view class="small muted">继续磕线</view>
     <view class="row proj-id">
       <view class="hold-dot {{projectRoute.colorLight ? 'light' : ''}}" style="background:{{projectRoute.colorHex}}"></view>
@@ -29,35 +83,37 @@
     </view>
   </view>
 
-  <!-- 主环 2：去哪爬 -->
+  <!-- 附近岩馆：紧凑一行 -->
   <view class="gym-row-head">
-    <text class="section-label">去哪爬</text>
-    <text class="section-more" bindtap="goGyms">全部岩馆 ›</text>
+    <text class="section-label">附近岩馆</text>
+    <text class="section-more" bindtap="goGyms">全部 ›</text>
   </view>
-  <view
-    class="card near-card"
-    wx:for="{{gyms}}"
-    wx:key="id"
-    data-id="{{item.id}}"
-    bindtap="goGym"
-    hover-class="near-hover"
-  >
-    <view class="between">
-      <view class="flex-1 near-mid">
-        <view class="near-name ellipsis">{{item.name}}</view>
-        <view class="small faint">
-          {{item.area}}<text wx:if="{{item.distanceText}}"> · {{item.distanceText}}</text>
-        </view>
-      </view>
-      <view class="near-side">
-        <text class="small near-count" wx:if="{{item.routeCount}}">{{item.routeCount}} 条</text>
-        <text class="small faint" wx:else>待共建</text>
-        <text class="faint"> ›</text>
-      </view>
+  <scroll-view scroll-x class="gymchips" enhanced show-scrollbar="{{false}}">
+    <view class="gymchip" wx:for="{{gyms}}" wx:key="id" data-id="{{item.id}}" bindtap="goGym">
+      <text class="gymchip-name">{{item.name}}</text>
+      <text class="gymchip-meta" wx:if="{{item.distanceText}}">{{item.distanceText}}</text>
+      <text class="gymchip-meta gymchip-count" wx:if="{{item.routeCount}}">{{item.routeCount}} 条</text>
     </view>
-  </view>
+  </scroll-view>
 
-  <!-- 次要：热门 Beta -->
+  <!-- 本周新线（不在馆时；在馆时到馆卡里已有本馆新线） -->
+  <block wx:if="{{!atGym && newRoutes.length}}">
+    <view class="gym-row-head feed-head">
+      <text class="section-label">本周新线</text>
+    </view>
+    <scroll-view scroll-x class="nr-row" enhanced show-scrollbar="{{false}}">
+      <view class="nr-card" wx:for="{{newRoutes}}" wx:key="id" data-id="{{item.id}}" bindtap="goRoute">
+        <view class="nr-top">
+          <view class="hold-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+          <text class="nr-name">{{item.name}}</text>
+          <view class="grade-badge nr-grade" style="background:{{item.gradeColor}}">{{item.grade}}</view>
+        </view>
+        <view class="nr-gym ellipsis">{{item.gymName}}</view>
+      </view>
+    </scroll-view>
+  </block>
+
+  <!-- 热门 Beta：双列瀑布流 -->
   <view class="gym-row-head feed-head">
     <text class="section-label">热门 Beta</text>
   </view>

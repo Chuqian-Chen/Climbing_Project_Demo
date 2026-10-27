@@ -97,6 +97,18 @@
         </view>
       </block>
 
+      <!-- 下一条可以试试：同馆、没完攀过、难度贴近 -->
+      <view class="nx" wx:if="{{nextRoutes.length}}">
+        <view class="nx-title">下一条可以试试</view>
+        <view class="nx-item" wx:for="{{nextRoutes}}" wx:key="id" data-id="{{item.id}}" bindtap="goNext">
+          <view class="hold-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
+          <text class="nx-name">{{item.name}}</text>
+          <view class="grade-badge nx-grade" style="background:{{item.gradeColor}}">{{item.grade}}</view>
+          <text class="nx-why">{{item.why}}</text>
+          <view class="flex-1"></view>
+          <text class="nx-meta">{{item.betaCount ? item.betaCount + ' 条 Beta' : item.wallName}} ›</text>
+        </view>
+      </view>
       <view class="row done-links">
         <view class="done-link" bindtap="backToRoute">返回线路</view>
         <view class="done-link" bindtap="goLogbook">足迹 ›</view>

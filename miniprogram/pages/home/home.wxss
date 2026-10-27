@@ -7,18 +7,18 @@
   margin-bottom: 20rpx;
 }
 .load-err {
-  background: #fff3f3;
+  background: var(--red-soft);
   color: #b23b3b;
-  border-radius: 16rpx;
+  border-radius: var(--r-md);
   padding: 16rpx 24rpx;
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   margin-bottom: 20rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .load-err-retry {
-  color: #e8571f;
+  color: var(--brand-deep);
   font-weight: 700;
   padding-left: 20rpx;
 }
@@ -29,12 +29,12 @@
   align-items: center;
   justify-content: space-between;
   background: #fff7f2;
-  border-radius: 12rpx;
+  border-radius: var(--r-sm);
   padding: 14rpx 22rpx;
   margin-bottom: 16rpx;
 }
 .onboard-slim-text {
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   color: #c05621;
   flex: 1;
 }
@@ -59,6 +59,7 @@
   margin-top: 20rpx;
 }
 
+/* 区块标题行 */
 .gym-row-head {
   display: flex;
   align-items: center;
@@ -66,42 +67,43 @@
   margin: 8rpx 4rpx 14rpx;
 }
 .feed-head {
-  margin-top: 28rpx;
+  margin-top: 24rpx;
 }
 .section-label {
-  font-size: 32rpx;
+  font-size: var(--fs-lg);
   font-weight: 800;
 }
 .section-more {
-  font-size: 24rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-md);
+  color: var(--ink-3);
 }
 
-.near-card {
-  padding: 24rpx 28rpx;
-  margin-bottom: 12rpx;
+/* 附近岩馆：紧凑 chips */
+.gymchips {
+  white-space: nowrap;
+  margin: 0 -24rpx;
+  padding: 0 24rpx;
 }
-.near-hover {
-  transform: scale(0.985);
-  transition: transform 0.1s;
+.gymchip {
+  display: inline-flex;
+  align-items: baseline;
+  background: #ffffff;
+  border-radius: 999rpx;
+  padding: 12rpx 24rpx;
+  margin-right: 14rpx;
 }
-.near-mid {
-  min-width: 0;
-  margin-right: 16rpx;
+.gymchip-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
 }
-.near-name {
-  font-size: 30rpx;
-  font-weight: 700;
+.gymchip-meta {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  margin-left: 10rpx;
 }
-.near-side {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-.near-count {
-  color: #e8571f;
-  font-weight: 700;
-  margin-right: 8rpx;
+.gymchip-count {
+  color: var(--brand);
+  font-weight: 600;
 }
 
 /* 难度筛选档 */
@@ -115,12 +117,12 @@
   padding: 10rpx 30rpx;
   border-radius: 999rpx;
   background: #ffffff;
-  color: #5a6072;
-  font-size: 24rpx;
+  color: var(--ink-2);
+  font-size: var(--fs-md);
   margin-right: 14rpx;
 }
 .band-chip.on {
-  background: #1b1e28;
+  background: var(--ink);
   color: #fff;
   font-weight: 700;
 }
@@ -140,4 +142,156 @@
 }
 .feed-col:first-child {
   margin-right: 16rpx;
+}
+
+/* ---------- 到馆卡 ---------- */
+.ag {
+  background: var(--ink);
+  color: #ffffff;
+  border-radius: var(--radius);
+  padding: 24rpx 24rpx 12rpx;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow-float);
+}
+.ag-head {
+  display: flex;
+  align-items: flex-end;
+}
+.ag-kicker {
+  font-size: var(--fs-sm);
+  color: #ffb38f;
+  font-weight: 600;
+}
+.ag-name {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  margin-top: 4rpx;
+}
+.ag-count {
+  font-size: var(--fs-md);
+  color: rgba(255, 255, 255, 0.65);
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+.ag-wall {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--r-md);
+  padding: 14rpx;
+  margin-top: 20rpx;
+}
+.ag-wall-img {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+  margin-right: 18rpx;
+}
+.ag-wall-text {
+  flex: 1;
+  min-width: 0;
+}
+.ag-wall-title {
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+.ag-wall-sub {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4rpx;
+}
+.ag-wall-go {
+  font-size: var(--fs-xl);
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0 8rpx;
+}
+.ag-label {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  margin: 22rpx 0 12rpx;
+}
+.ag-label-sub {
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 8rpx;
+}
+.ag-row {
+  white-space: nowrap;
+  margin: 0 -24rpx;
+  padding: 0 24rpx 12rpx;
+}
+.ag-chip {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999rpx;
+  padding: 10rpx 22rpx;
+  margin-right: 14rpx;
+}
+.ag-proj {
+  background: rgba(255, 107, 53, 0.22);
+}
+.ag-dot {
+  width: 22rpx;
+  height: 22rpx;
+}
+.ag-chip-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  margin: 0 8rpx 0 10rpx;
+}
+.ag-chip-grade {
+  font-size: var(--fs-md);
+  font-weight: 800;
+}
+.ag-chip-meta {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.55);
+  margin-left: 10rpx;
+}
+.ag-chip-warn {
+  font-size: var(--fs-xs);
+  color: #ff9a8a;
+  font-weight: 700;
+  margin-left: 10rpx;
+}
+
+/* ---------- 本周新线 ---------- */
+.nr-row {
+  white-space: nowrap;
+  margin: 0 -24rpx 8rpx;
+  padding: 0 24rpx;
+}
+.nr-card {
+  display: inline-block;
+  width: 240rpx;
+  background: var(--card);
+  border-radius: var(--r-md);
+  padding: 18rpx 20rpx;
+  margin-right: 14rpx;
+  vertical-align: top;
+}
+.nr-top {
+  display: flex;
+  align-items: center;
+}
+.nr-name {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  margin: 0 10rpx;
+  flex: 1;
+}
+.nr-grade {
+  min-width: 56rpx;
+  font-size: var(--fs-sm);
+}
+.nr-gym {
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+  margin-top: 8rpx;
+}
+/* 深色卡片上黑点 / 深色点看不清：加一圈浅描边 */
+.ag-dot {
+  box-shadow: 0 0 0 2rpx rgba(255, 255, 255, 0.45);
 }

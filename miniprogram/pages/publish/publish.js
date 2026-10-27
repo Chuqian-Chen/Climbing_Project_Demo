@@ -1,4 +1,5 @@
-// 发布 Beta：城市→区域→岩馆 三级选线（支持在名录馆「新建线路」开荒）→ 素材 → 分步拆解 → 发布
+// 发布 Beta：三步向导 —— ① 选线（城市→区域→岩馆，支持在名录馆「新建线路」开荒）+ 素材
+//                         ② 标题 + 三段拆解 + 易掉点  ③ 动作标签 / 适合身高 / 可见范围 → 发布
 const api = require('../../utils/api');
 const gradeUtil = require('../../utils/grade');
 
@@ -40,6 +41,12 @@ Page({
     heightIdx: 0,
     isPublic: true,
     showTips: false,
+    // 向导
+    step: 1,
+    step1Ok: false,
+    step2Ok: false,
+    routeSummary: '',
+    firstStep: '',
     canSubmit: false,
     routeLocked: false,
     lockedRouteText: ''
@@ -108,6 +115,7 @@ Page({
         const hIdx = Math.max(0, this.data.heightRanges.indexOf(rangeStr));
         this.setData({
           editMode: true,
+          step: 2,
           editRouteText: (res.route ? res.route.fullName : b.routeName) || '',
           title: b.title || '',
           caution: b.caution || '',
@@ -290,22 +298,68 @@ Page({
     this.setData({ showTips: !this.data.showTips });
   },
 
+  // 每步是否填好 + 是否可发布；顺带算出顶部线路摘要与第 3 步预览
   checkSubmit() {
     const d = this.data;
     const hasStep = d.steps.some((s) => s.text.trim());
-    // 编辑模式：线路已固定，只校验内容
+    const step2Ok = !!d.title.trim() && hasStep;
+    const first = d.steps.find((s) => s.text.trim());
+    let step1Ok;
+    let summary;
     if (d.editMode) {
-      this.setData({ canSubmit: !!d.title.trim() && hasStep });
+      // 编辑模式：线路已固定
+      step1Ok = true;
+      summary = d.editRouteText;
+    } else if (d.newRouteMode) {
+      // 真实口径：线路不命名，颜色+难度即身份
+      step1Ok = !!d.gymId && d.colorIdx >= 0 && d.gradeIdx >= 0;
+      summary = step1Ok ? d.colorNames[d.colorIdx] + '点 ' + d.grades[d.gradeIdx] + '（新建）· ' + d.gymLabel : '';
+    } else {
+      step1Ok = !!d.gymId && d.routeIdx >= 0 && d.routeIdx < d.routeLabels.length - 1;
+      summary = step1Ok ? d.routeLabels[d.routeIdx] + ' · ' + d.gymLabel : '';
+    }
+    this.setData({
+      step1Ok: step1Ok,
+      step2Ok: step2Ok,
+      canSubmit: step1Ok && step2Ok,
+      routeSummary: summary,
+      firstStep: first ? first.phase + '：' + first.text.trim() : ''
+    });
+  },
+
+  /* ---------- 向导翻页 ---------- */
+  stepBlocker(step) {
+    if (step === 1 && !this.data.step1Ok) return '先选好岩馆和线路';
+    if (step === 2 && !this.data.step2Ok) return '写个标题和至少一步拆解';
+    return '';
+  },
+  setStep(n) {
+    this.setData({ step: n });
+    wx.pageScrollTo({ scrollTop: 0, duration: 0 });
+  },
+  nextStep() {
+    const block = this.stepBlocker(this.data.step);
+    if (block) {
+      wx.showToast({ title: block, icon: 'none' });
       return;
     }
-    let routeOk;
-    if (d.newRouteMode) {
-      // 真实口径：线路不命名，颜色+难度即身份
-      routeOk = !!(d.colorIdx >= 0 && d.gradeIdx >= 0);
-    } else {
-      routeOk = d.routeIdx >= 0 && d.routeIdx < d.routeLabels.length - 1;
+    this.setStep(Math.min(3, this.data.step + 1));
+  },
+  prevStep() {
+    // 编辑模式没有可改的第 1 步内容，但仍可回看线路说明
+    this.setStep(Math.max(1, this.data.step - 1));
+  },
+  goStep(e) {
+    const target = Number(e.currentTarget.dataset.s);
+    // 往后跳要经过的每一步都得填好
+    for (let s = this.data.step; s < target; s++) {
+      const block = this.stepBlocker(s);
+      if (block) {
+        wx.showToast({ title: block, icon: 'none' });
+        return;
+      }
     }
-    this.setData({ canSubmit: !!d.gymId && routeOk && !!d.title.trim() && hasStep });
+    this.setStep(target);
   },
 
   submit() {

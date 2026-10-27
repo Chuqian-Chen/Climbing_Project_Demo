@@ -119,6 +119,7 @@ Page({
         gym: res.gym,
         routes: res.routes,
         wallPhotos: res.walls || [],
+        featuredWall: (res.walls || []).find((w) => w.photo) || null,
         gradeSystem: res.gradeSystem || [],
         gradeNote: res.gradeNote || '',
         gradeBy: res.gradeBy || 'hold',

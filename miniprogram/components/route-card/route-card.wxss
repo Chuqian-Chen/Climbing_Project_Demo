@@ -10,7 +10,7 @@
   transition: transform 0.1s;
 }
 .rc-name {
-  font-size: 30rpx;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin: 0 12rpx;
   max-width: 300rpx;
@@ -23,11 +23,11 @@
   position: relative;
   width: 110rpx;
   height: 110rpx;
-  border-radius: 14rpx;
+  border-radius: var(--r-md);
   overflow: hidden;
   flex-shrink: 0;
   margin-right: 18rpx;
-  background: #f0f2f5;
+  background: var(--chip);
 }
 .rc-thumb {
   width: 100%;
@@ -51,14 +51,14 @@
 }
 .rc-beta {
   flex-shrink: 0;
-  font-size: 22rpx;
-  color: #e8571f;
+  font-size: var(--fs-sm);
+  color: var(--brand-deep);
   font-weight: 600;
   padding: 4rpx 14rpx;
   border-radius: 999rpx;
-  background: #fff1ea;
+  background: var(--brand-soft);
 }
 .rc-beta.on {
-  background: #1b1e28;
+  background: var(--ink);
   color: #fff;
 }

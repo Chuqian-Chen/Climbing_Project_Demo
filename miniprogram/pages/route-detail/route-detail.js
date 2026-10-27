@@ -35,6 +35,10 @@ Page({
         route: res.route,
         betas: res.betas,
         wallRef: res.wallRef || null,
+        analysis: res.analysis || null,
+        analysisMoves: res.analysisMoves || null,
+        aiBeta: res.aiBeta || null,
+        aiBetaAvailable: !!res.aiBetaAvailable,
         hasHeight: !!res.hasHeight,
         canEdit: !!res.route.isMine,
         seqChips: seqChips,
@@ -48,6 +52,18 @@ Page({
       this.applyBetaFilter();
     }).catch(() => {
       this.setData({ loadFailed: true });
+    });
+  },
+
+  // 看图深度分析（视觉模型）；失败保留规则预判
+  runAiBeta() {
+    if (this.data.aiBetaLoading) return;
+    this.setData({ aiBetaLoading: true });
+    api.aiRouteBeta(this.routeId).then((res) => {
+      this.setData({ aiBeta: res, aiBetaLoading: false });
+    }).catch((e) => {
+      this.setData({ aiBetaLoading: false });
+      wx.showToast({ title: (e && e.message) || 'AI 分析失败', icon: 'none' });
     });
   },
 

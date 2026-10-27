@@ -1,16 +1,16 @@
 .err {
-  background: #fff3f3;
+  background: var(--red-soft);
   color: #b23b3b;
-  border-radius: 16rpx;
+  border-radius: var(--r-md);
   padding: 16rpx 24rpx;
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   margin-bottom: 20rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .err-retry {
-  color: #e8571f;
+  color: var(--brand-deep);
   font-weight: 700;
   padding-left: 20rpx;
 }
@@ -26,12 +26,12 @@
   font-weight: 800;
 }
 .stat-sub {
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   font-weight: 400;
 }
 .stat-label {
-  font-size: 22rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
   margin-top: 4rpx;
 }
 
@@ -45,12 +45,12 @@
 }
 .heat-cell {
   height: 36rpx;
-  border-radius: 6rpx;
+  border-radius: var(--r-xs);
   background: #eef0f3;
 }
 .heat-cell.lv1 { background: #ffd0b8; }
 .heat-cell.lv2 { background: #ff9a66; }
-.heat-cell.lv3 { background: #ff6b35; }
+.heat-cell.lv3 { background: var(--brand); }
 .heat-cell.today { outline: 3rpx solid #1b1e28; outline-offset: -3rpx; }
 
 .pyr-row {
@@ -61,11 +61,11 @@
 .pyr-grade {
   width: 80rpx;
   font-weight: 800;
-  font-size: 26rpx;
+  font-size: var(--fs-body);
 }
 .pyr-track {
   flex: 1;
-  background: #f0f2f5;
+  background: var(--chip);
   border-radius: 999rpx;
   height: 28rpx;
   overflow: hidden;
@@ -78,8 +78,8 @@
 .pyr-count {
   width: 60rpx;
   text-align: right;
-  font-size: 24rpx;
-  color: #5a6072;
+  font-size: var(--fs-md);
+  color: var(--ink-2);
 }
 
 .badges {
@@ -90,8 +90,8 @@
 .badge {
   text-align: center;
   padding: 16rpx 4rpx;
-  border-radius: 16rpx;
-  background: #f7f8fa;
+  border-radius: var(--r-md);
+  background: var(--sunken);
   filter: grayscale(1);
   opacity: 0.55;
 }
@@ -101,19 +101,19 @@
   background: #fff7f2;
 }
 .badge-name {
-  font-size: 22rpx;
+  font-size: var(--fs-sm);
   font-weight: 700;
   margin-top: 6rpx;
 }
 .badge-desc {
-  font-size: 18rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
   margin-top: 2rpx;
 }
 
 .tl-date {
-  font-size: 24rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-md);
+  color: var(--ink-3);
   margin: 20rpx 0 12rpx;
 }
 .tl-item {
@@ -136,7 +136,7 @@
 
 .seed {
   text-align: center;
-  color: #e8571f;
-  font-size: 24rpx;
+  color: var(--brand-deep);
+  font-size: var(--fs-md);
   margin-top: 8rpx;
 }

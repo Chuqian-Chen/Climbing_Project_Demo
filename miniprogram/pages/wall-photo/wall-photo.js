@@ -28,7 +28,12 @@ Page({
     qcColorIdx: -1,
     grades: gradeUtil.GRADE_LIST,
     qcGradeIdx: -1,
-    qcName: ''
+    qcName: '',
+    // 一键识别全墙
+    scanItems: [],
+    scanIdx: -1,
+    scanPreview: [],
+    scanColorHex: ''
   },
 
   onLoad(options) {
@@ -90,6 +95,9 @@ Page({
 
   toggleEdit() {
     this.setData({
+      scanItems: [],
+      scanPreview: [],
+      scanIdx: -1,
       editMode: !this.data.editMode,
       pendingIdx: -1,
       pendingRouteId: '',
@@ -277,6 +285,14 @@ Page({
       color: colorKey,
       grade: d.grades[d.qcGradeIdx]
     }).then((route) => {
+      const scan = this._pendingScan;
+      this._pendingScan = null;
+      if (scan) {
+        return api.setWallHolds(this.gymId, this.wallId, route.id, scan.holds).then(() => this.load()).then(() => {
+          this.setData({ showCreate: false, qcColorIdx: -1, qcGradeIdx: -1, ['scanItems[' + scan.idx + '].done']: true });
+          wx.showToast({ title: '建好了，岩点已填入，长按可微调', icon: 'none' });
+        });
+      }
       return this.load().then(() => {
         const i = this.routes.findIndex((r) => r.id === route.id);
         this.setData({
@@ -388,15 +404,23 @@ Page({
     const existing = (this.data.holds[route.id] || []).length;
     const doRun = () => {
       wx.showLoading({ title: 'AI 识别中…' });
-      this.runDetect(route.color)
-        .then((holds) => {
+      // 云端墙照：云函数（同一份算法 + 视觉模型剔除胶带 / 海报、标起步点）；否则本地 canvas 算法
+      const local = () => this.runDetect(route.color).then((holds) => ({ holds: holds, llm: false }));
+      api.aiDetectHolds(this.data.photo, route.color)
+        .catch(local)
+        .then((res) => {
+          const holds = res.holds || [];
           if (!holds.length) throw new Error('未识别到该颜色的岩点');
           return api.setWallHolds(this.gymId, this.wallId, route.id, holds)
-            .then(() => holds.length);
+            .then(() => res);
         })
-        .then((n) => {
+        .then((res) => {
           wx.hideLoading();
-          wx.showToast({ title: '圈出 ' + n + ' 个候选点，长按可删/标起步', icon: 'none' });
+          const n = res.holds.length;
+          wx.showToast({
+            title: res.llm ? 'AI 圈出 ' + n + ' 个岩点，长按可微调' : '圈出 ' + n + ' 个候选点，长按可删/标起步',
+            icon: 'none'
+          });
           this.load();
         })
         .catch((e) => {
@@ -415,8 +439,8 @@ Page({
     }
   },
 
-  // 把照片画进隐藏 canvas，取像素跑检测
-  runDetect(colorKey) {
+  // 把照片画进隐藏 canvas 取像素（540 宽：与云函数 aiAnnotate、tools/hold-detect 回归测试同一取样宽度）
+  readPixels() {
     return new Promise((resolve, reject) => {
       wx.getImageInfo({
         src: this.data.photo,
@@ -428,7 +452,7 @@ Page({
               return;
             }
             const canvas = res[0].node;
-            const DW = 360;
+            const DW = 540;
             const DH = Math.round(DW * info.height / info.width);
             canvas.width = DW;
             canvas.height = DH;
@@ -437,8 +461,7 @@ Page({
             img.onload = () => {
               ctx.drawImage(img, 0, 0, DW, DH);
               try {
-                const data = ctx.getImageData(0, 0, DW, DH);
-                resolve(holdDetect.detect(data, colorKey));
+                resolve(ctx.getImageData(0, 0, DW, DH));
               } catch (e) {
                 reject(new Error('读取像素失败'));
               }
@@ -450,6 +473,84 @@ Page({
         fail: () => reject(new Error('照片信息获取失败'))
       });
     });
+  },
+
+  runDetect(colorKey) {
+    return this.readPixels().then((data) => holdDetect.detect(data, colorKey));
+  },
+
+  /* ---------- 一键识别全墙：一次找出墙上所有颜色，逐色预览后填入已有线或新建 ---------- */
+  scanWall() {
+    wx.showLoading({ title: '识别全墙中…' });
+    this.readPixels().then((data) => {
+      const res = holdDetect.detectAll(data);
+      const items = Object.keys(res.holds)
+        .filter((c) => gradeUtil.HOLD_COLORS[c] && res.holds[c].length >= 3)
+        .map((c) => {
+          const meta = gradeUtil.HOLD_COLORS[c];
+          // 同色已有线：优先还没圈点的那条
+          const same = this.routes.filter((r) => r.color === c);
+          const target = same.find((r) => !((this.data.holds || {})[r.id] || []).length) || same[0];
+          return {
+            color: c, colorName: meta.name, colorHex: meta.hex, colorLight: !!meta.light,
+            holds: res.holds[c].map((h) => ({ x: h.x, y: h.y })),
+            count: res.holds[c].length,
+            routeId: target ? target.id : '',
+            routeLabel: target ? target.label : '',
+            done: false
+          };
+        })
+        .sort((a, b) => b.count - a.count);
+      wx.hideLoading();
+      if (!items.length) {
+        wx.showToast({ title: '没识别到成组的岩点，换张更清晰的墙照试试', icon: 'none' });
+        return;
+      }
+      this.setData({ scanItems: items, scanIdx: 0, scanPreview: items[0].holds, scanColorHex: items[0].colorHex, pendingIdx: -1, pendingRouteId: '', segs: [] });
+      wx.showToast({ title: '找到 ' + items.length + ' 种颜色，点一行预览', icon: 'none' });
+    }).catch((e) => {
+      wx.hideLoading();
+      wx.showToast({ title: (e && e.message) || '识别失败', icon: 'none' });
+    });
+  },
+
+  previewScan(e) {
+    const i = Number(e.currentTarget.dataset.i);
+    const it = this.data.scanItems[i];
+    if (!it) return;
+    this.setData({ scanIdx: i, scanPreview: it.holds, scanColorHex: it.colorHex });
+  },
+
+  closeScan() {
+    this.setData({ scanItems: [], scanPreview: [], scanIdx: -1 });
+  },
+
+  applyScan(e) {
+    const i = Number(e.currentTarget.dataset.i);
+    const it = this.data.scanItems[i];
+    if (!it || it.done) return;
+    const done = () => {
+      this.setData({ ['scanItems[' + i + '].done']: true });
+      return this.load();
+    };
+    if (it.routeId) {
+      api.setWallHolds(this.gymId, this.wallId, it.routeId, it.holds).then(done).then(() => {
+        wx.showToast({ title: '已填入「' + it.routeLabel + '」，长按可微调', icon: 'none' });
+      });
+      return;
+    }
+    // 没有同色线：按本馆「岩点颜色 = 难度」能直接定级就建线；否则打开快速建线，建好后自动填入
+    const gs = this.gradeBy === 'hold' && (this.gradeSystem || []).find((g) => g.color === it.color);
+    if (gs) {
+      api.createRoute({ gymId: this.gymId, wallId: this.wallId, name: '', color: it.color, grade: gs.grade })
+        .then((route) => api.setWallHolds(this.gymId, this.wallId, route.id, it.holds))
+        .then(done)
+        .then(() => wx.showToast({ title: '已新建' + it.colorName + '点 ' + gs.grade + ' 并填入岩点', icon: 'none' }));
+      return;
+    }
+    this._pendingScan = { idx: i, holds: it.holds };
+    this.setData({ showCreate: true, qcColorIdx: this.colorKeys.indexOf(it.color), qcGradeIdx: -1 });
+    wx.showToast({ title: '选一下难度，建好后自动填入岩点', icon: 'none' });
   },
 
   // 编辑态长按圆圈：切换起步点标记
