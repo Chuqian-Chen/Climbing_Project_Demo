@@ -212,7 +212,9 @@ async function run(s) {
   await s.tap('.edit-toggle', { after: 400 });
   await s.tap('.scan-btn', { after: 1200 });
   await s.scrollTo('.scan');
-  await s.tap('.scan-row', { text: '粉', after: 1100 });
+  await s.tap('.scan-row', { text: '粉', after: 300 });
+  await s.scrollTo('#wall-img');
+  await s.wait(1300);
   await s.waitCaption(300);
   await s.tap('.edit-toggle', { after: 400 });
   await s.scrollTo('.marker');
