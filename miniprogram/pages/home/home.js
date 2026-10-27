@@ -1,4 +1,4 @@
-// 首页：Beta 瀑布流为主 + 附近岩馆紧凑条
+// 首页：去哪爬（岩馆 + 磕线）为主，Beta 流靠后
 const api = require('../../utils/api');
 const cloudSync = require('../../utils/cloud-sync');
 const gradeUtil = require('../../utils/grade');
@@ -20,12 +20,10 @@ Page({
   data: {
     loading: true,
     onboarded: true,
-    todayCount: 0,
     projectRoute: null,
     hotBetas: [],
-    newRoutes: [],
     gyms: [],
-    gymCounts: null,
+    newRoutes: [],
     atGym: null,
     gradeBands: GRADE_BANDS,
     bandKey: 'all',
@@ -65,12 +63,10 @@ Page({
       this.setData({
         loading: false,
         onboarded: res.onboarded,
-        todayCount: res.todayCount,
         projectRoute: res.projectRoute,
         hotBetas: res.hotBetas,
-        newRoutes: res.newRoutes,
         gyms: res.gyms,
-        gymCounts: res.gymCounts,
+        newRoutes: res.newRoutes,
         atGym: res.atGym || null,
         loadError: ''
       });
@@ -88,9 +84,10 @@ Page({
       const gi = gradeUtil.gradeIndex(b.routeGrade);
       return gi >= band.min && gi <= band.max;
     });
+    const shown = list.slice(0, 8);
     const colL = [];
     const colR = [];
-    list.forEach((b, i) => (i % 2 === 0 ? colL : colR).push(b));
+    shown.forEach((b, i) => (i % 2 === 0 ? colL : colR).push(b));
     this.setData({ betaColL: colL, betaColR: colR, bandEmpty: !list.length });
   },
 
@@ -135,6 +132,10 @@ Page({
   goProject() {
     if (!this.data.projectRoute) return;
     wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + this.data.projectRoute.id });
+  },
+  goProjectCheckin() {
+    if (!this.data.projectRoute) return;
+    wx.navigateTo({ url: '/pages/checkin/checkin?routeId=' + this.data.projectRoute.id });
   },
   goProfile() {
     api.markOnboarded().then(() => {

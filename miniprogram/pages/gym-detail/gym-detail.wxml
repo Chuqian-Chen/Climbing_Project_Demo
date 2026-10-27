@@ -1,7 +1,7 @@
 <view class="page-pad" wx:if="{{loadFailed}}">
   <view class="card">
-    <view class="bold">这家岩馆不存在</view>
-    <view class="small faint" style="margin-top:12rpx">可能链接已失效，回岩馆列表看看</view>
+    <view class="bold">岩馆不存在</view>
+    <view class="small faint" style="margin-top:12rpx">回列表看看</view>
     <view class="btn btn-soft" style="margin-top:24rpx" bindtap="goBackHome">返回</view>
   </view>
 </view>
@@ -11,11 +11,8 @@
   <!-- 头图 -->
   <view class="hero" style="background:{{gym.typeColor || '#4a5164'}}">
     <view class="hero-name">{{gym.name}}</view>
-    <view class="hero-meta">{{gym.area}}<text wx:if="{{gym.openHours}}"> · {{gym.openHours}}</text><text wx:if="{{gym.distanceText}}"> · {{gym.distanceText}}</text><text wx:if="{{gym.price}}"> · 单次 ¥{{gym.price}}</text></view>
+    <view class="hero-meta">{{gym.area}}<text wx:if="{{gym.distanceText}}"> · {{gym.distanceText}}</text><text wx:if="{{gym.price}}"> · ¥{{gym.price}}</text></view>
     <view class="hero-meta" wx:if="{{gym.comingSoon}}">即将开业</view>
-    <view class="hero-tags">
-      <text class="hero-tag" wx:for="{{gym.tags}}" wx:key="*this">{{item}}</text>
-    </view>
   </view>
 
   <view class="page-pad body">
@@ -48,21 +45,29 @@
       </view>
       <text class="faint">›</text>
     </view>
-    <!-- 本馆分级标准（认证定线员可补充/修正，众包同步全馆） -->
-    <view class="card">
-      <view class="between">
-        <text class="bold">本馆分级</text>
-        <text class="small faint" wx:if="{{!editingGrade}}">{{gradeNote || (gradeSystem.length ? '岩点颜色 = 难度' : '')}}</text>
+
+    <!-- 位置：打开系统地图导航 -->
+    <view class="card loc-card" wx:if="{{gym.lat || gym.address}}" bindtap="openMap">
+      <view class="loc-text">
+        <view class="loc-addr">{{gym.address || gym.area || gym.district}}</view>
+      </view>
+      <view class="loc-btn" wx:if="{{gym.lat}}">地图</view>
+    </view>
+
+    <!-- 本馆分级：一行看完 -->
+    <view class="card gs-card" wx:if="{{gradeSystem.length || isSetter || editingGrade}}">
+      <view class="between" wx:if="{{!editingGrade}}">
+        <text class="small faint">分级</text>
+        <text class="small eg-edit-link" wx:if="{{isSetter}}" bindtap="startGradeEdit">{{gradeSystem.length ? '修正' : '补充'}}</text>
       </view>
       <block wx:if="{{!editingGrade}}">
-        <view class="row wrap gs-row" wx:if="{{gradeSystem.length}}">
+        <scroll-view scroll-x class="gs-scroll" enhanced show-scrollbar="{{false}}" wx:if="{{gradeSystem.length}}">
           <view class="gs-chip" wx:for="{{gradeSystem}}" wx:key="color">
             <view class="hold-dot {{item.colorLight ? 'light' : ''}}" style="background:{{item.colorHex}}"></view>
             <text class="gs-grade">{{item.grade}}</text>
           </view>
-        </view>
-        <view class="small faint" wx:else>暂未收录分级标准，欢迎本馆定线员补充</view>
-        <view class="small eg-edit-link" wx:if="{{isSetter}}" bindtap="startGradeEdit">{{gradeSystem.length ? '修正' : '补充'}}分级标准</view>
+        </scroll-view>
+        <view class="small faint" wx:else>暂未收录分级标准</view>
       </block>
       <block wx:else>
         <view class="row wrap eg-opts">
@@ -85,7 +90,7 @@
           <image wx:if="{{item.photo}}" class="wp-thumb" src="{{item.photo}}" mode="aspectFill" />
           <view wx:else class="wp-thumb wp-add">＋</view>
           <view class="small wp-name ellipsis">{{item.name}}</view>
-          <view class="small faint">{{item.photo ? item.markerCount + ' 条已标注' : '上传墙面照'}}</view>
+          <view class="small faint">{{item.photo ? item.markerCount + ' 条' : '拍墙'}}</view>
         </view>
       </scroll-view>
     </view>
@@ -94,8 +99,8 @@
     <view class="card notice" wx:if="{{gym.announcement}}">{{gym.announcement}}</view>
 
     <!-- 墙面筛选 -->
-    <scroll-view scroll-x class="walls" enhanced show-scrollbar="{{false}}" wx:if="{{gym.walls.length}}">
-      <view class="wall-chip {{wallId === 'all' ? 'on' : ''}}" data-id="all" bindtap="pickWall">全部区域</view>
+    <scroll-view scroll-x class="walls" enhanced show-scrollbar="{{false}}" wx:if="{{gym.walls.length > 1}}">
+      <view class="wall-chip {{wallId === 'all' ? 'on' : ''}}" data-id="all" bindtap="pickWall">全部</view>
       <view
         class="wall-chip {{wallId === item.id ? 'on' : ''}}"
         wx:for="{{gym.walls}}"
@@ -115,12 +120,12 @@
         bindtap="pickBand"
       >{{item.label}}</view>
       <view class="f-chip {{onlyNew ? 'on' : ''}}" bindtap="toggleNew">新线</view>
-      <view class="f-chip sort" bindtap="toggleSort">{{sort === 'hot' ? '按热度' : '按最新'}}</view>
+      <view class="f-chip sort" bindtap="toggleSort">{{sort === 'hot' ? '热度' : '最新'}}</view>
     </view>
 
-    <!-- 线路列表：点卡片就地展开该线的 Beta 预览 -->
+    <!-- 点卡片进线路；点 Beta 芯片就地预览 -->
     <block wx:for="{{shown}}" wx:key="id">
-      <route-card route="{{item}}" expandable bind:toggle="onRouteToggle" />
+      <route-card route="{{item}}" previewable="{{true}}" open="{{expandedId === item.id}}" bind:preview="onRouteToggle" />
       <view class="rb-panel" wx:if="{{expandedId === item.id}}">
         <view class="rb-loading small faint" wx:if="{{rbLoading}}">加载中…</view>
         <block wx:elif="{{routeBetas[item.id]}}">
@@ -141,22 +146,29 @@
               </view>
               <view class="rb-caution small" wx:if="{{b.caution}}">易掉点：{{b.caution}}</view>
             </view>
-            <view class="rb-likes small faint">♡ {{b.likeCount}}</view>
           </view>
           <view class="rb-empty small faint" wx:if="{{!routeBetas[item.id].betas.length}}">
-            还没人发这条线的 Beta · 爬过你来发第一条
+            暂无 Beta
           </view>
           <view class="rb-actions">
-            <view class="rb-act rb-pub" data-rid="{{item.id}}" bindtap="goPublishRoute">＋ 发这条线的 Beta</view>
-            <view class="rb-act" data-rid="{{item.id}}" bindtap="goRouteDetail">{{routeBetas[item.id].total > 3 ? '全部 ' + routeBetas[item.id].total + ' 条 ›' : '线路详情 ›'}}</view>
+            <view class="rb-act rb-pub" data-rid="{{item.id}}" bindtap="goPublishRoute">发 Beta</view>
+            <view class="rb-act" data-rid="{{item.id}}" bindtap="goRouteWall">走线 ›</view>
           </view>
         </block>
       </view>
     </block>
+    <view class="card cold-card" wx:if="{{!routes.length}}">
+      <view class="bold">暂无线路</view>
+      <view class="small muted cold-desc">拍墙圈点，或先到馆打卡</view>
+      <view class="row cold-acts">
+        <view class="btn btn-soft flex-1" bindtap="goShootWall">拍墙圈点</view>
+        <view class="btn btn-primary flex-1" bindtap="goGymCheckin">到馆打卡</view>
+      </view>
+    </view>
     <empty-state
-      wx:if="{{!shown.length}}"
-      title="{{routes.length ? '没有符合条件的线路' : '这家岩馆的线路待共建'}}"
-      desc="{{routes.length ? '换个筛选条件试试' : '来过这家馆？打卡、发条 Beta，让更多岩友看到它的线'}}"
+      wx:if="{{routes.length && !shown.length}}"
+      title="没有符合的线路"
+      desc="换个筛选"
     />
   </view>
 </view>

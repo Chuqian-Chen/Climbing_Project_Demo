@@ -73,7 +73,25 @@ function uid(prefix) {
   return (prefix || 'id') + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+// 打开系统地图。坐标按 gcj02（与 wx.getLocation 一致）；没有 lat 则只提示。
+function openGymMap(gym) {
+  if (!gym || gym.lat == null || gym.lng == null) {
+    wx.showToast({ title: '暂时没有坐标', icon: 'none' });
+    return;
+  }
+  wx.openLocation({
+    latitude: Number(gym.lat),
+    longitude: Number(gym.lng),
+    scale: 16,
+    name: gym.name || '岩馆',
+    address: gym.address || gym.area || '',
+    fail() {
+      wx.showToast({ title: '打不开地图', icon: 'none' });
+    }
+  });
+}
+
 module.exports = {
   formatDate, today, parseDate, daysUntil, daysSince,
-  relativeDate, distanceKm, formatKm, weekKey, uid
+  relativeDate, distanceKm, formatKm, weekKey, uid, openGymMap
 };

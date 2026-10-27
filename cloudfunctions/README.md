@@ -11,13 +11,13 @@
 | 函数 | 作用 | 校验要点 |
 | --- | --- | --- |
 | `login` | 换取 openid，写入客户端 `yy_openid` | 登录即可 |
-| `fetchAll` | 管理员权限全量/增量读（`since`） | 核心集合为空时客户端拒绝覆盖本地 |
+| `fetchAll` | 管理员权限全量/增量读（`since`）；含 likes/favs；软删墓碑 | 核心集合为空时客户端拒绝覆盖本地 |
 | `initDb` | 建集合 + 灌演示数据 / `mode:'prod'` 清演示 | 可选 `ADMIN_OPENIDS`；force 只按种子 id 删除 |
 | `saveWall` | 墙面协作写（`setHolds` / `removeRoute` / `setPhoto`） | 必须有 OPENID；holds 按 `routeId` 字段隔离 |
 | `saveGymMeta` | 众包分级标准 | 必须有 OPENID；馆不存在则失败 |
 | `updateRoute` | 改难度 / 颜色 / 备注名 | 线主或已认证定线员 |
 | `updateBeta` | 改标题/步骤/易掉点等 | 仅作者 |
-| `deleteContent` | 删 Beta / 线路 / 评论 / 打卡 | 线路有他人内容时转下架 |
+| `deleteContent` | 软删 Beta / 线路 / 评论 / 打卡（`deleted`+`mtime`） | 线路有他人内容时转下架 |
 | `setterApply` | 定线员申请 / 查状态 | 已 `approved` 的申请不会被重新提交打回 pending |
 | `retireWall` | 整墙线路批量下架 | 服务端校验认证定线员 |
 | `secCheck` | 文本 + 图片内容安全 | 检测服务不可用时客户端放行 |
@@ -30,7 +30,7 @@
 
 ## 改演示数据后
 
-`miniprogram/utils/mock-data.js` 与 `gym-directory.js` 改完后，复制到本目录 `initDb/` 再重新部署 `initDb`。
+`miniprogram/utils/mock-data.js` 与 `gym-directory.js` 改完后，复制到本目录 `initDb/` 再重新部署 `initDb`。名录更新后需再跑一次「生产灌库」才会把新地址/坐标写进云数据库。
 
 ## 视觉模型（aiAnnotate）
 

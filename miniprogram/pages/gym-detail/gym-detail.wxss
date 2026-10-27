@@ -1,5 +1,5 @@
 .hero {
-  padding: 48rpx 32rpx 40rpx;
+  padding: 40rpx 32rpx 36rpx;
   color: #fff;
 }
 .hero-name {
@@ -76,16 +76,20 @@
   font-weight: 700;
 }
 
-.gs-row {
-  margin-top: 20rpx;
+.gs-card {
+  padding: 18rpx 24rpx;
+}
+.gs-scroll {
+  white-space: nowrap;
+  margin-top: 12rpx;
 }
 .gs-chip {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   background: var(--sunken);
   border-radius: 999rpx;
   padding: 8rpx 20rpx;
-  margin: 0 14rpx 14rpx 0;
+  margin-right: 12rpx;
 }
 .gs-grade {
   font-size: var(--fs-md);
@@ -166,7 +170,6 @@
 /* 分级标准众包编辑 */
 .eg-edit-link {
   color: var(--brand-deep);
-  margin-top: 12rpx;
 }
 .eg-opts {
   margin: 16rpx 0 4rpx;
@@ -213,6 +216,41 @@
   padding: 8rpx 24rpx 18rpx;
   border-top: 1rpx solid var(--chip);
 }
+.loc-card {
+  display: flex;
+  align-items: center;
+  padding: 22rpx 24rpx;
+}
+.loc-text {
+  flex: 1;
+  min-width: 0;
+}
+.loc-addr {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #1b1e28;
+}
+.loc-btn {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #fff;
+  background: #2f7a58;
+  padding: 8rpx 22rpx;
+  border-radius: 999rpx;
+  font-weight: 600;
+}
+.cold-card {
+  padding: 32rpx 28rpx;
+  text-align: center;
+}
+.cold-desc {
+  margin: 12rpx 0 28rpx;
+}
+.cold-acts {
+  gap: 16rpx;
+}
+
 .rb-loading,
 .rb-empty {
   padding: 20rpx 0;

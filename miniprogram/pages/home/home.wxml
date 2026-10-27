@@ -68,11 +68,19 @@
     </block>
   </view>
 
-  <!-- 继续磕线（不在馆时） -->
-  <view class="slim small" wx:if="{{!atGym && projectRoute}}" bindtap="goProject">
-    <text class="muted">继续磕线：</text>
-    <text class="bold">{{projectRoute.name}} {{projectRoute.grade}}</text>
-    <text class="faint"> ›</text>
+  <!-- 继续磕线（不在馆时；在馆时到馆卡里已有） -->
+  <view class="card proj" wx:if="{{!atGym && projectRoute}}">
+    <view class="small muted">继续磕线</view>
+    <view class="row proj-id">
+      <view class="hold-dot {{projectRoute.colorLight ? 'light' : ''}}" style="background:{{projectRoute.colorHex}}"></view>
+      <text class="bold ellipsis">{{projectRoute.name}}</text>
+      <view class="grade-badge" style="background:{{projectRoute.gradeColor}}">{{projectRoute.grade}}</view>
+    </view>
+    <view class="small faint">{{projectRoute.gymName}}<text wx:if="{{projectRoute.wallName}}"> · {{projectRoute.wallName}}</text></view>
+    <view class="proj-acts">
+      <view class="btn btn-soft flex-1" catchtap="goProject">看走线</view>
+      <view class="btn btn-primary flex-1" catchtap="goProjectCheckin">打卡</view>
+    </view>
   </view>
 
   <!-- 附近岩馆：紧凑一行 -->
@@ -105,9 +113,9 @@
     </scroll-view>
   </block>
 
-  <!-- 大家的 Beta：双列瀑布流 -->
+  <!-- 热门 Beta：双列瀑布流 -->
   <view class="gym-row-head feed-head">
-    <text class="section-label">大家的 Beta</text>
+    <text class="section-label">热门 Beta</text>
   </view>
   <scroll-view scroll-x class="band-row" enhanced show-scrollbar="{{false}}">
     <view
@@ -118,7 +126,7 @@
       bindtap="pickBand"
     >{{item.label}}</view>
   </scroll-view>
-  <view class="band-empty small faint" wx:if="{{bandEmpty}}">这个难度档还没有 Beta · 换个档看看，或去发第一条</view>
+  <view class="band-empty small faint" wx:if="{{bandEmpty}}">这档暂无 Beta</view>
   <view class="feed">
     <view class="feed-col">
       <beta-tile wx:for="{{betaColL}}" wx:key="id" beta="{{item}}" />

@@ -3,10 +3,10 @@
   <view class="between head">
     <view>
       <view class="bold">{{gymName}}</view>
-      <view class="small faint">{{wallName}} · 已标注 {{markers.length}} 条线</view>
+      <view class="small faint">{{wallName}} · {{markers.length}} 条</view>
     </view>
     <view class="edit-toggle {{editMode ? 'on' : ''}}" wx:if="{{photo}}" bindtap="toggleEdit">
-      {{editMode ? '✓ 完成' : '标注线路'}}
+      {{editMode ? '完成' : '标注'}}
     </view>
   </view>
 
@@ -35,7 +35,7 @@
         <view
           wx:for="{{holds[mk.routeId]}}"
           wx:key="index"
-          wx:if="{{editMode ? pendingRouteId === mk.routeId : (!selectedId || selectedId === mk.routeId)}}"
+          wx:if="{{editMode ? pendingRouteId === mk.routeId : selectedId === mk.routeId}}"
           class="hold-ring {{item.f ? 'ft' : ''}} {{(selectedId === mk.routeId || pendingRouteId === mk.routeId) ? 'on' : ''}}"
           style="left:{{item.x}}%;top:{{item.y}}%;border-color:{{mk.colorHex}}"
           data-rid="{{mk.routeId}}"
@@ -58,25 +58,31 @@
       </view>
     </view>
     <view class="tip small muted" wx:if="{{editMode}}">
-      {{pendingIdx >= 0 ? '按手序点照片给「' + routeLabels[pendingIdx] + '」加点 · 点已圈的圆圈可改/删' : '先在下方选择要标注的线路'}}
+      {{pendingIdx >= 0 ? '按手序点图加点，点圈可改' : '先选下方线路'}}
     </view>
-    <view class="tip beta-jump" wx:elif="{{selectedId}}" bindtap="goSelectedRoute">
-      <text class="small">「{{selectedName}}」</text>
-      <text class="small beta-jump-link">{{selectedBetaCount ? '有 ' + selectedBetaCount + ' 条 Beta，去学 ›' : '还没有 Beta · 爬完你来发第一条 ›'}}</text>
+    <view class="sel-bar" wx:elif="{{selectedId}}">
+      <view class="sel-head">
+        <text class="bold">{{selectedName}} {{selectedGrade}}</text>
+        <text class="small faint" wx:if="{{selectedSeq}}">{{selectedSeq}}</text>
+      </view>
+      <view class="sel-acts">
+        <view class="btn btn-soft sel-btn" bindtap="goSelectedRoute">详情</view>
+        <view class="btn btn-primary sel-btn" bindtap="goSelectedCheckin">打卡</view>
+      </view>
     </view>
-    <view class="tip small faint" wx:elif="{{markers.length}}">点徽章高亮整条线的岩点，再点进入线路详情</view>
+    <view class="tip small faint" wx:elif="{{markers.length}}">点徽章看走线</view>
   </block>
 
   <!-- 空状态 -->
   <view wx:else class="card empty">
     <view class="bold">还没有墙面照片</view>
-    <view class="small faint empty-desc">定线员或岩友拍一张整面墙，再把每条线标上去，大家就能按图找线了</view>
+    <view class="small faint empty-desc">拍整墙图，再标线</view>
   </view>
 
   <!-- 编辑面板 -->
   <view class="card" wx:if="{{editMode}}">
     <view class="field" wx:if="{{routeLabels.length}}">
-      <text class="label">标注线路</text>
+      <text class="label">选线路</text>
       <picker range="{{routeLabels}}" value="{{pendingIdx}}" bindchange="onPickRoute">
         <view class="pick {{pendingIdx >= 0 ? 'has' : ''}}">{{pendingIdx >= 0 ? routeLabels[pendingIdx] : '选择线路 ›'}}</view>
       </picker>
@@ -97,7 +103,7 @@
       <view class="undo-btn small" bindtap="undoHold">⟲ 撤销上一个</view>
     </view>
     <view class="btn btn-soft ai-btn" wx:if="{{pendingRouteId}}" bindtap="aiAnnotate">
-      AI 自动圈点（识别本线颜色的岩点）
+      AI 圈点
     </view>
 
     <view class="btn btn-soft ai-btn scan-btn" wx:if="{{photo && !scanItems.length}}" bindtap="scanWall">一键识别全墙（找出所有颜色的线）</view>
@@ -122,7 +128,7 @@
     </view>
     <!-- 快速建线：这面墙的新线直接在这里建 -->
     <view class="qc-toggle small" bindtap="toggleCreate">
-      {{showCreate ? '收起' : '＋ 快速建线'}}{{routeLabels.length ? '' : '（这面墙还没有线，先建一条）'}}
+      {{showCreate ? '收起' : '＋ 建线'}}{{routeLabels.length ? '' : '（先建一条）'}}
     </view>
     <block wx:if="{{showCreate || !routeLabels.length}}">
       <view class="field">
@@ -140,16 +146,16 @@
       <view class="field" wx:if="{{tapeLabels}}">
         <text class="label">标签参考</text>
         <picker range="{{tapeLabels}}" value="{{qcTapeIdx}}" bindchange="onQcTape">
-          <view class="pick {{qcTapeIdx >= 0 ? 'has' : ''}}">{{qcTapeIdx >= 0 ? tapeLabels[qcTapeIdx] : '选填：按本馆标签色带出难度 ›'}}</view>
+          <view class="pick {{qcTapeIdx >= 0 ? 'has' : ''}}">{{qcTapeIdx >= 0 ? tapeLabels[qcTapeIdx] : '选填 ›'}}</view>
         </picker>
       </view>
-      <view class="btn btn-primary qc-btn" bindtap="createRoute">建线并开始标注</view>
+      <view class="btn btn-primary qc-btn" bindtap="createRoute">建线并标注</view>
     </block>
   </view>
 
   <!-- 无照片时上传对所有人开放（共建）；已有照片后「更换」收进编辑模式，浏览者不打扰 -->
-  <view class="btn btn-soft up-btn" wx:if="{{!photo || editMode}}" bindtap="choosePhoto">{{photo ? '更换墙面照片' : '上传墙面照片'}}</view>
-  <view class="btn btn-soft up-btn retire-btn" wx:if="{{editMode && isSetter}}" bindtap="retireWall">整墙换线（下架本墙全部线路）</view>
+  <view class="btn btn-soft up-btn" wx:if="{{!photo || editMode}}" bindtap="choosePhoto">{{photo ? '换照片' : '上传墙面照'}}</view>
+  <view class="btn btn-soft up-btn retire-btn" wx:if="{{editMode && isSetter}}" bindtap="retireWall">整墙下架</view>
 
   <!-- AI 检测用的离屏画布 -->
   <canvas type="2d" id="detect-canvas" class="detect-canvas"></canvas>

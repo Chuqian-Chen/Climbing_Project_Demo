@@ -16,16 +16,16 @@
       bindtap="pickCity"
     >{{item.name}}</view>
     <view class="flex-1"></view>
-    <text class="small faint" wx:if="{{located}}">已按距离排序</text>
+    <text class="small faint" wx:if="{{located}}">按距离</text>
   </view>
 
   <view class="loc-tip" wx:if="{{locationDenied}}" bindtap="openLocationSetting">
-    开启定位后可按距离排序 <text class="loc-link">去开启</text>
+    开定位可按距离排 <text class="loc-link">去开启</text>
   </view>
 
   <!-- 快速筛选 -->
   <view class="kw-bar">
-    <input class="kw-input" placeholder="搜馆名 / 区域，如「徐汇」「香蕉」" value="{{kw}}" bindinput="onKw" />
+    <input class="kw-input" placeholder="搜馆名或区域" value="{{kw}}" bindinput="onKw" />
     <text class="count small faint">{{shown.length}}/{{gyms.length}} 家</text>
   </view>
 
@@ -35,23 +35,20 @@
         <view class="gym-name flex-1">{{item.name}}</view>
         <view class="gym-demo" wx:if="{{item.isDemo}}">演示数据</view>
         <view class="gym-demo gym-soon" wx:if="{{item.comingSoon}}">即将开业</view>
+        <view class="gym-demo" wx:if="{{item.unlisted}}">待核实</view>
       </view>
       <view class="gym-area">{{item.area}}<text wx:if="{{item.price}}"> · ¥{{item.price}}</text></view>
       <view class="gym-dist" wx:if="{{item.distanceText}}">{{item.distanceText}}</view>
     </view>
     <view class="gym-body">
-      <view class="row wrap" wx:if="{{item.tags.length}}">
-        <text class="tag" wx:for="{{item.tags}}" wx:for-item="t" wx:key="*this">{{t}}</text>
-      </view>
       <block wx:if="{{item.routeCount}}">
         <view class="between gym-stats">
-          <text class="small muted">{{item.routeCount}} 条在墙</text>
-          <text class="small muted">本周 {{item.weekCheckins}} 次打卡</text>
-          <text class="small gym-new" wx:if="{{item.newCount}}">新线 {{item.newCount}} 条</text>
+          <text class="small muted">{{item.routeCount}} 条</text>
+          <text class="small gym-new" wx:if="{{item.newCount}}">新线 {{item.newCount}}</text>
         </view>
-        <view class="gym-notice" wx:if="{{item.announcement}}">{{item.announcement}}</view>
       </block>
-      <view class="small faint" wx:else>线路数据待共建 · 进馆打卡开个荒 →</view>
+      <view class="small faint" wx:else>暂无线路</view>
+      <view class="gym-map" wx:if="{{item.lat}}" catchtap="openMap" data-id="{{item.id}}">地图 ›</view>
     </view>
   </view>
 

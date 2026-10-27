@@ -47,7 +47,9 @@ Page({
     step2Ok: false,
     routeSummary: '',
     firstStep: '',
-    canSubmit: false
+    canSubmit: false,
+    routeLocked: false,
+    lockedRouteText: ''
   },
 
   onLoad(options) {
@@ -92,7 +94,7 @@ Page({
           });
         });
       }
-      this.applySelection(ci, di, gi, ri);
+      this.applySelection(ci, di, gi, ri, !!this.presetRouteId && ri >= 0);
     });
 
     // 编辑模式：预填现有内容；线路与媒体不可改
@@ -130,7 +132,7 @@ Page({
   },
 
   // 应用选中的 城市/区域/岩馆，刷新线路选项
-  applySelection(ci, di, gi, ri) {
+  applySelection(ci, di, gi, ri, lock) {
     const city = this.cities[ci];
     if (!city) return;
     const t = this.tree[city.key];
@@ -144,7 +146,7 @@ Page({
     this.currentGradeSystem = (gym && gym.gradeSystem) || null;
     this.currentGradeBy = (gym && gym.gradeBy) || 'hold';
     this.tmpVal = [ci, dIdx, gIdx];
-    this.setData({
+    const patch = {
       gymPickerRange: [
         this.cities.map((c) => c.name),
         t.districts,
@@ -153,11 +155,19 @@ Page({
       gymPickerValue: [ci, dIdx, gIdx],
       gymId: gym ? gym.id : '',
       gymLabel: gym ? city.name + ' · ' + district + ' · ' + gym.name : '',
-      routeLabels: routes.map((r) => r.label).concat(['＋ 新建线路（发这家馆还没收录的线）']),
+      routeLabels: routes.map((r) => r.label).concat(['＋ 新建线路']),
       hasRoutes: routes.length > 0,
       routeIdx: ri,
       newRouteMode: routes.length === 0 || (ri >= 0 && ri >= routes.length)
-    }, () => this.checkSubmit());
+    };
+    if (lock && ri >= 0 && routes[ri]) {
+      patch.routeLocked = true;
+      patch.lockedRouteText = gym.name + ' · ' + routes[ri].label;
+    }
+    this.setData(patch, () => this.checkSubmit());
+  },
+  unlockRoute() {
+    this.setData({ routeLocked: false });
   },
 
   onGymColumn(e) {
@@ -192,7 +202,7 @@ Page({
   },
   onGymChange(e) {
     const v = e.detail.value;
-    this.applySelection(Number(v[0]), Number(v[1]), Number(v[2]), -1);
+    this.applySelection(Number(v[0]), Number(v[1]), Number(v[2]), -1, false);
   },
   onRouteChange(e) {
     const i = Number(e.detail.value);

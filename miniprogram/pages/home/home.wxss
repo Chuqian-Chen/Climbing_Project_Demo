@@ -43,11 +43,20 @@
   padding: 0 8rpx;
 }
 
-.slim {
-  background: #ffffff;
-  border-radius: var(--r-sm);
-  padding: 16rpx 22rpx;
-  margin-bottom: 16rpx;
+.proj {
+  padding: 24rpx;
+  margin-bottom: 8rpx;
+}
+.proj-id {
+  margin: 10rpx 0 6rpx;
+}
+.proj-id .bold {
+  margin: 0 12rpx;
+}
+.proj-acts {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 20rpx;
 }
 
 /* 区块标题行 */

@@ -25,6 +25,10 @@
 .sec-title {
   margin-bottom: 12rpx;
 }
+.lock-line {
+  margin-top: 10rpx;
+  font-weight: 600;
+}
 .title-hint {
   margin-left: 12rpx;
   font-weight: 400;

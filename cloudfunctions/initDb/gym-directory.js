@@ -2,9 +2,11 @@
 // 上海：初版为小红书 Melania「上海攀岩馆索引图」Version 2（77家）；
 //       2026-07-29 按「女子岩上」名单（统计 2026-7-9，56 营业 + 6 即将开业）逐条更新，
 //       新名单未收录的旧条目保留并标 unlisted（多为远郊馆，待核实）
-// 北京：小红书攀岩馆分布图（综合馆=难度+抱石 / 抱石馆 / 难度馆）
-// 注意：名称/地标为图片转录，个别可能有识别误差；坐标为地铁站/商圈近似值（±1km），
-// 仅用于距离排序，不作导航用途；district 为大致行政区归属。欢迎在本文件直接修正。
+//       2026-10-13 按公开新闻/品牌官网补门牌地址；有 OSM/高德 POI 的才改坐标（gcj02），
+//       馆详情/列表可打开系统地图。未找到出处的坐标仍是地铁站/商圈近似值。
+// 北京：小红书攀岩馆分布图（综合馆=难度+抱石 / 抱石馆 / 难度馆）；同日补岩时/香蕉等门牌。
+// 注意：名称/地标为图片转录，个别可能有识别误差；无 address 的坐标只适合距离排序。
+// district 为大致行政区归属。欢迎在本文件直接修正。
 // gradeBy 定级方式：'hold'=岩点颜色即难度（默认）| 'tape'=看岩点下方胶带标签颜色 | 'sign'=旁边难度牌直接写V几
 
 const CITIES = [
@@ -20,12 +22,13 @@ const DISTRICT_ORDER = {
 
 // type: 综合 | 抱石 | 难度 | ''（未标注）
 const DIRECTORY = [
-  /* ================= 上海（77 + 6 即将开业） =================
+  /* ================= 上海 =================
    * 2026-07-29 依据用户提供的「女子岩上」上海岩馆名单（统计时间 2026-7-9）更新：
    * 56 家营业馆逐一匹配原条目（id 不变），更新馆名/区域/地铁距离，补 type 与 price（门票单次价格）；
    * unlisted: true = 该名单未收录（多为远郊馆，不确定是否停业，待 POI 核实）；
-   * comingSoon: true = 名单标注即将开业。near 为最近地铁站距离（源自名单）。 */
-  { id: 'sh01', city: 'sh', district: '静安', name: '香蕉攀岩（嘉里合集店）', near: '上海火车站 360m', type: '抱石', price: '99-120', lat: 31.2495, lng: 121.456 },
+   * comingSoon: true = 即将开业。near 为最近地铁站距离（源自名单）。
+   * 2026-10-13：FFC/龙凤/PRISMA 已开业；补攀蛛侠康桥；address 供地图导航。 */
+  { id: 'sh01', city: 'sh', district: '静安', name: '香蕉攀岩（嘉里合集店）', near: '上海火车站 360m', type: '抱石', price: '99-120', address: '静安区天目西路218号嘉里合集B1层B103-104', lat: 31.2497, lng: 121.4558 },
   { id: 'sh02', city: 'sh', district: '静安', name: 'Beta', near: '江宁路 480m', type: '抱石', price: '109-119', lat: 31.241, lng: 121.447 },
   { id: 'sh03', city: 'sh', district: '普陀', name: '尽峰（189弄购物中心）', near: '长寿路 270m', type: '综合', price: '110', lat: 31.2415, lng: 121.437 },
   { id: 'sh04', city: 'sh', district: '普陀', name: 'Rock Climbing', near: '中潭路 350m', type: '抱石', price: '91-111', lat: 31.253, lng: 121.442 },
@@ -56,12 +59,12 @@ const DIRECTORY = [
   { id: 'sh24', city: 'sh', district: '黄浦', name: 'Hey Bouldering嘿抱（绿地外滩中心店）', near: '小南门 890m', type: '抱石', price: '130-180', lat: 31.213, lng: 121.498 },
   { id: 'sh25', city: 'sh', district: '黄浦', name: '1778（黄浦）', near: '南浦大桥 30m', type: '抱石', price: '68-146', lat: 31.2, lng: 121.493 },
   { id: 'sh26', city: 'sh', district: '黄浦', name: 'Camp4 岩肆（8号桥店）', near: '世博会博物馆 612m', type: '抱石', price: '85-130', lat: 31.193, lng: 121.485 },
-  { id: 'sh27', city: 'sh', district: '黄浦', name: '岩时攀岩（新天地东台里店）', near: '老西门站 550m', type: '抱石', price: '125-150', lat: 31.22, lng: 121.474 },
+  { id: 'sh27', city: 'sh', district: '黄浦', name: '岩时攀岩（新天地东台里店）', near: '老西门站 550m', type: '抱石', price: '125-150', address: '黄浦区新天地东台里', lat: 31.22, lng: 121.475 },
   { id: 'sh28', city: 'sh', district: '徐汇', name: 'Star星岩', near: '龙华中路 624m', type: '抱石', price: '102-122', lat: 31.181, lng: 121.452 },
   // 原转录"长桥"，名单为龙华站 170m，坐标已按龙华站修正
   { id: 'sh29', city: 'sh', district: '徐汇', name: 'Stonehaven Climbing', near: '龙华站 170m', type: '抱石', price: '88-138', lat: 31.171, lng: 121.452 },
   { id: 'sh30', city: 'sh', district: '徐汇', name: '尽峰（乐动力西岸）', near: '龙耀路 430m', type: '抱石', price: '128', lat: 31.169, lng: 121.462 },
-  { id: 'sh31', city: 'sh', district: '徐汇', name: '岩时攀岩（Gate M西岸梦中心）', near: '龙耀路 640m', type: '难度', price: '125-150', lat: 31.176, lng: 121.457 },
+  { id: 'sh31', city: 'sh', district: '徐汇', name: '岩时攀岩（Gate M西岸梦中心）', near: '云锦路/龙耀路', type: '难度', price: '125-150', address: '徐汇区龙腾大道2266号Gate M西岸梦中心12号楼201', lat: 31.1614, lng: 121.4662 },
   { id: 'sh32', city: 'sh', district: '浦东', name: '攀竞（东体馆）', near: '东方体育中心 360m', type: '综合', price: '131', lat: 31.156, lng: 121.47 },
   { id: 'sh33', city: 'sh', district: '浦东', name: 'Le Mont（浦东）', near: '灵岩南路 0.9km', type: '', lat: 31.174, lng: 121.554, unlisted: true },
   { id: 'sh34', city: 'sh', district: '浦东', name: '岩羊攀吧', near: '杨思站 280m', type: '抱石', price: '点饮品即可', lat: 31.157, lng: 121.5 },
@@ -75,9 +78,9 @@ const DIRECTORY = [
   { id: 'sh42', city: 'sh', district: '徐汇', name: 'Roc811攀岩馆', near: '桂林公园 675m', type: '抱石', price: '118', lat: 31.173, lng: 121.418 },
   { id: 'sh43', city: 'sh', district: '长宁', name: '晨道（黄金城道）', near: '娄山关路/伊犁路 0.6km', type: '', lat: 31.21, lng: 121.405, unlisted: true },
   // 原转录"香蕉（古北）· 美兰路待确认"，名单为金虹桥店（娄山关路站 430m），坐标已修正
-  { id: 'sh44', city: 'sh', district: '长宁', name: '香蕉攀岩（金虹桥店）', near: '娄山关路站 430m', type: '抱石', price: '99-120', lat: 31.211, lng: 121.402 },
+  { id: 'sh44', city: 'sh', district: '长宁', name: '香蕉攀岩（金虹桥店）', near: '娄山关路站 430m', type: '抱石', price: '99-120', address: '长宁区茅台路179号金虹桥国际中心L2', lat: 31.2102, lng: 121.3988 },
   { id: 'sh45', city: 'sh', district: '长宁', name: 'LAPUTA（长宁来福士）', near: '中山公园 0.2km', type: '', lat: 31.22, lng: 121.413, unlisted: true },
-  { id: 'sh46', city: 'sh', district: '长宁', name: '香蕉攀岩（延安西路店）', near: '延安西路 280m', type: '抱石', price: '99-120', lat: 31.213, lng: 121.425 },
+  { id: 'sh46', city: 'sh', district: '长宁', name: '香蕉攀岩（延安西路店）', near: '娄山关路/延安西路', type: '抱石', price: '99-120', address: '长宁区昭化路658号海粟广场A栋104-105', lat: 31.213, lng: 121.425 },
   { id: 'sh47', city: 'sh', district: '长宁', name: 'Dome（定西路店）', near: '延安西路 934m', type: '抱石', price: '92-100', lat: 31.216, lng: 121.42 },
   // 名单区域为长宁（交大站属徐汇/长宁交界，从名单）
   { id: 'sh48', city: 'sh', district: '长宁', name: 'BLOC', near: '交通大学站 910m', type: '抱石', price: '130', lat: 31.203, lng: 121.433 },
@@ -101,7 +104,7 @@ const DIRECTORY = [
   // 原转录"康桥待确认"，名单为康恒路 130m
   { id: 'sh63', city: 'sh', district: '浦东', name: 'Sizer抱石攀岩馆', near: '康恒路 130m', type: '抱石', price: '99', lat: 31.145, lng: 121.555 },
   // 原转录"普陀 悦天地 华林路待确认"，名单为浦东 陆悦天地店（学林路站 260m）；坐标为估算，待 POI 核实
-  { id: 'sh64', city: 'sh', district: '浦东', name: '岩时攀岩（陆悦天地店）', near: '学林路站 260m', type: '抱石', price: '125-150', lat: 31.14, lng: 121.56 },
+  { id: 'sh64', city: 'sh', district: '浦东', name: '岩时攀岩（陆悦天地店）', near: '学林路站 260m', type: '抱石', price: '125-150', address: '浦东新区环科路1155号陆悦天地金星2层J-L209', lat: 31.183, lng: 121.6155 },
   { id: 'sh65', city: 'sh', district: '浦东', name: '优加（唐镇）', near: '唐镇 0.6km', type: '', lat: 31.216, lng: 121.652, unlisted: true },
   { id: 'sh66', city: 'sh', district: '浦东', name: '优石', near: '浦东足球场 630m', type: '综合', price: '118-144', lat: 31.221, lng: 121.544 },
   { id: 'sh67', city: 'sh', district: '浦东', name: '优加（航头）', near: '航头 0.1km', type: '', lat: 31.06, lng: 121.61, unlisted: true },
@@ -116,24 +119,28 @@ const DIRECTORY = [
   // 原"汇源路待确认/疑似未开业"，名单确认已营业（白银路 1.8km），坐标已按白银路修正
   { id: 'sh76', city: 'sh', district: '嘉定', name: '尽峰（嘉定）', near: '白银路 1.8km', type: '综合', price: '121', lat: 31.366, lng: 121.255 },
   { id: 'sh77', city: 'sh', district: '崇明', name: '岩心 Ganshin（崇明）', near: '崇明 39.0km', type: '', lat: 31.53, lng: 121.63, unlisted: true },
+  // 旧名单未收；康桥新田360 有公开场馆页（秀浦路668号）
+  { id: 'sh84', city: 'sh', district: '浦东', name: '攀蛛侠（康桥新田360）', near: '秀沿路 800m', type: '综合', address: '浦东新区秀浦路668号新田360广场LG层', lat: 31.1371, lng: 121.599 },
 
-  /* ---- 即将开业（2026-7-9 名单 Coming Soon）---- */
+  /* ---- 2026-7 名单 Coming Soon：已有开业报道的去掉 comingSoon ---- */
+  { id: 'sh79', city: 'sh', district: '徐汇', name: '此山攀岩（FFC滨江悦里）', near: '大木桥路 1.2km', type: '综合', address: '徐汇区瑞宁路2号FFC滨江悦里', lat: 31.1843, lng: 121.4632 },
+  { id: 'sh80', city: 'sh', district: '黄浦', name: '香蕉攀岩（龙凤PRSCO店）', near: '黄陂南路/陕西南路', type: '抱石', address: '黄浦区淮海中路728号龙凤PRSCO 4F 01-03', lat: 31.221, lng: 121.47 },
+  { id: 'sh82', city: 'sh', district: '浦东', name: '岩时攀岩（PRISMA新嘉中心店）', near: '巨峰路站上盖', type: '抱石', address: '浦东新区张杨北路巨峰路 PRISMA新嘉中心L6', lat: 31.2807, lng: 121.5884 },
+
+  /* ---- 仍未开业 / 新址未公布 ---- */
   { id: 'sh78', city: 'sh', district: '', name: 'Pongo（换新址）', near: '新址待公布', type: '', comingSoon: true },
-  { id: 'sh79', city: 'sh', district: '徐汇', name: '此山攀岩（FFC滨江悦里）', near: '大木桥路', type: '', comingSoon: true, lat: 31.198, lng: 121.462 },
-  { id: 'sh80', city: 'sh', district: '黄浦', name: '香蕉攀岩（龙凤PRSCO店）', near: '淮海中路', type: '', comingSoon: true, lat: 31.221, lng: 121.47 },
-  { id: 'sh81', city: 'sh', district: '浦东', name: '香蕉攀岩（正大广场店）', near: '陆家嘴西路', type: '难度', comingSoon: true, lat: 31.239, lng: 121.494 },
-  { id: 'sh82', city: 'sh', district: '浦东', name: '岩时攀岩（PRISMA新嘉中心店）', near: '浦东巨峰路', type: '', comingSoon: true, lat: 31.265, lng: 121.607 },
-  { id: 'sh83', city: 'sh', district: '闵行', name: '岩时攀岩（维璟印象城）', near: '七莘路', type: '', comingSoon: true, lat: 31.156, lng: 121.35 },
+  { id: 'sh81', city: 'sh', district: '浦东', name: '香蕉攀岩（正大广场店）', near: '陆家嘴西路', type: '难度', comingSoon: true, address: '浦东新区陆家嘴西路168号正大广场', lat: 31.2367, lng: 121.4992 },
+  { id: 'sh83', city: 'sh', district: '闵行', name: '岩时攀岩（维璟印象城）', near: '七莘路', type: '', comingSoon: true, address: '闵行区七莘路1507号维璟印象城', lat: 31.1308, lng: 121.3638 },
 
-  /* ================= 北京（53） ================= */
+  /* ================= 北京（54） ================= */
   { id: 'bj01', city: 'bj', district: '顺义', name: '浩石（顺义）', near: '顺义', type: '综合', lat: 40.13, lng: 116.65 },
   { id: 'bj02', city: 'bj', district: '昌平', name: '趣野（腾讯众创空间）', near: '昌平', type: '综合', lat: 40.07, lng: 116.32 },
-  { id: 'bj03', city: 'bj', district: '昌平', name: '岩时（回龙观）', near: '回龙观', type: '综合', lat: 40.073, lng: 116.34 },
-  { id: 'bj04', city: 'bj', district: '海淀', name: '岩时（西三旗）', near: '西三旗', type: '综合', lat: 40.05, lng: 116.36 },
-  { id: 'bj05', city: 'bj', district: '海淀', name: '香蕉（上地）', near: '上地', type: '抱石', lat: 40.036, lng: 116.31 },
+  { id: 'bj03', city: 'bj', district: '昌平', name: '岩时（回龙观）', near: '回龙观', type: '综合', address: '昌平区回龙观体育文化公园南区乐动力体育中心B1', lat: 40.073, lng: 116.34 },
+  { id: 'bj04', city: 'bj', district: '海淀', name: '岩时攀登中心（西三旗）', near: '育新/西三旗', type: '综合', address: '海淀区建材城中路27号金隅智造工场S1-W', lat: 40.0571, lng: 116.3589 },
+  { id: 'bj05', city: 'bj', district: '海淀', name: '香蕉（上地）', near: '上地', type: '抱石', address: '海淀区东北旺西路58号尚科办公社区西门1层', lat: 40.037, lng: 116.2875 },
   { id: 'bj06', city: 'bj', district: '海淀', name: '奥攀（上地）', near: '上地', type: '综合', lat: 40.033, lng: 116.315 },
   { id: 'bj07', city: 'bj', district: '海淀', name: '青山攀石', near: '西二旗附近', type: '综合', lat: 40.045, lng: 116.305 },
-  { id: 'bj08', city: 'bj', district: '海淀', name: '香蕉（768）', near: '768创意产业园', type: '综合', lat: 40.04, lng: 116.355 },
+  { id: 'bj08', city: 'bj', district: '海淀', name: '香蕉（768）', near: '学院桥/学院路', type: '综合', address: '海淀区学院路甲5号768创意园D01', lat: 39.9985, lng: 116.3498 },
   { id: 'bj09', city: 'bj', district: '朝阳', name: '北顶奥森', near: '奥林匹克森林公园', type: '综合', lat: 40.017, lng: 116.396 },
   { id: 'bj10', city: 'bj', district: '朝阳', name: '几何', near: '奥体附近', type: '综合', lat: 40.005, lng: 116.39 },
   { id: 'bj11', city: 'bj', district: '海淀', name: '华攀攀岩（地质大学）', near: '地质大学', type: '综合', lat: 39.99, lng: 116.35 },
@@ -141,7 +148,7 @@ const DIRECTORY = [
   { id: 'bj13', city: 'bj', district: '海淀', name: '青山攀石 2.0', near: '海淀', type: '抱石', lat: 39.96, lng: 116.3 },
   { id: 'bj14', city: 'bj', district: '海淀', name: '奥攀（四季青）', near: '四季青', type: '综合', lat: 39.94, lng: 116.26 },
   { id: 'bj15', city: 'bj', district: '海淀', name: '问山', near: '海淀', type: '综合', lat: 39.93, lng: 116.29 },
-  { id: 'bj16', city: 'bj', district: '海淀', name: '奥攀（五棵松）', near: '五棵松', type: '综合', lat: 39.907, lng: 116.274 },
+  { id: 'bj16', city: 'bj', district: '海淀', name: '奥攀（五棵松）', near: '五棵松', type: '综合', address: '海淀区华熙LIVE·五棵松', lat: 39.9103, lng: 116.2777 },
   { id: 'bj17', city: 'bj', district: '石景山', name: 'COG（首钢）', near: '首钢园', type: '综合', lat: 39.91, lng: 116.15 },
   { id: 'bj18', city: 'bj', district: '朝阳', name: '悦石（华贸天地西区）', near: '华贸', type: '综合', lat: 39.91, lng: 116.48 },
   { id: 'bj19', city: 'bj', district: '朝阳', name: '趣野（龙湖）', near: '朝阳北部', type: '综合', lat: 39.999, lng: 116.48 },
@@ -160,9 +167,9 @@ const DIRECTORY = [
   { id: 'bj32', city: 'bj', district: '朝阳', name: '金点石（日坛）', near: '日坛', type: '综合', lat: 39.915, lng: 116.448 },
   { id: 'bj33', city: 'bj', district: '东城', name: '一起攀岩', near: '东城', type: '综合', lat: 39.91, lng: 116.43 },
   { id: 'bj34', city: 'bj', district: '朝阳', name: '中攀', near: '朝阳', type: '综合', lat: 39.93, lng: 116.52 },
-  { id: 'bj35', city: 'bj', district: '朝阳', name: '岩时（大望路）', near: '大望路', type: '综合', lat: 39.909, lng: 116.475 },
+  { id: 'bj35', city: 'bj', district: '朝阳', name: '岩时（大望路）', near: '平乐园 410m', type: '综合', address: '朝阳区西大望路27号院74栋', lat: 39.8852, lng: 116.4775 },
   { id: 'bj36', city: 'bj', district: '朝阳', name: '我攀', near: '朝阳东部', type: '综合', lat: 39.915, lng: 116.52 },
-  { id: 'bj37', city: 'bj', district: '朝阳', name: '岩时（管庄）', near: '管庄', type: '抱石', lat: 39.91, lng: 116.6 },
+  { id: 'bj37', city: 'bj', district: '朝阳', name: '岩时（管庄）', near: '管庄', type: '抱石', address: '朝阳区管庄路1号新管庄科技园6号楼-1-112', lat: 39.9091, lng: 116.599 },
   { id: 'bj38', city: 'bj', district: '朝阳', name: '大手', near: '朝阳东部', type: '综合', lat: 39.92, lng: 116.61 },
   { id: 'bj39', city: 'bj', district: '朝阳', name: '鼎石', near: '朝阳南部', type: '综合', lat: 39.87, lng: 116.46 },
   { id: 'bj40', city: 'bj', district: '丰台', name: '人人攀岩（丽泽）', near: '丽泽商务区', type: '难度', lat: 39.87, lng: 116.32 },
@@ -176,9 +183,10 @@ const DIRECTORY = [
   { id: 'bj48', city: 'bj', district: '东城', name: '奥攀（王府井）', near: '王府井', type: '综合', lat: 39.914, lng: 116.411 },
   { id: 'bj49', city: 'bj', district: '大兴', name: '奥攀（鸿坤广场）', near: '西红门', type: '综合', lat: 39.79, lng: 116.33 },
   { id: 'bj50', city: 'bj', district: '通州', name: '趣攀岩', near: '通州', type: '综合', lat: 39.9, lng: 116.66 },
-  { id: 'bj51', city: 'bj', district: '通州', name: '此山（通州·未开业）', near: '通州', type: '抱石', lat: 39.91, lng: 116.68 },
+  { id: 'bj51', city: 'bj', district: '通州', name: '此山攀岩（通州）', near: '通州', type: '抱石', comingSoon: true, lat: 39.91, lng: 116.68 },
   { id: 'bj52', city: 'bj', district: '房山', name: '极石', near: '房山', type: '综合', lat: 39.75, lng: 116.14 },
-  { id: 'bj53', city: 'bj', district: '房山', name: '趣野（房山）', near: '房山', type: '综合', lat: 39.755, lng: 116.16 }
+  { id: 'bj53', city: 'bj', district: '房山', name: '趣野（房山）', near: '房山', type: '综合', lat: 39.755, lng: 116.16 },
+  { id: 'bj54', city: 'bj', district: '海淀', name: '香蕉攀岩（东升小月河）', near: '小月河', type: '综合', comingSoon: true, address: '海淀区小月河路聚生智慧产业园' }
 ];
 
 module.exports = { CITIES, DISTRICT_ORDER, DIRECTORY };

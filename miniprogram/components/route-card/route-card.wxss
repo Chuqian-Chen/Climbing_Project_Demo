@@ -1,5 +1,9 @@
 .rc {
-  margin-bottom: 20rpx;
+  margin-bottom: 16rpx;
+}
+.rc.open {
+  margin-bottom: 0;
+  border-radius: 24rpx 24rpx 0 0;
 }
 .rc-hover {
   transform: scale(0.985);
@@ -46,5 +50,15 @@
   padding-left: 40rpx;
 }
 .rc-beta {
+  flex-shrink: 0;
+  font-size: var(--fs-sm);
   color: var(--brand-deep);
+  font-weight: 600;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  background: var(--brand-soft);
+}
+.rc-beta.on {
+  background: var(--ink);
+  color: #fff;
 }

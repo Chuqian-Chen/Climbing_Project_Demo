@@ -26,7 +26,7 @@ const chapters = [
     title: '线路详情 · 打卡',
     desc: '线路身份 = 馆 · 墙 · 岩点颜色 · 难度。',
     bullets: [
-      '定级共识条：偏软 / 准确 / 偏辣 三档投票',
+      '认线：照片 + 馆 · 墙 · 颜色 · 难度，一屏看完',
       '闪送 / 完攀 / 磕线中，<em>≤3 次点击</em>记下一次完攀',
       '解锁成就 + 打卡海报，再<em>推荐下一条</em>'
     ]
@@ -81,7 +81,7 @@ const captions = {
   home3: '按难度档一键筛选',
   beta1: '易掉点单独提醒，标明适合身高',
   beta2: '起手 / 中段 / 收尾，三步拆解',
-  route1: '难度共识：偏软、准确还是偏辣',
+  route1: '认线：馆、墙、颜色、难度一屏看完',
   check1: '闪送 / 完攀 / 磕线中，三下记好',
   check2: '解锁成就，一键生成打卡海报',
   check3: '再推荐下一条：同馆、没爬过、难度贴近',
@@ -172,7 +172,7 @@ async function run(s) {
 
   /* ---------- 04 足迹 ---------- */
   s.chapter(3);
-  await s.tap('.done-link', { text: '查看足迹', after: 400 });
+  await s.tap('.done-link', { text: '足迹', after: 400 });
   await s.bullet(0);
   await s.caption('log1');
   await s.wait(900);
@@ -219,7 +219,7 @@ async function run(s) {
   await s.tap('.edit-toggle', { after: 400 });
   await s.scrollTo('.marker');
   await s.tap('.marker', { text: 'V3', after: 600 });
-  await s.tap('.beta-jump', { after: 600 });
+  await s.tap('.sel-btn', { text: '详情', after: 600 });
   await s.bullet(2);
   await s.caption('wall3');
   await s.wait(600);
@@ -228,7 +228,7 @@ async function run(s) {
 
   /* ---------- 07 发布 Beta ---------- */
   s.chapter(6);
-  await s.tap('.section-more', { text: '发我的Beta', after: 500 });
+  await s.tap('.act-main', { text: '发 Beta', after: 500 });
   await s.bullet(0);
   await s.caption('pub1');
   await s.nextMedia(['/assets/demo/climb6.jpg']);

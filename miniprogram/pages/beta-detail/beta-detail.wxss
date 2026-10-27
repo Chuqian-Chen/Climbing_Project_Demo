@@ -1,5 +1,44 @@
-.author-info {
-  margin-left: 16rpx;
+.byline {
+  margin: 4rpx 4rpx 20rpx;
+}
+.by-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  font-size: 24rpx;
+  margin-right: 12rpx;
+}
+.seq-row {
+  white-space: nowrap;
+  margin-top: 16rpx;
+}
+.seq-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48rpx;
+  height: 48rpx;
+  padding: 0 10rpx;
+  border-radius: 50%;
+  border: 4rpx solid;
+  font-size: 20rpx;
+  font-weight: 800;
+  background: #fff;
+  vertical-align: middle;
+}
+.seq-arrow {
+  display: inline-block;
+  margin: 0 6rpx;
+  color: #c5cad3;
+  font-size: 22rpx;
+  vertical-align: middle;
+}
+.seq-wall {
+  margin-top: 12rpx;
+  color: #e8571f;
+  font-weight: 600;
+}
+.ck-main {
+  margin: 8rpx 0 16rpx;
 }
 .setter-badge {
   font-size: var(--fs-xs);

@@ -1,6 +1,7 @@
-// 岩馆详情：墙面筛选 + 线路列表 + 周打卡榜
+// 岩馆详情：墙面 + 线路列表（点卡进详情，点 Beta 芯片就地预览）
 const api = require('../../utils/api');
 const gradeUtil = require('../../utils/grade');
+const util = require('../../utils/helpers');
 
 // 分级编辑输入解析："橙=V0" / "orange V0" / "橙色：V0" 每行一条
 function parseGradeLines(text) {
@@ -45,7 +46,6 @@ Page({
     expandedId: '',    // 当前展开 Beta 预览的线路（手风琴：同时只展开一条）
     routeBetas: {},    // routeId -> { total, betas }
     rbLoading: false,
-    leaderboard: [],
     wallPhotos: [],
     gradeSystem: [],
     wallId: 'all',
@@ -95,6 +95,18 @@ Page({
   goRouteDetail(e) {
     wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + e.currentTarget.dataset.rid });
   },
+  goRouteWall(e) {
+    const rid = e.currentTarget.dataset.rid;
+    const route = (this.data.routes || []).find((r) => r.id === rid);
+    const wall = route && (this.data.wallPhotos || []).find((w) => w.id === route.wallId);
+    if (wall && wall.photo) {
+      wx.navigateTo({
+        url: '/pages/wall-photo/wall-photo?gymId=' + this.gymId + '&wallId=' + route.wallId + '&highlight=' + rid
+      });
+      return;
+    }
+    wx.navigateTo({ url: '/pages/route-detail/route-detail?id=' + rid });
+  },
   goPublishRoute(e) {
     wx.navigateTo({ url: '/pages/publish/publish?routeId=' + e.currentTarget.dataset.rid });
   },
@@ -106,7 +118,6 @@ Page({
       this.setData({
         gym: res.gym,
         routes: res.routes,
-        leaderboard: res.leaderboard,
         wallPhotos: res.walls || [],
         featuredWall: (res.walls || []).find((w) => w.photo) || null,
         gradeSystem: res.gradeSystem || [],
@@ -154,7 +165,7 @@ Page({
       gradeNote: d.egNote.trim()
     }).then(() => {
       this.setData({ editingGrade: false });
-      wx.showToast({ title: '已保存，全馆岩友可见', icon: 'none' });
+      wx.showToast({ title: '已保存', icon: 'none' });
       this.load();
     }).catch((e) => {
       wx.showToast({
@@ -200,14 +211,22 @@ Page({
     this.setData({ sort: this.data.sort === 'hot' ? 'new' : 'hot' });
     this.applyFilter();
   },
-  goUser(e) {
-    const id = e.currentTarget.dataset.id;
-    if (id && id !== 'me') wx.navigateTo({ url: '/pages/user/user?id=' + id });
-  },
   goWall(e) {
     wx.navigateTo({
       url: '/pages/wall-photo/wall-photo?gymId=' + this.gymId + '&wallId=' + e.currentTarget.dataset.id
     });
+  },
+  goShootWall() {
+    const wall = (this.data.wallPhotos || [])[0];
+    wx.navigateTo({
+      url: '/pages/wall-photo/wall-photo?gymId=' + this.gymId + '&wallId=' + ((wall && wall.id) || 'w-main')
+    });
+  },
+  goGymCheckin() {
+    wx.navigateTo({ url: '/pages/checkin/checkin?gymId=' + this.gymId });
+  },
+  openMap() {
+    util.openGymMap(this.data.gym);
   },
   goBackHome() {
     const pages = getCurrentPages();

@@ -108,7 +108,7 @@ test('打卡：闪送 → 解锁成就 → 推荐下一条 → 足迹更新', as
   const next = await h.data('d.nextRoutes');
   assert.ok(next.length >= 1 && next.length <= 3, '应推荐 1~3 条');
   assert.ok(next.every((r) => r.id !== 'r105'), '不应推荐刚打卡的线');
-  await h.tap('.done-link', '查看足迹');
+  await h.tap('.done-link', '足迹');
   assert.strictEqual(await h.route(), 'pages/logbook/logbook');
   assert.strictEqual(await h.data('d.stats.totalSends'), before + 1);
 });
@@ -164,7 +164,7 @@ test('墙面：点徽章高亮整条线并连线', async (h) => {
   await h.page.waitForTimeout(200);
   assert.ok(await h.data('!!d.selectedId'));
   assert.ok(await h.data('d.segs.length') >= 5, '粉线 12 个点应连出多段');
-  await h.tap('.beta-jump');
+  await h.tap('.sel-btn', '详情');
   assert.strictEqual(await h.route(), 'pages/route-detail/route-detail');
   assert.ok(await h.data('d.analysis.length') >= 2, '应有规则预判');
   assert.strictEqual(await h.data('d.aiBetaAvailable'), false, '本地照片不出「AI 看图分析」按钮');

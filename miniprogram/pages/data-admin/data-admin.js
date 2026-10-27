@@ -1,5 +1,6 @@
 // 数据管理（管理员/开发用）：从「我的」设置区收纳进来的危险操作，普通用户不需要进这里
 const api = require('../../utils/api');
+const cloudSync = require('../../utils/cloud-sync');
 
 Page({
   initCloud() {
@@ -14,6 +15,7 @@ Page({
         if (!r.confirm) return;
         wx.showLoading({ title: '初始化中…' });
         wx.cloud.callFunction({ name: 'initDb', data: {} })
+          .then((res) => cloudSync.refresh().then(() => res).catch(() => res))
           .then((res) => {
             wx.hideLoading();
             wx.showModal({
@@ -48,6 +50,7 @@ Page({
         if (!r.confirm) return;
         wx.showLoading({ title: '重灌中…' });
         wx.cloud.callFunction({ name: 'initDb', data: { force: true } })
+          .then((res) => cloudSync.refresh().then(() => res).catch(() => res))
           .then((res) => {
             wx.hideLoading();
             wx.showModal({
@@ -78,6 +81,7 @@ Page({
         if (!r.confirm) return;
         wx.showLoading({ title: '切换中…' });
         wx.cloud.callFunction({ name: 'initDb', data: { mode: 'prod' } })
+          .then((res) => cloudSync.refresh().then(() => res).catch(() => res))
           .then((res) => {
             wx.hideLoading();
             wx.showModal({

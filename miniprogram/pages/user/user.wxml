@@ -30,6 +30,6 @@
 
   <view class="section-title">TA 的 Beta</view>
   <beta-card wx:for="{{betas}}" wx:key="id" beta="{{item}}" />
-  <empty-state wx:if="{{!betas.length}}" title="TA 还没有发布 Beta" />
+  <empty-state wx:if="{{!betas.length}}" title="TA 还没有 Beta" />
 
 </view>

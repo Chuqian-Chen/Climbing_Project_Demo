@@ -1,14 +1,14 @@
 <view class="page-pad" wx:if="{{loadFailed}}">
   <view class="card rd-missing">
-    <view class="bold">这条线路不存在或已下架</view>
-    <view class="small muted rd-missing-desc">可能已换线拆除，去墙上看看新线吧</view>
+    <view class="bold">线路不存在或已下架</view>
+    <view class="small muted rd-missing-desc">可能已换线，去墙上看新线</view>
     <view class="btn btn-soft rd-missing-btn" bindtap="goBackHome">返回</view>
   </view>
 </view>
 
-<view class="page-pad" wx:if="{{route}}">
+<view class="page-pad rd-page" wx:if="{{route}}">
 
-  <!-- 图示：线路照片 > 墙面定位图 -->
+  <!-- 图示：线路照片 / 墙面走线 -->
   <image
     wx:if="{{route.photo}}"
     class="hero-photo"
@@ -18,33 +18,39 @@
   />
   <view wx:elif="{{wallRef && wallRef.photo}}" class="hero-wall" bindtap="goWall">
     <image class="hero-wall-img" src="{{wallRef.photo}}" mode="widthFix" />
-    <!-- 这条线用到的每个岩点 -->
     <view
       wx:for="{{wallRef.holds}}"
       wx:key="index"
-      class="hero-ring"
+      class="hero-ring {{item.f ? 'ft' : ''}}"
       style="left:{{item.x}}%;top:{{item.y}}%;border-color:{{route.colorHex}}"
     ><text class="hero-num">{{item.label}}</text></view>
     <view
+      wx:if="{{wallRef.hasMarker}}"
       class="hero-dot {{route.colorLight ? 'light' : ''}}"
       style="left:{{wallRef.x}}%;top:{{wallRef.y}}%;background:{{route.colorHex}}"
     >
       <text class="hero-dot-t">{{route.grade}}</text>
     </view>
-    <view class="hero-wall-tip small">{{wallRef.holds.length ? wallRef.holds.length + ' 个岩点已圈注 · 点击放大' : '墙面位置 · 点击查看'}}</view>
+    <view class="hero-wall-tip small">看整墙</view>
   </view>
 
-  <!-- 线路信息（精简） -->
+  <!-- 身份 -->
   <view class="card main">
     <view class="row">
       <view class="hold-dot {{route.colorLight ? 'light' : ''}}" style="background:{{route.colorHex}}"></view>
       <text class="main-name ellipsis">{{route.name}}</text>
       <view class="badge-new" wx:if="{{route.isNew}}">新线</view>
+      <view class="badge-warn" wx:if="{{route.removingSoon}}">{{route.daysLeft === 0 ? '今日拆' : route.daysLeft + '天拆'}}</view>
       <view class="flex-1"></view>
       <view class="grade-badge main-grade" style="background:{{route.gradeColor}}">{{route.grade}}</view>
     </view>
-    <view class="small faint main-meta">{{route.gymName}}<text wx:if="{{route.wallName}}"> · {{route.wallName}}{{route.wallAngle ? ' ' + route.wallAngle : ''}}</text> · {{route.setterName}} 定线</view>
-    <view class="row edit-links" wx:if="{{canEdit}}">
+    <view class="small faint main-meta">{{route.gymName}}<text wx:if="{{route.wallName}}"> · {{route.wallName}}</text></view>
+    <view class="small muted main-meta">
+      {{route.sendsTotal}} 人完攀<text wx:if="{{route.betaCount}}"> · {{route.betaCount}} 条 Beta</text>
+    </view>
+    <view class="removed-banner" wx:if="{{route.possiblyRemoved}}">{{route.reportCount}} 位岩友报告此线可能已换线</view>
+    <view class="small edit-link" wx:if="{{canEdit}}" bindtap="toggleManage">{{showManage ? '收起' : '管理'}}</view>
+    <view class="row edit-links" wx:if="{{showManage}}">
       <picker range="{{gradeOpts}}" bindchange="onGradeEdit">
         <text class="small edit-link">改难度</text>
       </picker>
@@ -52,36 +58,38 @@
         <text class="small edit-link">改颜色</text>
       </picker>
       <view class="flex-1"></view>
-      <text class="small edit-link del-link" bindtap="deleteRouteTap">删除线路</text>
+      <text class="small edit-link del-link" bindtap="deleteRouteTap">删除</text>
     </view>
-    <view class="removed-banner" wx:if="{{route.possiblyRemoved}}">{{route.reportCount}} 位岩友报告此线可能已换线</view>
-    <view class="small main-meta">
-      <text class="muted">{{route.sendsTotal}} 人完攀 · {{route.attempts}} 次尝试 · </text>
-      <text class="{{route.removingSoon ? 'warn' : 'muted'}}">{{route.removingSoon ? (route.daysLeft === 0 ? '今日拆线' : route.daysLeft + ' 天后拆线') : route.removeDate + ' 拆线'}}</text>
-    </view>
-    <view class="row wrap main-tags" wx:if="{{route.tags.length}}">
-      <text class="tag" wx:for="{{route.tags}}" wx:key="*this">{{item}}</text>
-    </view>
-
-    <!-- 难度共识（展示条，投票在打卡时进行） -->
-    <view class="feel" wx:if="{{route.feelTotal}}">
-      <view class="feel-bar">
-        <view class="feel-soft" style="width:{{route.softPct}}%"></view>
-        <view class="feel-fair" style="width:{{route.fairPct}}%"></view>
-        <view class="feel-hard" style="width:{{route.hardPct}}%"></view>
-      </view>
-      <view class="small faint feel-line">定级感受：偏软 {{route.softPct}}% · 准确 {{route.fairPct}}% · 偏辣 {{route.hardPct}}%</view>
-    </view>
-
-    <view class="add-photo small faint" wx:if="{{!route.photo && !(wallRef && wallRef.photo)}}" bindtap="addRoutePhoto">＋ 补一张线路照片</view>
+    <view class="add-photo small faint" wx:if="{{!route.photo && !(wallRef && wallRef.photo)}}" bindtap="addRoutePhoto">＋ 补照片</view>
   </view>
 
-  <!-- 操作：只留两个 -->
+  <!-- 走线：手序一眼看懂 -->
+  <view class="card seq-card" wx:if="{{seqChips.length}}" bindtap="goWall">
+    <view class="between">
+      <text class="bold">走线</text>
+      <text class="small faint" wx:if="{{wallRef && wallRef.photo}}">看墙面 ›</text>
+    </view>
+    <scroll-view scroll-x class="seq-row" enhanced show-scrollbar="{{false}}">
+      <block wx:for="{{seqChips}}" wx:key="index">
+        <view class="seq-chip" style="border-color:{{route.colorHex}}">{{item.label}}</view>
+        <text class="seq-arrow" wx:if="{{index < seqChips.length - 1}}">→</text>
+      </block>
+    </scroll-view>
+  </view>
+  <view class="card seq-card seq-empty" wx:elif="{{wallRef && wallRef.photo}}" bindtap="goWall">
+    <view class="between">
+      <text class="bold">走线</text>
+      <text class="small faint">去圈点 ›</text>
+    </view>
+    <view class="small muted">这条线还没标点</view>
+  </view>
+
+  <!-- 两个主操作 -->
   <view class="actions">
     <view class="btn btn-primary act-main" bindtap="goCheckin">打卡</view>
+    <view class="btn btn-soft act-main" bindtap="goPublish">发 Beta</view>
     <view class="act-side {{route.faved ? 'on' : ''}}" bindtap="toggleFav">{{route.faved ? '★' : '☆'}}</view>
   </view>
-  <view class="small faint report-link" bindtap="reportRemoved">{{route.myReported ? '已报告换线，等待更多岩友确认' : '这条线拆了？报告已换线'}}</view>
 
   <!-- AI 路线预判：视觉模型看图分析（有缓存直接展示）> 岩点几何规则 -->
   <view class="card ai" wx:if="{{aiBeta || analysis}}">
@@ -107,41 +115,20 @@
     </block>
   </view>
 
-  <!-- 有线路照片时，墙面位置作为次级入口 -->
-  <view class="card wall-link" wx:if="{{route.photo && wallRef && wallRef.photo}}" bindtap="goWall">
-    <view class="between"><text class="small">墙面位置：{{wallRef.wallName}}</text><text class="faint">›</text></view>
-  </view>
-
   <!-- Beta -->
   <view class="section-title">
     Beta ({{betas.length}})
-    <view class="row">
-      <view class="hfilter {{onlyMyHeight ? 'on' : ''}}" wx:if="{{hasHeight}}" bindtap="toggleHeightFilter">适合我身高</view>
-      <text class="section-more" bindtap="goPublish">＋ 发我的Beta</text>
-    </view>
+    <view class="hfilter {{onlyMyHeight ? 'on' : ''}}" wx:if="{{hasHeight}}" bindtap="toggleHeightFilter">适合我</view>
   </view>
   <beta-card wx:for="{{shownBetas}}" wx:key="id" beta="{{item}}" showRoute="{{false}}" />
   <empty-state
     wx:if="{{!shownBetas.length}}"
-    title="{{onlyMyHeight ? '暂无匹配你身高的 Beta' : '还没有人分享 Beta'}}"
-    desc="{{onlyMyHeight ? '关掉筛选看看全部' : '第一条 Beta 由你来写？'}}"
-    btnText="发布 Beta"
+    title="{{onlyMyHeight ? '暂无匹配身高的 Beta' : '还没有 Beta'}}"
+    desc="{{onlyMyHeight ? '关掉筛选看全部' : '爬过可以发'}}"
+    btnText="发 Beta"
     bind:action="goPublish"
   />
 
-  <!-- 最近打卡 -->
-  <view class="section-title" wx:if="{{checkins.length}}">最近打卡</view>
-  <view class="card ck" wx:for="{{checkins}}" wx:key="id">
-    <view class="row">
-      <view class="avatar-emoji ck-avatar" style="background:{{item.user.color}}" data-id="{{item.user.id}}" bindtap="goUser">{{item.user.emoji}}</view>
-      <view class="flex-1">
-        <text class="bold small">{{item.user.nickname}}</text>
-        <text class="small muted"> {{item.resultText}}</text>
-        <text class="small faint" wx:if="{{item.result !== 'flash'}}"> · {{item.attempts}} 次尝试</text>
-      </view>
-      <text class="small faint">{{item.dateText}}</text>
-    </view>
-  </view>
-
-  <view class="safety small faint">攀岩有风险，Beta 仅供参考，请量力而行并注意落点保护</view>
+  <view class="small faint report-link" bindtap="reportRemoved">{{route.myReported ? '已报告换线' : '报告换线'}}</view>
+  <view class="safety small faint">攀岩有风险，Beta 仅供参考，注意落点保护</view>
 </view>

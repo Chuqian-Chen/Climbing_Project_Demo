@@ -1,5 +1,8 @@
+.rd-page {
+  padding-bottom: 48rpx;
+}
 .main {
-  padding: 28rpx;
+  padding: 24rpx;
 }
 .hero-photo {
   width: 100%;
@@ -63,13 +66,17 @@
 .rd-missing-btn {
   margin-top: 28rpx;
 }
-.edit-links {
-  gap: 32rpx;
-  margin-top: 10rpx;
-}
 .edit-link {
   color: var(--brand);
   font-weight: 600;
+  margin-top: 12rpx;
+}
+.edit-links {
+  gap: 32rpx;
+  margin-top: 4rpx;
+}
+.edit-links .edit-link {
+  margin-top: 0;
 }
 .del-link {
   color: var(--red);
@@ -149,14 +156,59 @@
   font-weight: 700;
 }
 
+.seq-card {
+  padding: 22rpx 24rpx;
+}
+.seq-empty {
+  padding: 22rpx 24rpx;
+}
+.seq-row {
+  white-space: nowrap;
+  margin-top: 16rpx;
+}
+.seq-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56rpx;
+  height: 56rpx;
+  padding: 0 12rpx;
+  border-radius: 50%;
+  border: 4rpx solid;
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #1b1e28;
+  background: #fff;
+  vertical-align: middle;
+}
+.seq-chip.ft {
+  min-width: 40rpx;
+  height: 40rpx;
+  border-style: dashed;
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #5a6072;
+}
+.seq-arrow {
+  display: inline-block;
+  margin: 0 8rpx;
+  color: #c5cad3;
+  font-size: 24rpx;
+  vertical-align: middle;
+}
+.seq-hint {
+  margin-top: 14rpx;
+  line-height: 1.5;
+}
+
 .actions {
   display: flex;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin: 4rpx 0 8rpx;
 }
 .act-main {
   flex: 1;
-  margin-right: 16rpx;
+  margin-right: 12rpx;
   white-space: nowrap;
 }
 .act-side {
@@ -208,6 +260,12 @@
   align-items: center;
   justify-content: center;
 }
+.hero-ring.ft {
+  width: 36rpx;
+  height: 36rpx;
+  border-width: 4rpx;
+  border-style: dashed;
+}
 .hero-num {
   color: #ffffff;
   font-size: var(--fs-xs);
@@ -239,10 +297,6 @@
   color: var(--ai);
   text-align: right;
 }
-.wall-link {
-  padding: 22rpx 24rpx;
-  font-size: var(--fs-body);
-}
 .hfilter {
   font-size: var(--fs-sm);
   color: var(--ink-2);
@@ -256,17 +310,6 @@
   background: var(--brand-soft);
   color: var(--brand-deep);
   font-weight: 700;
-}
-
-.ck {
-  padding: 18rpx 24rpx;
-  margin-bottom: 14rpx;
-}
-.ck-avatar {
-  width: 56rpx;
-  height: 56rpx;
-  font-size: var(--fs-lg);
-  margin-right: 14rpx;
 }
 
 .safety {
