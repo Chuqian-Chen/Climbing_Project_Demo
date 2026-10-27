@@ -3,6 +3,7 @@
 //   npm run eval              # 跑全部样张
 //   npm run eval -- --render  # 同时把检测结果画到 out/*.jpg（白圈 = 真值，彩圈 = 检出）
 //   npm run eval -- --debug   # 列出被剔除的真岩点和保留下来的误检，调 CFG 参数用
+//   SAT=1.2 npm run eval      # 先把饱和度放大 20%，模拟浏览器 / 手机 canvas 的解码差异
 //
 // 判定：检出点与真值点距离 < MATCH（画面百分比）且一一对应才算命中。
 // 大岩点 / 造型输出的是质心、真值是抓握点，偶尔会超出距离，属已知误差。
@@ -15,6 +16,18 @@ const fixtures = require('./fixtures');
 const MATCH = 4.5;
 const WIDTH = +process.env.WIDTH || 540; // 与小程序端 / 云函数的取样宽度一致
 const render = process.argv.includes('--render');
+// 饱和度放大：模拟浏览器 / 手机 canvas 的解码（同一 JPEG 比 Jimp 饱和约 15%），检验颜色命名是否稳
+const SAT = +process.env.SAT || 1;
+
+function boostSaturation(px, k) {
+  for (let i = 0; i < px.length; i += 4) {
+    const r = px[i], g = px[i + 1], b = px[i + 2];
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    px[i] = Math.max(0, Math.min(255, gray + (r - gray) * k));
+    px[i + 1] = Math.max(0, Math.min(255, gray + (g - gray) * k));
+    px[i + 2] = Math.max(0, Math.min(255, gray + (b - gray) * k));
+  }
+}
 
 function match(gt, found) {
   const used = new Set();
@@ -37,6 +50,7 @@ async function run() {
     const img = await Jimp.read(path.resolve(__dirname, fx.image));
     img.resize(WIDTH, Jimp.AUTO);
     const imageData = { width: img.bitmap.width, height: img.bitmap.height, data: img.bitmap.data };
+    if (SAT !== 1) boostSaturation(imageData.data, SAT);
     const t0 = Date.now();
     const all = det.detectAll(imageData, fx.routes.map((r) => r.color));
     const ms = Date.now() - t0;
@@ -50,6 +64,12 @@ async function run() {
       rows.push({ 线路: r.label, 颜色: r.color, 方式: all.mode[r.color], 真值: r.holds.length, 检出: found.length, 命中: m.hit, 漏检: m.miss, 误检: m.fp });
     }
     console.table(rows);
+    const auto = det.detectAll(imageData);
+    const named = Object.keys(auto.holds);
+    const missing = fx.routes.map((r) => r.color).filter((c) => named.indexOf(c) < 0);
+    console.log('   一键识别全墙：' + named.map((c) => c + ' ' + auto.holds[c].length).join(' / ') +
+      (missing.length ? '   ✗ 漏掉颜色：' + missing.join(', ') : '   ✓ 线路颜色全部识别'));
+    tot.missingColors = (tot.missingColors || 0) + missing.length;
     if (process.argv.includes('--debug')) {
       for (const r of fx.routes) {
         const blobs = det.debugBlobs(imageData, r.color).filter((b) => b.n >= 12);
@@ -65,7 +85,8 @@ async function run() {
   }
   const recall = tot.hit / tot.gt, prec = tot.hit / (tot.hit + tot.fp);
   console.log('\n合计  真值 ' + tot.gt + '  命中 ' + tot.hit + '  误检 ' + tot.fp +
-    '  找全率 ' + (recall * 100).toFixed(0) + '%  准确率 ' + (prec * 100).toFixed(0) + '%');
+    '  找全率 ' + (recall * 100).toFixed(0) + '%  准确率 ' + (prec * 100).toFixed(0) + '%' +
+    '  全墙漏色 ' + (tot.missingColors || 0));
 }
 
 const TINT = { yellow: 0xffd400ff, pink: 0xff50b4ff, green: 0x00c850ff, orange: 0xff7a1aff, blue: 0x2090ffff, purple: 0x9a5cf0ff, red: 0xff3030ff, black: 0x202020ff, white: 0xf0f0f0ff };

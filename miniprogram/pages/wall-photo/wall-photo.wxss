@@ -225,3 +225,53 @@
   color: var(--red);
   margin-top: 16rpx;
 }
+
+/* ---------- 一键识别全墙 ---------- */
+.scan-ring {
+  position: absolute;
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  border: 4rpx dashed #ffffff;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 2rpx rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 3;
+}
+.scan {
+  margin-top: 16rpx;
+  background: var(--sunken);
+  border-radius: var(--r-md);
+  padding: 12rpx 20rpx 16rpx;
+}
+.scan-head {
+  padding: 8rpx 0 4rpx;
+}
+.scan-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 12rpx;
+  margin: 6rpx -12rpx 0;
+  border-radius: var(--r-sm);
+}
+.scan-row.on {
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.scan-name {
+  font-size: var(--fs-body);
+  margin-left: 14rpx;
+}
+.scan-act {
+  font-size: var(--fs-md);
+  color: var(--brand-deep);
+  font-weight: 700;
+  padding: 6rpx 0 6rpx 16rpx;
+}
+.scan-act.done {
+  color: var(--green);
+}
+.scan-tip {
+  margin-top: 10rpx;
+  line-height: 1.5;
+}

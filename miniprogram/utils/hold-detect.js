@@ -18,7 +18,7 @@ const COLOR_DEFS = {
   yellow: { h: 50, s: 0.75, v: 0.65, win: { h: [40, 72], s: 0.45, v: 0.26 } },
   green: { h: 135, s: 0.60, v: 0.35, win: { h: [95, 168], s: 0.30, v: 0.18 } },
   blue: { h: 212, s: 0.80, v: 0.50, win: { h: [195, 245], s: 0.35, v: 0.25 } },
-  purple: { h: 290, s: 0.55, v: 0.30, win: { h: [262, 312], s: 0.22, v: 0.14 } },
+  purple: { h: 305, s: 0.55, v: 0.30, win: { h: [262, 312], s: 0.22, v: 0.14 } },
   pink: { h: 342, s: 0.65, v: 0.60, win: { h: [312, 352], s: 0.30, v: 0.30 } },
   black: { dark: true },
   white: { light: true }
@@ -28,7 +28,7 @@ const COLOR_DEFS = {
 const CFG = {
   // 参与调色板聚类的像素条件、采样步长、簇数、迭代次数
   palSat: 0.30, palVal: 0.18, palStep: 4, palK: 10, palIters: 20,
-  // 簇 → 颜色名：加权距离（色相差/40°、饱和差/0.2、明度差/0.2）超过此值视为无归属（木箱、皮肤、地垫等）
+  // 簇 → 颜色名：priorDist 超过此值视为无归属（木箱、皮肤、地垫等）
   palMaxDist: 2.6,
   // 像素进入掩膜：最低饱和 / 明度、相对固定阈值的放宽系数、离目标簇的最大色相差
   maskSat: 0.20, maskVal: 0.12, winRelax: 1.0, hueGate: 16,
@@ -65,9 +65,10 @@ function hueDiff(a, b) {
   return d > 180 ? 360 - d : d;
 }
 
-// 色簇与颜色先验的距离（色相差/40°、饱和差/0.2、明度差/0.2 的平方和）
+// 色簇与颜色先验的距离。色相决定颜色名，权重最大；饱和度随相机 / 解码差异大（同一张图浏览器 canvas
+// 比 Jimp 解码饱和约 0.15），权重放低；明度保留较高权重，它是区分深紫与亮粉的关键
 function priorDist(c, p) {
-  return Math.pow(hueDiff(c.h, p.h) / 40, 2) + Math.pow((c.s - p.s) / 0.2, 2) + Math.pow((c.v - p.v) / 0.2, 2);
+  return Math.pow(hueDiff(c.h, p.h) / 25, 2) + Math.pow((c.s - p.s) / 0.4, 2) + Math.pow((c.v - p.v) / 0.25, 2);
 }
 
 /* ---------- 预处理：整图 HSV ---------- */

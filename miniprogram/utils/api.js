@@ -583,12 +583,20 @@ function getGymDetail(gymId, loc) {
     };
   });
 
-  // 墙面照片状态（KAYA 式整墙浏览入口）
+  // 墙面照片状态（KAYA 式整墙浏览入口）；有照片的墙带上各线徽章，馆详情顶部大图直接显示
   const walls = gymWalls(gym).map((w) => {
     const doc = getWallDoc(gym.id, w.id, s);
+    const photo = doc ? (doc.photoFileID || doc.photoPath || '') : '';
+    const markers = photo ? (doc.markers || []).map((m) => {
+      const r = findRoute(m.routeId, s);
+      if (!r || r.status !== 'active') return null;
+      const c = gradeUtil.HOLD_COLORS[r.color] || {};
+      return { routeId: r.id, x: m.x, y: m.y, grade: r.grade, colorHex: c.hex || '#ccc', colorLight: !!c.light };
+    }).filter(Boolean) : [];
     return Object.assign({}, w, {
-      photo: doc ? (doc.photoFileID || doc.photoPath || '') : '',
-      markerCount: doc ? (doc.markers || []).length : 0
+      photo: photo,
+      markerCount: doc ? (doc.markers || []).length : 0,
+      markers: markers
     });
   });
   return Promise.resolve({

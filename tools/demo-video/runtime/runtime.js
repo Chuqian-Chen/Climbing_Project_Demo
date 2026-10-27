@@ -1542,6 +1542,8 @@
     config: CFG,
     top() { return stack[stack.length - 1]; },
     topWrap() { const t = stack[stack.length - 1]; return t && t.__wrap; },
+    // 测试用：按小程序根目录路径取模块，如 require('/utils/api')
+    require(id) { return loadModule(resolveModule('app.js', id)); },
     resolveSrc
   };
 })();
