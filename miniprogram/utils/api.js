@@ -446,7 +446,9 @@ function getHome(loc) {
   // 到馆场景：人在某馆 2km 内时，该馆的 Beta 置顶（打「本馆」标），其余按热度
   let feedBetas = hotBetas;
   const nearest = nearGyms[0];
-  if (nearest && nearest.distance != null && nearest.distance <= 2) {
+  const atGym = nearest && nearest.distance != null && nearest.distance <= 2
+    ? buildAtGym(nearest, s) : null;
+  if (atGym) {
     const local = [];
     const rest = [];
     hotBetas.forEach((b) => {
@@ -463,8 +465,39 @@ function getHome(loc) {
     hotBetas: feedBetas,
     newRoutes: newRoutes,
     gyms: nearGyms,
-    gymCounts: counts
+    gymCounts: counts,
+    atGym: atGym
   });
+}
+
+// 到馆卡：本馆我在磕的线 / 新线 / 即将拆线 / 墙面照入口
+function buildAtGym(gym, s) {
+  const routes = gymActiveRoutes(gym.id, s).map((r) => decorateRoute(r, s));
+  const sent = {};
+  (s.checkins || []).forEach((k) => { if (k.result !== 'attempt') sent[k.routeId] = true; });
+  const projectIds = [];
+  (s.checkins || []).slice().reverse().forEach((k) => {
+    if (k.result === 'attempt' && !sent[k.routeId] && projectIds.indexOf(k.routeId) < 0) projectIds.push(k.routeId);
+  });
+  const chip = (r) => ({
+    id: r.id, name: r.name, grade: r.grade, gradeColor: r.gradeColor,
+    colorHex: r.colorHex, colorLight: r.colorLight, wallName: r.wallName,
+    daysLeft: r.daysLeft, betaCount: r.betaCount, visual: r.visual
+  });
+  const walls = gymWalls(gym).map((w) => {
+    const doc = getWallDoc(gym.id, w.id, s);
+    return { id: w.id, name: w.name, photo: doc ? (doc.photoFileID || doc.photoPath || '') : '', markerCount: doc ? (doc.markers || []).length : 0 };
+  });
+  return {
+    id: gym.id,
+    name: gym.name,
+    distanceText: gym.distanceText,
+    routeCount: routes.length,
+    projects: projectIds.map((id) => routes.find((r) => r.id === id)).filter(Boolean).slice(0, 4).map(chip),
+    newRoutes: routes.filter((r) => r.isNew).sort((a, b) => (a.setDate < b.setDate ? 1 : -1)).slice(0, 6).map(chip),
+    removing: routes.filter((r) => r.removingSoon).sort((a, b) => a.daysLeft - b.daysLeft).slice(0, 6).map(chip),
+    wall: walls.find((w) => w.photo) || walls[0] || null
+  };
 }
 
 function markOnboarded() {
