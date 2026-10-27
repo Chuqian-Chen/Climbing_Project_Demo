@@ -1246,7 +1246,7 @@
   function storageKey(k) { return CFG.storagePrefix + k; }
 
   // 选图结果固定轮换，保证每次录制画面一致；脚本可用 window.__SIM_NEXT_MEDIA__ 指定
-  const MEDIA_POOL = ['/assets/demo/climb4.jpg', '/assets/demo/climb6.jpg', '/assets/demo/climb2.jpg'];
+  const MEDIA_POOL = ['/assets/demo/climb4.jpg', '/assets/demo/climb6.jpg', '/assets/demo/climb1.jpg'];
   let mediaTurn = 0;
 
   const api = {

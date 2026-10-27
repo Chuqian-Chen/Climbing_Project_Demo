@@ -34,7 +34,7 @@ function gradeIndex(grade) {
 const MOVE_TAGS = [
   '动态跳跃', '双手起跳', '挂脚跟', '勾脚尖', '高脚', '折膝',
   '侧拉', '锁定', '顶胯', '重心转换', '核心张力', '压手上墙',
-  '小点发力', '大圆点', '交叉手', '手点顺序'
+  '小点发力', '大圆点', '交叉手', '手点顺序', '平衡'
 ];
 
 module.exports = { GRADE_LIST, HOLD_COLORS, MOVE_TAGS, gradeColor, gradeIndex };
