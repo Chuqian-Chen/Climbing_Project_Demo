@@ -22,3 +22,4 @@ scratchpad/
 tools/demo-video/dist/
 tools/demo-video/out/
 tools/demo-video/.models/
+__pycache__/
