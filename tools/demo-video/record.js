@@ -1,7 +1,8 @@
 // 录制演示视频：编译小程序 → 本地起服务 → Chromium 按 scenario.js 自动操作 → CDP 逐帧采集 → ffmpeg 合成 MP4
 //
 //   node tools/demo-video/record.js                                  # 横屏 1080p，无声
-//   node tools/demo-video/record.js --layout vertical --narrate      # 竖屏 9:16 + 配音讲解 + 字幕（视频号）
+//   node tools/demo-video/record.js --layout vertical --captions     # 竖屏 9:16 + 讲解字幕，无声（视频号）
+//   node tools/demo-video/record.js --layout vertical --narrate      # 同上，另合成配音（可选）
 //   node tools/demo-video/record.js --out docs/demo/demo.mp4 --keep-frames
 //   node tools/demo-video/record.js --dry                            # 只跑流程不录（排查脚本用）
 //
@@ -21,7 +22,7 @@ const LAYOUTS = {
 };
 
 function parseArgs(argv) {
-  const o = { layout: 'horizontal', fps: 30, crf: 20, keepFrames: false, dry: false, headed: false, narrate: false };
+  const o = { layout: 'horizontal', fps: 30, crf: 20, keepFrames: false, dry: false, headed: false, narrate: false, captions: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--out') o.out = path.resolve(argv[++i]);
@@ -29,7 +30,8 @@ function parseArgs(argv) {
     else if (a === '--dpr') o.dpr = +argv[++i];
     else if (a === '--fps') o.fps = +argv[++i];
     else if (a === '--crf') o.crf = +argv[++i];
-    else if (a === '--narrate') o.narrate = true;
+    else if (a === '--narrate') o.narrate = o.captions = true;
+    else if (a === '--captions') o.captions = true;
     else if (a === '--tts') o.tts = argv[++i];
     else if (a === '--voice') o.voice = argv[++i];
     else if (a === '--speed') o.speed = +argv[++i];
@@ -115,7 +117,7 @@ function exportCover(video, at) {
 
 /* ---------------- 操作原语 ---------------- */
 
-function makeHelpers(page, log, voice) {
+function makeHelpers(page, log, voice, captions) {
   const sleep = (ms) => page.waitForTimeout(ms);
   const top = (sel) => page.locator('[data-top] ' + sel);
   const spoken = [];
@@ -170,19 +172,19 @@ function makeHelpers(page, log, voice) {
       return page.evaluate(({ show, html }) => window.stage.cover(show, html), { show, html });
     },
 
-    // 讲解一句：等上一句说完再开口，显示字幕并记下开口时刻；不阻塞后续操作
-    // 未开启 --narrate 时只按字数估算时长占位，保证节奏一致
+    // 讲解一句：等上一句结束再开始，显示字幕（--captions / --narrate）并记下时刻；不阻塞后续操作
+    // 有配音时长 = 音频时长；无配音时按阅读速度估算，保证节奏一致
     async say(id) {
       const line = scenario.narration[id];
       if (!line) throw new Error('scenario.narration 里没有：' + id);
       const wait = speakUntil - Date.now();
       if (wait > 0) await sleep(wait + 150);
       const clip = voice && voice[id];
-      const ms = clip ? clip.dur * 1000 : Math.max(1500, line.text.length * 210);
-      if (clip) {
+      const ms = clip ? clip.dur * 1000 : Math.max(1800, 400 + line.text.length * 220);
+      if (clip || captions) {
         const token = ++subToken;
         await page.evaluate((t) => window.stage.subtitle(t), line.text);
-        spoken.push({ id, file: clip.file, dur: clip.dur, text: line.text, at: Date.now() / 1000 });
+        if (clip) spoken.push({ id, file: clip.file, dur: clip.dur, text: line.text, at: Date.now() / 1000 });
         setTimeout(() => {
           if (token === subToken) page.evaluate(() => window.stage.subtitle('')).catch(() => {});
         }, ms + 200);
@@ -267,7 +269,7 @@ function makeHelpers(page, log, voice) {
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const log = (...a) => console.log('[record]', ...a);
-  log('布局 ' + opts.layout + ' → ' + opts.outW + '×' + opts.outH + (opts.narrate ? ' · 配音' : ''));
+  log('布局 ' + opts.layout + ' → ' + opts.outW + '×' + opts.outH + (opts.narrate ? ' · 配音' : '') + (opts.captions ? ' · 字幕' : ''));
   // 先合成配音：每句时长决定画面节奏
   const voice = opts.narrate ? synthesize(scenario.narration, opts) : null;
 
@@ -297,7 +299,7 @@ async function main() {
 
   const framesDir = path.join(__dirname, 'out', 'frames-' + opts.layout);
   const rec = opts.dry ? null : await startRecording(page, framesDir, opts);
-  const helpers = makeHelpers(page, log, voice);
+  const helpers = makeHelpers(page, log, voice, opts.captions);
   const t0 = Date.now();
   try {
     await scenario.run(helpers);
