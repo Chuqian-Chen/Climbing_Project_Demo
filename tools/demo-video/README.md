@@ -47,6 +47,15 @@ npm run record:vertical     # → out/yanyou-beta-vertical.mp4（1080×1920，�
 | `--headed` | 弹出浏览器窗口，边看边跑 |
 | `--keep-frames` | 保留 `out/frames-<layout>/` 原始帧 |
 
+## 核心流程测试
+
+```bash
+npm test                    # 11 个用例：页面渲染、到馆卡、打卡→推荐→足迹、发布向导、一键识别全墙…
+npm test -- 打卡             # 只跑标题含「打卡」的用例
+```
+
+`e2e.js` 复用同一套模拟器，每个用例重新加载页面（seed 数据重置）；可用 `{ location }` 指定定位，测「在馆 / 不在馆」两种首页。页面有 `console.error` 或未捕获异常也算失败。
+
 ## 在浏览器里手动玩
 
 ```bash
@@ -68,10 +77,11 @@ scenario.js  分镜：7 个章节的要点 + 讲解字幕 + 每一步操作
 record.js    起本地服务 → Chromium 打开舞台页 → 执行分镜 → CDP screencast 采帧 → ffmpeg 合成
 serve.js     零依赖静态服务（预览与录制共用）
 shot.js      调试：逐页截图，核对渲染
+e2e.js       核心流程端到端测试（npm test）
 ```
 
 - `wx.cloud` 在模拟器里恒为 `undefined`，`api.js` 自动走「本地演示数据」分支，和开发者工具未开通云开发时一致。
-- 定位固定在北京望京（`runtime.js` 里 `CFG.location`），所以首页「附近岩馆」第一个是磐石·望京，Beta 流里出现「本馆」标。
+- 定位固定在北京望京（`runtime.js` 里 `CFG.location`，可用 `window.__SIM_CONFIG__` 覆盖），离磐石·望京 377m，所以首页显示到馆卡。
 - 墙面圈点章节用的是 `cloudfunctions/initDb/real-content.js` 里 TA山 主墙的真实标注，墙照为 `docs/tashan.jpg`；线路的上墙 / 拆线日期按「今天」滚动。
 
 ## 改分镜

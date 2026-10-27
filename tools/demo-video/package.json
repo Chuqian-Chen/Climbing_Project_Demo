@@ -6,7 +6,8 @@
     "record": "node record.js",
     "record:vertical": "node record.js --layout vertical --captions",
     "serve": "node serve.js",
-    "shots": "node shot.js"
+    "shots": "node shot.js",
+    "test": "node e2e.js"
   },
   "devDependencies": {
     "playwright": "^1.47.0"

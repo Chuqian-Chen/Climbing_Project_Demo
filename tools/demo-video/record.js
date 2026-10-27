@@ -291,14 +291,18 @@ async function main() {
   const framesDir = path.join(__dirname, 'out', 'frames-' + opts.layout);
   const rec = opts.dry ? null : await startRecording(page, framesDir, opts);
   const t0 = Date.now();
+  let ok = false;
   try {
     await scenario.run(makeHelpers(page, log, opts));
+    ok = true;
   } finally {
     const end = rec ? await rec.stop() : 0;
     log('脚本耗时 ' + ((Date.now() - t0) / 1000).toFixed(1) + 's');
     await browser.close();
     server.close();
-    if (rec) {
+    // 分镜中途出错就不编码，免得把半截视频当成品
+    if (rec && !ok) fs.rmSync(framesDir, { recursive: true, force: true });
+    if (rec && ok) {
       log('采集 ' + rec.frames.length + ' 帧，编码中…');
       encode(rec.frames, end, opts.out, opts);
       // 竖屏取片头卡（可直接做视频号封面），横屏取首页画面；时间按真实录制时刻换算
