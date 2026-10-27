@@ -157,3 +157,46 @@
   width: 300px;
   height: 480px;
 }
+
+/* ---------- 下一条可以试试 ---------- */
+.nx {
+  margin-top: 32rpx;
+  text-align: left;
+  border-top: 2rpx solid var(--line);
+  padding-top: 24rpx;
+}
+.nx-title {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  margin-bottom: 8rpx;
+}
+.nx-item {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 0;
+  border-bottom: 2rpx solid var(--line);
+}
+.nx-item:last-child {
+  border-bottom: 0;
+}
+.nx-name {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  margin: 0 12rpx;
+}
+.nx-grade {
+  min-width: 56rpx;
+  font-size: var(--fs-sm);
+}
+.nx-why {
+  font-size: var(--fs-xs);
+  color: var(--brand-deep);
+  background: var(--brand-soft);
+  border-radius: var(--r-xs);
+  padding: 2rpx 10rpx;
+  margin-left: 12rpx;
+}
+.nx-meta {
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}

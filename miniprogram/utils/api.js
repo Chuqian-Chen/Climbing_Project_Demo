@@ -888,6 +888,33 @@ function doAddCheckin(data) {
   });
 }
 
+// 打卡后推荐下一条：同馆在墙、我还没完攀；难度贴近（同级 > 高一级 > 低一级 > 其余 ±2 内），有 Beta 的优先
+function recommendNext(routeId) {
+  const s = store.get();
+  const cur = findRoute(routeId, s);
+  if (!cur) return Promise.resolve([]);
+  const sent = {};
+  (s.checkins || []).forEach((k) => { if (k.result !== 'attempt') sent[k.routeId] = true; });
+  const base = gradeUtil.gradeIndex(cur.grade);
+  const why = (d) => (d === 0 ? '同难度' : d === 1 ? '进阶一级' : d === -1 ? '稳一手' : d > 0 ? '挑战一下' : '热身');
+  const list = gymActiveRoutes(cur.gymId, s)
+    .filter((r) => r.id !== routeId && !sent[r.id])
+    .map((r) => {
+      const d = gradeUtil.gradeIndex(r.grade) - base;
+      const rank = d === 0 ? 0 : (d === 1 ? 1 : (d === -1 ? 2 : 2 + Math.abs(d)));
+      return { r: decorateRoute(r, s), rank: rank, d: d };
+    })
+    .filter((x) => x.rank <= 4)
+    .sort((a, b) => (a.rank - b.rank) || (b.r.betaCount - a.r.betaCount))
+    .slice(0, 3)
+    .map((x) => ({
+      id: x.r.id, name: x.r.name, grade: x.r.grade, gradeColor: x.r.gradeColor,
+      colorHex: x.r.colorHex, colorLight: x.r.colorLight, wallName: x.r.wallName,
+      betaCount: x.r.betaCount, why: why(x.d)
+    }));
+  return Promise.resolve(list);
+}
+
 /* ---------- 足迹 ---------- */
 
 function getLogbook() {
@@ -1888,6 +1915,7 @@ function resetDemo() {
 }
 
 module.exports = {
+  recommendNext,
   aiDetectHolds,
   aiRouteBeta,
   getHome, markOnboarded,

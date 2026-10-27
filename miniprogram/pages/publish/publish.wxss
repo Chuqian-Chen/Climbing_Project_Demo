@@ -176,3 +176,83 @@
   text-align: center;
   margin-top: 20rpx;
 }
+
+/* ---------- 三步向导 ---------- */
+.wz {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20rpx 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: var(--shadow-card);
+}
+.wz-item {
+  display: flex;
+  align-items: center;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+.wz-no {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: var(--chip);
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10rpx;
+}
+.wz-label {
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+.wz-item.ok .wz-no {
+  background: var(--brand-soft);
+  color: var(--brand-deep);
+}
+.wz-item.on {
+  color: var(--ink);
+}
+.wz-item.on .wz-no {
+  background: var(--brand);
+  color: #ffffff;
+}
+.wz-line {
+  flex: 1;
+  height: 4rpx;
+  border-radius: 2rpx;
+  background: var(--line);
+  margin: 0 16rpx;
+}
+.wz-line.ok {
+  background: var(--brand-soft);
+}
+.wz-route {
+  background: var(--brand-soft);
+  border-radius: var(--r-sm);
+  padding: 14rpx 22rpx;
+  margin-bottom: 20rpx;
+}
+.wz-nav {
+  display: flex;
+  margin-top: 8rpx;
+}
+.wz-back {
+  flex: 1;
+  margin-right: 20rpx;
+}
+.wz-next {
+  flex: 2;
+}
+.wz-preview-title {
+  font-size: var(--fs-lg);
+  margin: 8rpx 0;
+}
+.wz-preview-caution {
+  color: var(--red);
+  margin-top: 8rpx;
+}
