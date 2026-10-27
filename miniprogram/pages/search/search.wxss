@@ -14,13 +14,13 @@
 .input {
   flex: 1;
   margin-left: 12rpx;
-  font-size: 28rpx;
+  font-size: var(--fs-base);
 }
 .go {
   margin-left: 20rpx;
-  color: #e8571f;
+  color: var(--brand-deep);
   font-weight: 700;
-  font-size: 28rpx;
+  font-size: var(--fs-base);
 }
 .kw-wrap {
   margin: 16rpx 0 8rpx;
@@ -38,13 +38,13 @@
 .seg-item {
   flex: 1;
   text-align: center;
-  font-size: 24rpx;
-  color: #5a6072;
+  font-size: var(--fs-md);
+  color: var(--ink-2);
   padding: 12rpx 0;
   border-radius: 999rpx;
 }
 .seg-item.on {
-  background: #1b1e28;
+  background: var(--ink);
   color: #fff;
   font-weight: 700;
 }

@@ -6,7 +6,7 @@
   transition: transform 0.1s;
 }
 .rc-name {
-  font-size: 30rpx;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin: 0 12rpx;
   max-width: 300rpx;
@@ -19,11 +19,11 @@
   position: relative;
   width: 110rpx;
   height: 110rpx;
-  border-radius: 14rpx;
+  border-radius: var(--r-md);
   overflow: hidden;
   flex-shrink: 0;
   margin-right: 18rpx;
-  background: #f0f2f5;
+  background: var(--chip);
 }
 .rc-thumb {
   width: 100%;
@@ -46,5 +46,5 @@
   padding-left: 40rpx;
 }
 .rc-beta {
-  color: #e8571f;
+  color: var(--brand-deep);
 }

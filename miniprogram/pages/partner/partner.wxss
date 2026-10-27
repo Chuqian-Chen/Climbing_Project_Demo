@@ -1,16 +1,16 @@
 .p-title {
-  font-size: 32rpx;
+  font-size: var(--fs-lg);
   font-weight: 700;
   margin-bottom: 16rpx;
 }
 .p-text {
-  font-size: 26rpx;
-  color: #5a6072;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
   margin-bottom: 12rpx;
 }
 .p-item {
-  font-size: 26rpx;
-  color: #5a6072;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
   line-height: 1.9;
 }
 .p-btn {

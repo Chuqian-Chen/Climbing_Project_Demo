@@ -7,18 +7,18 @@
   margin-bottom: 20rpx;
 }
 .load-err {
-  background: #fff3f3;
+  background: var(--red-soft);
   color: #b23b3b;
-  border-radius: 16rpx;
+  border-radius: var(--r-md);
   padding: 16rpx 24rpx;
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   margin-bottom: 20rpx;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 .load-err-retry {
-  color: #e8571f;
+  color: var(--brand-deep);
   font-weight: 700;
   padding-left: 20rpx;
 }
@@ -29,12 +29,12 @@
   align-items: center;
   justify-content: space-between;
   background: #fff7f2;
-  border-radius: 12rpx;
+  border-radius: var(--r-sm);
   padding: 14rpx 22rpx;
   margin-bottom: 16rpx;
 }
 .onboard-slim-text {
-  font-size: 24rpx;
+  font-size: var(--fs-md);
   color: #c05621;
   flex: 1;
 }
@@ -45,7 +45,7 @@
 
 .slim {
   background: #ffffff;
-  border-radius: 12rpx;
+  border-radius: var(--r-sm);
   padding: 16rpx 22rpx;
   margin-bottom: 16rpx;
 }
@@ -61,12 +61,12 @@
   margin-top: 24rpx;
 }
 .section-label {
-  font-size: 32rpx;
+  font-size: var(--fs-lg);
   font-weight: 800;
 }
 .section-more {
-  font-size: 24rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-md);
+  color: var(--ink-3);
 }
 
 /* 附近岩馆：紧凑 chips */
@@ -84,16 +84,16 @@
   margin-right: 14rpx;
 }
 .gymchip-name {
-  font-size: 26rpx;
+  font-size: var(--fs-body);
   font-weight: 600;
 }
 .gymchip-meta {
-  font-size: 20rpx;
-  color: #9aa1b2;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
   margin-left: 10rpx;
 }
 .gymchip-count {
-  color: #ff6b35;
+  color: var(--brand);
   font-weight: 600;
 }
 
@@ -108,12 +108,12 @@
   padding: 10rpx 30rpx;
   border-radius: 999rpx;
   background: #ffffff;
-  color: #5a6072;
-  font-size: 24rpx;
+  color: var(--ink-2);
+  font-size: var(--fs-md);
   margin-right: 14rpx;
 }
 .band-chip.on {
-  background: #1b1e28;
+  background: var(--ink);
   color: #fff;
   font-weight: 700;
 }
