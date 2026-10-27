@@ -21,5 +21,3 @@ scratchpad/
 # 演示视频生成器的中间产物
 tools/demo-video/dist/
 tools/demo-video/out/
-tools/demo-video/.models/
-__pycache__/

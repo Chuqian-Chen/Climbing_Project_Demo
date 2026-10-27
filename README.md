@@ -8,8 +8,8 @@
 
 ## 演示视频
 
-- 横屏 [`docs/demo/yanyou-beta-demo.mp4`](docs/demo/yanyou-beta-demo.mp4)（约 110 秒，1080p，无声）
-- 竖屏 9:16 + 讲解字幕，适合视频号：[`docs/demo/yanyou-beta-vertical.mp4`](docs/demo/yanyou-beta-vertical.mp4)（1080×1920，无声）
+- 横屏 [`docs/demo/yanyou-beta-demo.mp4`](docs/demo/yanyou-beta-demo.mp4)（约 75 秒，1080p，无声）
+- 竖屏 9:16 + 讲解字幕，适合视频号：[`docs/demo/yanyou-beta-vertical.mp4`](docs/demo/yanyou-beta-vertical.mp4)（1080×1920，约 75 秒，无声）
 
 内容：首页 Beta 流 → Beta 详情 → 打卡与海报 → 足迹 → 岩馆名录 → TA山墙面圈点与 AI 预判 → 发布 Beta。
 

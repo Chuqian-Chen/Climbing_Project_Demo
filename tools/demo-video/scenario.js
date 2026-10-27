@@ -1,4 +1,4 @@
-// 分镜脚本：每章 = 字幕要点 + 讲解词 + 左侧手机里的真实操作
+// 分镜脚本：每章 = 右侧要点 + 讲解字幕 + 左侧手机里的真实操作
 // 改分镜只需改这里；选择器都在当前页（[data-top]）内查找，global:true 时全局查找
 const chapters = [
   {
@@ -73,26 +73,26 @@ const chapters = [
   }
 ];
 
-// 讲解词：text = 字幕；speak = 实际朗读（TTS 读英文缩写不稳，改用中文说法：Beta→贝塔、TA山→他山、AI→人工智能）
-const narration = {
-  intro: { text: '去攀岩馆，不知道这条线怎么爬？试试岩友 Beta。', speak: '去攀岩馆，不知道这条线怎么爬？试试岩友贝塔。' },
-  home1: { text: '首页是大家分享的 Beta，两列瀑布流，打开就能看。', speak: '首页是大家分享的贝塔，两列瀑布流，打开就能看。' },
-  home2: { text: '人在馆里两公里内，本馆的 Beta 排在最前面；填了身高，还会标出「适合你」。', speak: '人在馆里两公里以内，本馆的贝塔会排在最前面。填了身高，还会标出适合你。' },
-  home3: { text: '想练什么难度，点一下就能筛选。' },
-  beta1: { text: '点开一条 Beta，最容易掉的地方单独标出来，还写明适合多高的人。', speak: '点开一条贝塔，最容易掉的地方单独标出来，还写明适合多高的人。' },
-  beta2: { text: '起手、中段、收尾，分三步讲清楚。' },
-  route1: { text: '跳到线路详情，能看到大家对难度的感受：偏软、准确，还是偏辣。' },
-  check1: { text: '爬过之后点打卡，闪送、完攀还是磕线中，点三下就记好。', speak: '爬过之后点打卡，闪送、完攀，还是磕线中，点三下就记好。' },
-  check2: { text: '打卡立刻解锁成就，还能一键生成海报，发给岩友。' },
-  log1: { text: '足迹页把每次上墙变成数据：热力图、完攀金字塔，还有成就徽章。' },
-  gym1: { text: '岩馆页收录北京、上海一百三十多家岩馆，按距离排序，输入名字就能找到。' },
-  gym2: { text: '馆详情里有本馆的分级标准、墙面照片和线路列表。' },
-  wall1: { text: '这是 TA山主墙的真实照片，每条线的岩点都由岩友在手机上圈好了。', speak: '这是他山主墙的真实照片，每条线的岩点，都由岩友在手机上圈好了。' },
-  wall2: { text: '点一下难度徽章，整条线的岩点按手序连起来。' },
-  wall3: { text: '线路详情里，AI 会按岩点位置拆解手序，给出建议。', speak: '线路详情里，人工智能会按岩点位置拆解手序，给出建议。' },
-  pub1: { text: '看懂了怎么爬，就发一条自己的 Beta：这条线已经带好，加张图，写下拆解。', speak: '看懂了怎么爬，就发一条自己的贝塔。这条线已经带好，加张图，写下拆解。' },
-  pub2: { text: '发布之后，它会直接挂在这条线下面，帮到下一个人。' },
-  outro: { text: '岩友 Beta：找 Beta、记完攀、按图找线。', speak: '岩友贝塔。找贝塔，记完攀，按图找线。' }
+// 讲解字幕（竖屏显示在手机下方；横屏不显示，只用来控制节奏）。一句话一个点，越短越好读
+const captions = {
+  intro: '去岩馆不知道怎么爬？试试岩友 Beta',
+  home1: '首页：大家分享的 Beta 流',
+  home2: '人在馆里，本馆 Beta 置顶；按身高标「适合你」',
+  home3: '按难度档一键筛选',
+  beta1: '易掉点单独提醒，标明适合身高',
+  beta2: '起手 / 中段 / 收尾，三步拆解',
+  route1: '难度共识：偏软、准确还是偏辣',
+  check1: '闪送 / 完攀 / 磕线中，三下记好',
+  check2: '解锁成就，一键生成打卡海报',
+  log1: '足迹：热力图、完攀金字塔、成就徽章',
+  gym1: '北京上海 130+ 家岩馆，按距离排序',
+  gym2: '馆详情：分级标准、墙面照、线路列表',
+  wall1: 'TA山主墙真实照片，岩点由岩友圈注',
+  wall2: '点徽章，整条线按手序连起来',
+  wall3: 'AI 按岩点位置拆解手序',
+  pub1: '看懂了，就发一条自己的 Beta',
+  pub2: '发布后直接挂到这条线下面',
+  outro: '岩友 Beta：找 Beta、记完攀、按图找线'
 };
 
 const OUTRO = [
@@ -103,136 +103,136 @@ const OUTRO = [
   '<div class="cover-meta">github.com/Chuqian-Chen/Climbing_Project_Demo<br>本视频由 tools/demo-video 从源码自动录制</div>'
 ].join('');
 
-// 节奏：say() 开口后不阻塞，操作与讲解同时进行；下一句 say() 会等上一句说完；
-// hush() 用在换页前，保证这一页的话说完。chapter() 不 await = 字幕与页面跳转同时开始
+// 节奏：caption() 出字幕后不阻塞，操作同时进行；下一句会等上一句播完；
+// waitCaption() 用在换页前，保证这一页的字幕看完。chapter() 不 await = 章节标题与页面跳转同时切换
 async function run(s) {
   /* ---------- 片头 ---------- */
-  await s.wait(800);
-  await s.say('intro');
-  await s.hush(300);
+  await s.wait(500);
+  await s.caption('intro');
+  await s.waitCaption(200);
   await s.chapter(0);
   await s.cover(false);
-  await s.wait(700);
+  await s.wait(500);
 
   /* ---------- 01 首页 ---------- */
   await s.bullet(0);
-  await s.say('home1');
-  await s.hush(200);
+  await s.caption('home1');
+  await s.waitCaption();
   await s.bullet(1);
-  await s.say('home2');
-  await s.hush(200);
-  await s.say('home3');
+  await s.caption('home2');
+  await s.waitCaption();
+  await s.caption('home3');
   await s.tap('.band-chip', { text: 'V3-V4' });
   await s.bullet(2);
-  await s.scroll(330, 1400);
-  await s.wait(400);
-  await s.scroll(-330, 1000);
-  await s.hush(200);
+  await s.scroll(330, 1000);
+  await s.wait(250);
+  await s.scroll(-330, 800);
+  await s.waitCaption();
 
   /* ---------- 02 Beta 详情 ---------- */
   s.chapter(1);
-  await s.tap('beta-tile .bt', { text: '起手双拍直上版', fy: 0.3, after: 700 });
+  await s.tap('beta-tile .bt', { text: '起手双拍直上版', fy: 0.3, after: 500 });
   await s.bullet(0);
-  await s.say('beta1');
-  await s.hush(200);
+  await s.caption('beta1');
+  await s.waitCaption();
   await s.bullet(1);
-  await s.say('beta2');
-  await s.scroll(360, 1500);
-  await s.hush(300);
+  await s.caption('beta2');
+  await s.scroll(360, 1000);
+  await s.waitCaption(150);
   await s.bullet(2);
 
   /* ---------- 03 线路详情 · 打卡 ---------- */
   s.chapter(2);
-  await s.tap('.route-link', { after: 700 });
+  await s.tap('.route-link', { after: 500 });
   await s.bullet(0);
-  await s.say('route1');
-  await s.scroll(330, 1500);
-  await s.hush(200);
-  await s.say('check1');
-  await s.tap('.act-main', { after: 600 });
+  await s.caption('route1');
+  await s.scroll(330, 1000);
+  await s.waitCaption();
+  await s.caption('check1');
+  await s.tap('.act-main', { after: 450 });
   await s.bullet(1);
-  await s.tap('.res', { text: '闪送', after: 350 });
-  await s.tap('.feel-chip', { text: '准确', after: 300 });
-  await s.type('.note', '终于一把过！', { delay: 100 });
-  await s.hush();
-  await s.tap('.btn-primary', { text: '打卡', after: 600 });
+  await s.tap('.res', { text: '闪送', after: 250 });
+  await s.tap('.feel-chip', { text: '准确', after: 200 });
+  await s.type('.note', '终于一把过！', { delay: 70 });
+  await s.waitCaption();
+  await s.tap('.btn-primary', { text: '打卡', after: 450 });
   await s.bullet(2);
-  await s.say('check2');
-  await s.tap('.done-btn', { after: 1200 });
-  await s.scroll(260, 1100);
-  await s.hush(500);
+  await s.caption('check2');
+  await s.tap('.done-btn', { after: 900 });
+  await s.scroll(260, 900);
+  await s.waitCaption(300);
 
   /* ---------- 04 足迹 ---------- */
   s.chapter(3);
-  await s.tap('.done-link', { text: '查看足迹', after: 500 });
+  await s.tap('.done-link', { text: '查看足迹', after: 400 });
   await s.bullet(0);
-  await s.say('log1');
-  await s.wait(1300);
+  await s.caption('log1');
+  await s.wait(900);
   await s.bullet(1);
-  await s.scroll(250, 1300);
+  await s.scroll(250, 1000);
   await s.bullet(2);
-  await s.scroll(330, 1300);
-  await s.hush(700);
+  await s.scroll(330, 1000);
+  await s.waitCaption(400);
 
   /* ---------- 05 岩馆 ---------- */
   s.chapter(4);
   await s.tab(1);
   await s.bullet(0);
-  await s.say('gym1');
-  await s.tap('.city-chip', { text: '上海', after: 400 });
-  await s.type('.kw-input', 'TA山', { delay: 150 });
+  await s.caption('gym1');
+  await s.tap('.city-chip', { text: '上海', after: 300 });
+  await s.type('.kw-input', 'TA山', { delay: 110 });
   await s.bullet(1);
-  await s.hush(200);
-  await s.tap('.gym-card', { text: 'TA山', after: 700 });
+  await s.waitCaption();
+  await s.tap('.gym-card', { text: 'TA山', after: 500 });
   await s.bullet(2);
-  await s.say('gym2');
-  await s.wait(900);
-  await s.scroll(200, 1100);
-  await s.hush(300);
+  await s.caption('gym2');
+  await s.wait(600);
+  await s.scroll(200, 900);
+  await s.waitCaption(200);
 
   /* ---------- 06 墙面圈点 · AI ---------- */
   s.chapter(5);
-  await s.tap('.wp-item', { after: 800 });
+  await s.tap('.wp-item', { after: 600 });
   await s.bullet(0);
-  await s.say('wall1');
-  await s.hush(200);
-  await s.say('wall2');
-  await s.tap('.marker', { text: 'V3', after: 1300 });
-  await s.tap('.marker', { text: 'V2', after: 1100 });
-  await s.tap('.marker', { text: 'V3', after: 700 });
-  await s.hush(200);
-  await s.tap('.beta-jump', { after: 800 });
+  await s.caption('wall1');
+  await s.waitCaption();
+  await s.caption('wall2');
+  await s.tap('.marker', { text: 'V3', after: 1000 });
+  await s.tap('.marker', { text: 'V2', after: 900 });
+  await s.tap('.marker', { text: 'V3', after: 500 });
+  await s.waitCaption();
+  await s.tap('.beta-jump', { after: 600 });
   await s.bullet(1);
   await s.bullet(2);
-  await s.say('wall3');
-  await s.wait(900);
+  await s.caption('wall3');
+  await s.wait(600);
   await s.scrollTo('.ai');
-  await s.hush(1000);
+  await s.waitCaption(700);
 
   /* ---------- 07 发布 Beta ---------- */
   s.chapter(6);
-  await s.tap('.section-more', { text: '发我的Beta', after: 700 });
+  await s.tap('.section-more', { text: '发我的Beta', after: 500 });
   await s.bullet(0);
-  await s.say('pub1');
+  await s.caption('pub1');
   await s.nextMedia(['/assets/demo/climb6.jpg']);
-  await s.tap('.media-add', { after: 600 });
+  await s.tap('.media-add', { after: 450 });
   await s.bullet(1);
-  await s.type('.title-input', '小个子版：先高脚再侧拉', { delay: 80 });
-  await s.type('.step-input', '起步双手捏贴标点，右脚高踩到胯边', { nth: 0, delay: 55 });
-  await s.tap('.tag', { text: '高脚', after: 300 });
-  await s.hush();
+  await s.type('.title-input', '小个子版：先高脚再侧拉', { delay: 55 });
+  await s.type('.step-input', '起步双手捏贴标点，右脚高踩到胯边', { nth: 0, delay: 40 });
+  await s.tap('.tag', { text: '高脚', after: 250 });
+  await s.waitCaption();
   await s.scrollTo('.submit');
-  await s.tap('.submit', { after: 1000 });
+  await s.tap('.submit', { after: 800 });
   await s.bullet(2);
-  await s.say('pub2');
+  await s.caption('pub2');
   await s.scrollTo('beta-card');
-  await s.hush(900);
+  await s.waitCaption(700);
 
   /* ---------- 片尾 ---------- */
   await s.cover(true, OUTRO);
-  await s.wait(600);
-  await s.say('outro');
-  await s.hush(1800);
+  await s.wait(400);
+  await s.caption('outro');
+  await s.waitCaption(1200);
 }
 
-module.exports = { chapters, narration, run };
+module.exports = { chapters, captions, run };

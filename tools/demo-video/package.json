@@ -5,7 +5,6 @@
   "scripts": {
     "record": "node record.js",
     "record:vertical": "node record.js --layout vertical --captions",
-    "record:vertical-voice": "node record.js --layout vertical --narrate",
     "serve": "node serve.js",
     "shots": "node shot.js"
   },
